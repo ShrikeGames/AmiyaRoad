@@ -194,14 +194,16 @@ function sphereCollision(delta) {
 				playPosAdjustment.y += ((-direction.y * Math.abs(radius - collisionResult.distance)));
 
 				playPosAdjustment.z += ((-direction.z * Math.abs(radius - collisionResult.distance)));
-
-				if (direction.z < 0 && direction.y >= 0 && direction.y < 1 && direction.x == 0) {
-					if (playerVelocity.z >= maxDriveSpeed / 2.0) {
-						reset();
-						return;
+				if(collisionResult.object.name != "Boost"){
+					if (direction.z < 0 && direction.y >= 0 && direction.y < 1 && direction.x == 0) {
+						if (playerVelocity.z >= maxDriveSpeed / 2.0) {
+							reset();
+							return;
+						}
+	
 					}
-
 				}
+				
 			}
 		}
 
