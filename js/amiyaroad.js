@@ -350,6 +350,7 @@ function generateAmiyaBar(scale = 1) {
 function generateRandomLevel() {
 	trackGroup = new THREE.Group();
 	let t = 0;
+	let lastTilePos;
 	for (let i = 0; i < MAP_SEGMENT_LENGTH; i++) {
 		t++;
 		let random_skip = Math.random();
@@ -386,6 +387,7 @@ function generateRandomLevel() {
 				tileMesh.rotation.x = Math.sin(t) * 0.10;
 			}
 			tileMesh.receiveShadow = true;
+			lastTilePos = tileMesh.position;
 			trackGroup.add(tileMesh);
 		}
 
