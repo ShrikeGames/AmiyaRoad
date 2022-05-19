@@ -1,0 +1,135 @@
+body {
+    margin:0;
+    padding:0;
+    background-color: #dddbf9;
+}
+
+header {
+    display: none;
+    margin-left:auto;
+    margin-right:auto;
+    text-align: center;
+    line-height: 1;
+}
+header-mobile {
+    display: block;
+    margin-left:auto;
+    margin-right:auto;
+    text-align: center;
+    line-height: 1;
+}
+
+header img {
+    max-width: 100%;
+}
+header-mobile img {
+    max-width: 100%;
+}
+.button--watch {
+    font-size: 1.7em;
+}
+.container {
+    background-color: #FFF;
+}
+.row {
+    padding: 5px;
+}
+.hide {
+    display: none;
+}
+h1 {
+    font-size: 2.0em;
+}
+h2 {
+    word-wrap: break-word;
+}
+.container > strong {
+    padding-left: 5px;
+}
+#search-results .row:nth-child(2n+1) {
+    background-color: #b0a7ea;
+    color: #fff;
+}
+.search-results--result{
+    margin-bottom: 10px;
+}
+.search-results--result strong {
+    font-size: 16pt;
+}
+.u-60-width {
+    width: 100%;
+}
+.u-20-width {
+    width: 100%;
+}
+.u-desktop-only{
+    display: none;
+}
+.u-align-right {
+    text-align: right;
+}
+
+.button--language_toggle_en {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 0 5px 0 15px;
+    
+}
+.button--language_toggle_jp {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0 15px 0 5px;
+}
+
+/* Larger than mobile */
+@media (min-width: 400px) {}
+
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {
+    
+}
+
+/* Larger than tablet */
+@media (min-width: 750px) {
+    header {
+        display:block;
+    }
+    header-mobile {
+        display:none;
+    }
+    .u-60-width {
+        width: 60%;
+    }
+    .u-20-width {
+        width: 20%;
+    }
+    .u-desktop-only{
+        display: block;
+    }
+}
+a.button{
+    padding: 0 5px;
+}
+@media (min-width: 850px) {
+    a.button{
+        padding: 0 15px;
+    }
+
+}
+
+/* Larger than desktop */
+@media (min-width: 1000px) {
+    a.button{
+        padding: 0 30px;
+    }
+}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {}
+
+.loading{
+    height:200px;
+    background-image: url('../images/amiya-loading.gif');
+    background-position: center;
+    background-repeat: no-repeat;
+}
