@@ -3,21 +3,22 @@ import * as THREE from 'three';
 
 import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-import { PixelShader } from './jsm/shaders/PixelShader.js';
 import { Sky } from './jsm/objects/Sky.js';
 import Stats from './jsm/libs/stats.module.js';
+
+let won = false;
 
 let camera, scene, renderer, composer, clock;
 
 let sky, sun;
 let spotLight;
 
-let pixelPass, params;
 let keyStates, delta;
 let trackGroup, playerGroup;
 let playerMesh;
 let playerDirection;
+
+let bgm;
 
 //player
 const radius = 0.3;
@@ -58,6 +59,7 @@ let playerVelocity;
 const COLOUR_MAIN = new THREE.Color(0xc0bdf2);
 const COLOUR_SECONDARY = new THREE.Color(0xffbef4);
 const COLOUR_PILLAR = new THREE.Color(0xe0afff);
+const COLOUR_GOAL = new THREE.Color(0x00ff00);
 const MAP_SEGMENT_LENGTH = 250;
 const TILE_WIDTH = 2;
 const TILE_LENGTH = 4;
@@ -68,16 +70,15 @@ function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight);
-
-	//pixelPass.uniforms.resolution.value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
-
 }
 
 $('.play-button').on('click', function (e) {
-	init();
+	let $this = $(this);
+	let levelSelected = $this.attr("data-level");
+	won = false;
+	init(levelSelected);
 	animate();
 	$('.menu--start-screen').addClass('hide');
-
 });
 var $langToggleEN = $('.button--language_toggle_en');
 var $langToggleJP = $('.button--language_toggle_jp');
@@ -121,14 +122,16 @@ $langToggleJP.click(function (e) {
 });
 
 function animate() {
-	delta = clock.getDelta();
-	update(delta);
+	if (!won) {
+		delta = clock.getDelta();
+		update(delta);
 
-	composer.render();
+		composer.render();
 
-	stats.update();
+		stats.update();
 
-	window.requestAnimationFrame(animate);
+		window.requestAnimationFrame(animate);
+	}
 }
 function collides(raycaster, direction, delta) {
 	const intersects = raycaster.intersectObjects(trackGroup.children);
@@ -172,6 +175,10 @@ function sphereCollision(delta) {
 		for (let c = 0; c < collisionResults.length; c++) {
 			let collisionResult = collisionResults[c];
 			if (collisionResult != null) {
+				if (collisionResult.object.name == "Goal") {
+					win();
+					return;
+				}
 				if (collisionResult.object.name == "AmiyaBar") {
 					stamina = maxStamina;
 				}
@@ -211,6 +218,9 @@ function sphereCollision(delta) {
 	return false;
 }
 function update(delta) {
+	if (won) {
+		return;
+	}
 	if (stamina >= 0) {
 		if (keyStates.KeyW || keyStates.ArrowUp) {
 			playerVelocity.z = Math.min(playerVelocity.z + (acceleration * delta), maxDriveSpeed);
@@ -279,6 +289,20 @@ function update(delta) {
 		reset();
 	}
 }
+function clearThree(obj) {
+	obj.clear();
+}
+
+function win() {
+	if (!won) {
+		clearThree(scene);
+		bgm.stop();
+		$('.menu--start-screen').removeClass('hide');
+		$('.hud').addClass('hide');
+		won = true;
+	}
+
+}
 function reset() {
 	playerDirection = new THREE.Vector3(0, 0, 1);
 	playerVelocity = new THREE.Vector3(0, 0, 0);
@@ -300,7 +324,7 @@ function reset() {
 
 }
 function generateTile(colour, scale = 1) {
-	const boxGeometry = new THREE.BoxGeometry(TILE_WIDTH * scale, 0.4, TILE_LENGTH);
+	const boxGeometry = new THREE.BoxGeometry(TILE_WIDTH * scale, 0.8, TILE_LENGTH);
 
 	const material = new THREE.MeshPhongMaterial({ color: colour });
 	const mesh = new THREE.Mesh(boxGeometry, material);
@@ -323,7 +347,7 @@ function generateAmiyaBar(scale = 1) {
 	mesh.rotation.y = 1.5708;
 	return mesh;
 }
-function initMap() {
+function generateRandomLevel() {
 	trackGroup = new THREE.Group();
 	let t = 0;
 	for (let i = 0; i < MAP_SEGMENT_LENGTH; i++) {
@@ -435,7 +459,111 @@ function initMap() {
 		}
 
 	}
+	const goal = generateGoal(lastTilePos);
+	trackGroup.add(goal);
+	return trackGroup;
+}
 
+function getColour(i) {
+	if (i % 2 === 0) {
+		return COLOUR_SECONDARY;
+	}
+	return COLOUR_MAIN;
+}
+function generateGoal(lastTilePos) {
+	const geometry = new THREE.BoxGeometry(TILE_LENGTH, TILE_LENGTH, 1);
+	const material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+	const goal = new THREE.Mesh(geometry, material);
+
+	goal.position.x = lastTilePos.x;
+	goal.position.y = lastTilePos.y;
+	goal.position.z = lastTilePos.z;
+	goal.name = "Goal";
+	goal.receiveShadow = true;
+	return goal;
+}
+function generateLevel_1_1() {
+	trackGroup = new THREE.Group();
+	const mapLength = 40;
+	let direction = 0;
+	let lastTilePos;
+	for (let i = 0; i < mapLength; i++) {
+
+		let colour = getColour(i);
+		let tileMesh = generateTile(colour, 1);
+		if (i == 30) {
+			tileMesh = generateAmiyaBar();
+			tileMesh.position.y = 0.1;
+		}
+		if (i > 0 && i % 10 == 0) {
+			direction = 1 - direction;
+		}
+		if (i != 30) {
+			if (direction == 0) {
+				tileMesh.position.y = -0.2 + ((-0.5 + Math.cos(i)) * 0.15);
+			} else if (direction == 1) {
+				tileMesh.position.y = -0.2 + ((-0.5 + Math.sin(i)) * 0.15);
+			}
+		}
+
+		tileMesh.position.x = (-0.5 + Math.cos(i));
+		tileMesh.position.z = -i * TILE_LENGTH;
+		lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.yx, tileMesh.position.z);
+		//tileMesh.rotation.x = Math.cos(i) * 0.06;
+		tileMesh.receiveShadow = true;
+		trackGroup.add(tileMesh);
+	}
+	const goal = generateGoal(lastTilePos);
+	trackGroup.add(goal);
+	return trackGroup;
+}
+function generateLevel_1_2() {
+	trackGroup = new THREE.Group();
+	const mapLength = 80;
+	let direction = 0;
+	let lastTilePos;
+	for (let i = 0; i < mapLength; i++) {
+		if (i > 0) {
+			if (i % 3 == 0 || i % 7 == 0) {
+				continue;
+			}
+		}
+
+		let colour = getColour(i);
+		let tileMesh = generateTile(colour, 1);
+		if (i == 41) {
+			tileMesh = generateAmiyaBar();
+			tileMesh.position.y = 0.2;
+		}
+
+		if (i > 0 && i % 10 == 0) {
+			direction = 1 - direction;
+		}
+
+		tileMesh.position.y = -0.2;
+
+		tileMesh.position.x = (-0.5 + Math.cos(i));
+		tileMesh.position.z = -i * TILE_LENGTH;
+		lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.yx, tileMesh.position.z);
+		//tileMesh.rotation.x = Math.cos(i) * 0.06;
+		tileMesh.receiveShadow = true;
+		trackGroup.add(tileMesh);
+	}
+	const goal = generateGoal(lastTilePos);
+	trackGroup.add(goal);
+	return trackGroup;
+}
+function initMap(levelSelected) {
+	console.log(levelSelected);
+	if (levelSelected == "?-?") {
+		trackGroup = generateRandomLevel();
+	} else if (levelSelected == "1-1") {
+		trackGroup = generateLevel_1_1();
+	} else if (levelSelected == "1-2") {
+		trackGroup = generateLevel_1_2();
+	} else {
+		trackGroup = new THREE.Group();
+	}
 	scene.add(trackGroup);
 }
 
@@ -511,7 +639,7 @@ function initMusic() {
 	camera.add(audioListener);
 
 	// instantiate audio object
-	const bgm = new THREE.Audio(audioListener);
+	bgm = new THREE.Audio(audioListener);
 
 	// add the audio object to the scene
 	scene.add(bgm);
@@ -546,16 +674,7 @@ function initMusic() {
 		}
 	);
 }
-function init() {
-	clock = new THREE.Clock();
-	keyStates = {};
-	playerDirection = new THREE.Vector3(0, 0, 1);
-	playerVelocity = new THREE.Vector3(0, 0, 0);
-
-
-	onGround = false;
-	jumpSpeed = 0;
-	stamina = maxStamina;
+function initFirstTime() {
 
 	document.addEventListener('keydown', (event) => {
 		keyStates[event.code] = true;
@@ -564,6 +683,9 @@ function init() {
 	document.addEventListener('keyup', (event) => {
 		keyStates[event.code] = false;
 	});
+
+	window.addEventListener('resize', onWindowResize);
+
 
 	const container = document.getElementById('container');
 	renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -577,51 +699,55 @@ function init() {
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.top = '0px';
 	container.appendChild(stats.domElement);
+}
+
+function init(levelSelected = "") {
+	clock = new THREE.Clock();
+	keyStates = {};
+	playerDirection = new THREE.Vector3(0, 0, 1);
+	playerVelocity = new THREE.Vector3(0, 0, 0);
+
+	onGround = false;
+	jumpSpeed = 0;
+	stamina = maxStamina;
 
 	camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.001, 60);
 	camera.position.set(0, 1.9, 1);
 	camera.lookAt(0, 0.5, -1);
 
+
 	scene = new THREE.Scene();
+	if (levelSelected != "") {
+		const hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, 0.8);
+		scene.add(hemisphereLight);
 
-	const hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, 0.8);
-	scene.add(hemisphereLight);
+		spotLight = new THREE.SpotLight(0xffffff, 0.3);
+		spotLight.position.set(0, 15, 0);
 
-	spotLight = new THREE.SpotLight(0xffffff, 0.3);
-	spotLight.position.set(0, 15, 0);
+		spotLight.castShadow = true;
 
-	spotLight.castShadow = true;
+		spotLight.shadow.mapSize.width = 1024;
+		spotLight.shadow.mapSize.height = 1024;
 
-	spotLight.shadow.mapSize.width = 1024;
-	spotLight.shadow.mapSize.height = 1024;
+		spotLight.shadow.camera.near = 1;
+		spotLight.shadow.camera.far = 20;
+		spotLight.shadow.camera.fov = 90;
+		spotLight.shadow.camera.right = 1.5;
+		spotLight.shadow.camera.left = - 1.5;
+		spotLight.shadow.camera.top = 1.5;
+		spotLight.shadow.camera.bottom = - 1.5;
 
-	spotLight.shadow.camera.near = 1;
-	spotLight.shadow.camera.far = 20;
-	spotLight.shadow.camera.fov = 90;
-	spotLight.shadow.camera.right = 1.5;
-	spotLight.shadow.camera.left = - 1.5;
-	spotLight.shadow.camera.top = 1.5;
-	spotLight.shadow.camera.bottom = - 1.5;
+		initSky();
+		initMusic();
+		initMap(levelSelected);
+		initPlayer();
 
-
-	initSky();
-	initMap();
-	initPlayer();
-
-	spotLight.target = playerMesh;
-	scene.add(spotLight);
-
-	initMusic();
+		spotLight.target = playerMesh;
+		scene.add(spotLight);
+	}
 
 	composer = new EffectComposer(renderer);
 	composer.addPass(new RenderPass(scene, camera));
-
-	/*pixelPass = new ShaderPass( PixelShader );
-	pixelPass.uniforms.resolution.value = new THREE.Vector2( window.innerWidth, window.innerHeight );
-	pixelPass.uniforms.resolution.value.multiplyScalar( window.devicePixelRatio );
-	pixelPass.uniforms.pixelSize.value = 4;
-	composer.addPass( pixelPass );*/
-
-
-	window.addEventListener('resize', onWindowResize);
+	$('.hud').removeClass('hide');
 }
+initFirstTime();
