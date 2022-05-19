@@ -372,7 +372,7 @@ class MapGenerator {
 
             let colour = this.getBrambleColour(i);
             let tileMesh = this.generateTile(colour, 1);
-            if (i > 0 && i % 40 == 0) {
+            if (i > 0 && i % 30 == 0) {
                 tileMesh = this.generateAmiyaBar();
                 tileMesh.position.y = 0.2;
             } else if (i > 0 && i % 10 == 0) {
@@ -381,7 +381,7 @@ class MapGenerator {
             } else if (i > 0 && i % 4 == 0) {
                 tileMesh = this.generateBoost(colour);
                 tileMesh.rotation.x = 0.2;
-                tileMesh.position.y = 0.3;
+                tileMesh.position.y = 0.2;
             }else{
                 tileMesh.position.y = -0.2;
             }
