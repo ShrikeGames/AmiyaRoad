@@ -18,6 +18,7 @@ let keyStates, delta;
 let trackGroup, playerGroup;
 let playerMesh;
 let playerDirection;
+const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/AmiyaStare.png');
 
 let bgm;
 
@@ -27,7 +28,7 @@ const radius = 0.3;
 //collision
 const forward = new THREE.Vector3(0, 0, -1);
 const GRAVITY = new THREE.Vector3(0, -40, 0);
-const MAX_Y_VEL = 8;
+const MAX_Y_VEL = 6;
 let onGround, timeLastOnGround;
 let jumpSpeed, maxJumpSpeed;
 
@@ -44,9 +45,11 @@ for (let x = -1; x <= 1; x += 0.5) {
 }
 
 
-let acceleration, maxDriveSpeed, deacceleration, minDriveSpeed, handling;
+let acceleration, maxDriveSpeed, maxRegularSpeed, maxBoostSpeed, deacceleration, minDriveSpeed, handling;
 acceleration = 6;
-maxDriveSpeed = 15;
+maxRegularSpeed = 15;
+maxBoostSpeed = 30;
+maxDriveSpeed = maxRegularSpeed;
 maxJumpSpeed = 8;
 deacceleration = 10;
 minDriveSpeed = 0;
@@ -151,7 +154,7 @@ function collides(raycaster, direction, delta) {
 
 function sphereCollision(delta) {
 	let raycasters = [];
-	let adjustedFar = 8;
+	let adjustedFar = 12;
 	const startPos = new THREE.Vector3(playerGroup.position.x, playerGroup.position.y, playerGroup.position.z);
 
 
@@ -173,7 +176,18 @@ function sphereCollision(delta) {
 					win();
 					return;
 				}
-				if (collisionResult.object.name == "AmiyaBar") {
+				if (collisionResult.object.name == "Boost") {
+					maxDriveSpeed = maxBoostSpeed;
+					playerVelocity.z = maxDriveSpeed;
+					playerVelocity.y = maxJumpSpeed * 4;
+					onGround = false;
+				} else {
+					maxDriveSpeed = maxRegularSpeed;
+				}
+				if (collisionResult.object.name == "Death") {
+					reset();
+					return;
+				} else if (collisionResult.object.name == "AmiyaBar") {
 					stamina = maxStamina;
 				}
 				playPosAdjustment.x += ((-direction.x * Math.abs(radius - collisionResult.distance)));
@@ -204,6 +218,7 @@ function sphereCollision(delta) {
 			playerVelocity.x = 0;
 		}
 	}
+
 	if (playPosAdjustment.z >= maxDriveSpeed) {
 		console.log(playPosAdjustment.z);
 		reset();
@@ -217,11 +232,12 @@ function update(delta) {
 	}
 	if (stamina >= 0) {
 		if (keyStates.KeyW || keyStates.ArrowUp) {
-			playerVelocity.z = Math.min(playerVelocity.z + (acceleration * delta), maxDriveSpeed);
+			playerVelocity.z = playerVelocity.z + (acceleration * delta);
 		}
 		if (keyStates.KeyS || keyStates.ArrowDown) {
-			playerVelocity.z = Math.max(playerVelocity.z - (deacceleration * delta), minDriveSpeed);
+			playerVelocity.z = Math.max(playerVelocity.z - (deacceleration * delta), 0);
 		}
+
 		playerVelocity.x = 0;
 		if (keyStates.KeyA || keyStates.ArrowLeft) {
 			playerVelocity.x = -handling;
@@ -247,9 +263,11 @@ function update(delta) {
 	}
 
 	if (!keyStates.Space && !keyStates.KeyZ && !keyStates.KeyM && !onGround && playerVelocity.y > 0) {
-		playerVelocity.y *= 0.75;
+		playerVelocity.y *= 0.75 * delta;
 	}
-
+	if (playerVelocity.z > maxRegularSpeed) {
+		playerVelocity.z -= acceleration * delta;
+	}
 	//trackGroup.position.add(new THREE.Vector3(0, 0, -forward.z * playerVelocity.z * delta));
 	playerGroup.position.add(new THREE.Vector3(0, 0, forward.z * playerVelocity.z * delta));
 	stamina -= playerVelocity.z * delta;
@@ -262,8 +280,15 @@ function update(delta) {
 	playerGroup.rotation.z += playerVelocity.x * delta;
 	$('.hud--debug').text(onGround + " " + (clock.elapsedTime - timeLastOnGround) + " " + playerGroup.position.x.toPrecision(2) + "," + playerGroup.position.y.toPrecision(2) + "," + playerGroup.position.z.toPrecision(2) + " " + playerVelocity.x.toPrecision(2) + "," + playerVelocity.y.toPrecision(2) + "," + playerVelocity.z.toPrecision(2));
 
-	$('.hud--speed').text(playerVelocity.z.toPrecision(2));
-	$('.hud--speed').attr("style", "width:" + ((playerVelocity.z.toPrecision(2) / 10) * 50) + "%;");
+
+	if (playerVelocity.z <= maxRegularSpeed) {
+		$('.hud--speed').text(playerVelocity.z.toPrecision(2));
+		$('.hud--speed').attr("style", "width:" + ((playerVelocity.z.toPrecision(2) / 10) * 50) + "%;");
+	} else {
+		$('.hud--speed').text("AMI SPEED");
+		$('.hud--speed').attr("style", "width:100%;");
+	}
+
 	$('.hud--stamina').text(Math.round(stamina));
 	$('.hud--stamina').attr("style", "width:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
 	if (!onGround) {
@@ -303,6 +328,7 @@ function reset() {
 	onGround = false;
 	jumpSpeed = 0;
 	stamina = maxStamina;
+	maxDriveSpeed = maxRegularSpeed;
 
 	playerGroup.position.x = 0;
 	playerGroup.position.y = 1;
@@ -328,6 +354,8 @@ function initMap(levelSelected) {
 		trackGroup = mapGenerator.generateLevel_1_2();
 	} else if (levelSelected == "1-3") {
 		trackGroup = mapGenerator.generateLevel_1_3();
+	} else if (levelSelected == "2-1") {
+		trackGroup = mapGenerator.generateLevel_2_1();
 	} else {
 		trackGroup = new THREE.Group();
 	}
@@ -340,10 +368,10 @@ function initPlayer() {
 
 	const capSubdivisions = 32;
 	const radialSegments = 32;
-	const texture = new THREE.TextureLoader().load('../images/amiyaroad/AmiyaStare.png');
+
 
 	const playerGeometry = new THREE.SphereGeometry(radius * 0.75, capSubdivisions, radialSegments);
-	const playerMaterial = new THREE.MeshBasicMaterial({ map: texture, name: "Player" });
+	const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
 	//const playerMaterial = new THREE.MeshBasicMaterial( {color: 0xb9adeb, shininess: 0.5} );
 	playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
 	playerMesh.position.z = 0;

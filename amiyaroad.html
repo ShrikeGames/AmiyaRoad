@@ -1,109 +1,140 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
+<html lang="en">
 
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<head>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Play Amiya Road</title>
-    <meta name="twitter:card" content="summary"/>
-    <meta name="twitter:site" content="@ShrikeGames"/>
-    <meta name="twitter:creator" content="@ShrikeGames"/>
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@ShrikeGames" />
+    <meta name="twitter:creator" content="@ShrikeGames" />
     <meta content="Play Amiya Road" property="og:title">
 
     <meta content="Play Amiya Road" property="og:description">
-    
+
     <meta content="ShrikeGames" property="og:site_name">
-    
+
     <meta content="http://amiya.shrikegames.com/images/embed-image.png" property="og:image">
-    
-    <meta name="description" content="ShrikeGames, Watch, Learn, Play. Search for Amiya clips!"/>
-    <meta name="keywords" content="shrikegames, shrike, games, let&#x27;s play, tutorials, downloads, games, flash, java, youtube, twitch, streaming, amiya, tsunodream, tsunderia, piano, vtuber, retro games, amiya road, amiyaroad"/>
-	
-	<link rel="shortcut icon" type="image/png" href="favicon.png"/>
-	
-	
-	<link rel="stylesheet" href="./css/normalize.css">
-	<link rel="stylesheet" href="./css/skeleton.css">
-	<link rel="stylesheet" href="./css/styles.css">
-	<link rel="stylesheet" href="./css/amiyaroad.css">
-	<script src="./js/jquery-3.6.0.min.js"></script>
-	 <!-- Import maps polyfill --> 
-     <!-- Remove this when import maps will be widely supported --> 
-     <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script> 
+
+    <meta name="description" content="ShrikeGames, Watch, Learn, Play. Search for Amiya clips!" />
+    <meta name="keywords"
+        content="shrikegames, shrike, games, let&#x27;s play, tutorials, downloads, games, flash, java, youtube, twitch, streaming, amiya, tsunodream, tsunderia, piano, vtuber, retro games, amiya road, amiyaroad" />
+
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+
+
+    <link rel="stylesheet" href="./css/normalize.css">
+    <link rel="stylesheet" href="./css/skeleton.css">
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/amiyaroad.css">
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 </head>
+
 <body>
     <div class="menu--start-screen">
         <section class="main u-full-width">
-		
-    		<div class="container">
-    		    <header class="u-full-width">
-                    <img src="./images/header.png"/>
-        		</header>
-        		<header-mobile class="u-full-width">
-                    <img src="./images/header-mobile.png"/>
-        		</header-mobile>
-    		    <div class="row">
-    		         <h1>Amiya Road (WORK IN PROGRESS)</h1>
-    		    </div>
-    		    <div class="row">
-    		        <div class="eight columns">
-                        <p data-lang-en="Move with the Arrow Keys. Jump with the Space bar." data-lang-jp="カーソルキーで移動。カーソルキーでジャンプ。">Move with the Arrow Keys. Jump with the Space bar.</p>
-                        <img src="./images/amiyaroad/Amiyabars-logo.png" width="100"/>
-                        <p data-lang-en="Touch AmiyaBars to refuel." data-lang-jp="AmiyaBarsをタッチして給油">Touch AmiyaBars to refuel.<br/>Much wow, many informations not included here yet.<br/>Inspired by SkyRoads and Race the Sky.</p>
-    		        </div>
-    		        <div class="four columns u-align-right">
-                        <a class="button button-secondary button--language_toggle button--language_toggle_en" target='_blank' rel='noopener'>English</a><a class="button button-primary button--language_toggle button--language_toggle_jp" target='_blank' rel='noopener' href='#'>日本語</a>
-    		        </div>
-    			</div>
-                <div class="row">
-                    <a class="button button-special play-button"  href='#' data-lang-en="?-? Random" data-lang-jp="?-? ランダム" data-level="?-?">?-? Random</a>
-                    <h2 data-lang-en="1. Tutorial Levels" data-lang-jp="1. チュートリアル・レベル">1. Tutorial Levels</h2>
-                    <a class="button button-special play-button"  href='#' data-lang-en="1-1 Gentle slopes" data-lang-jp="1-1 緩やかなスロープ" data-level="1-1">1-1 Gentle slopes</a>
-                    <a class="button button-special play-button"  href='#' data-lang-en="1-2 Jumps" data-lang-jp="1-2 ジャンプ" data-level="1-2">1-2 Jumps</a>
-                    <a class="button button-special play-button"  href='#' data-lang-en="1-3 Alternate Path" data-lang-jp="1-3 代替パス" data-level="1-3">1-3 Alternate Path</a>
-                    
-                </div>
-    			<div class="row">
-    			    <a class="button button-primary" target='_blank' rel='noopener' href='https://discord.gg/tsundream' data-lang-en="Tsundream ◥" data-lang-jp="Tsundream◥">Tsundream ◥</a>
-    			    <a class="button button-primary" target='_blank' rel='noopener' href='https://www.youtube.com/c/AmiyaCh%E3%82%A2%E3%83%9F%E3%83%A4-%E3%82%A2%E3%83%A9%E3%83%8B%E3%83%A3-Tsunderia' data-lang-en="Amiya ◥" data-lang-jp="アミヤ◥">Amiya ◥</a>
-                    <a class="button button-primary" target='_blank' rel='noopener' href='https://discord.gg/tsundream' >Alt+Music ◥</a>
-                </div>
-    			<div class="row">
-    			    <a class="button button-primary" target='_blank' rel='noopener' href='http://clips.shrikegames.com/' data-lang-en="Vtuber Clips ◥" data-lang-jp="Vtuber動画◥">Vtuber Clips ◥</a>
-    			    <a class="button button-primary" target='_blank' rel='noopener' href='http://amiya.shrikegames.com/' data-lang-en="🕸Amiya🧵 Clips ◥" data-lang-jp="🕸アミヤ🧵動画◥">🕸Amiya🧵 Clips </a>
-    			    <a class="button button-primary" target='_blank' rel='noopener' href='http://watame.shrikegames.com/' data-lang-en="🐏Watame Clips ◥" data-lang-jp="🐏角巻わため動画◥">🐏Watame Clips ◥</a>
-    		        <a class="button button-primary" target='_blank' rel='noopener' href='http://noworld.shrikegames.com/' data-lang-en="🍮NoWorld🎹 Clips ◥" data-lang-jp="🍮NoWorld🎹動画◥">🍮NoWorld🎹 Clips ◥</a>
-    		    </div>
 
-    			<div class="row">
-    			    <p>Game developed by Shrike.<br/>Music made by Alt+Music.</p>
-    		    </div>
-    		</div>
-    
-    	</section>
-        
+            <div class="container">
+                <header class="u-full-width">
+                    <img src="./images/header.png" />
+                </header>
+                <header-mobile class="u-full-width">
+                    <img src="./images/header-mobile.png" />
+                </header-mobile>
+                <div class="row">
+                    <h1>Amiya Road (WORK IN PROGRESS)</h1>
+                </div>
+                <div class="row">
+                    <div class="eight columns">
+                        <p data-lang-en="Move with the Arrow Keys. Jump with the Space bar."
+                            data-lang-jp="カーソルキーで移動。カーソルキーでジャンプ。">Move with the Arrow Keys. Jump with the Space bar.</p>
+                        <img src="./images/amiyaroad/Amiyabars-logo.png" width="100" />
+                        <p data-lang-en="Touch AmiyaBars to refuel." data-lang-jp="AmiyaBarsをタッチして給油">Touch AmiyaBars to
+                            refuel.<br />Much wow, many informations not included here yet.<br />Inspired by SkyRoads
+                            and Race the Sky.</p>
+                    </div>
+                    <div class="four columns u-align-right">
+                        <a class="button button-secondary button--language_toggle button--language_toggle_en"
+                            target='_blank' rel='noopener'>English</a><a
+                            class="button button-primary button--language_toggle button--language_toggle_jp"
+                            target='_blank' rel='noopener' href='#'>日本語</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <h2 data-lang-en="1. Tutorial Levels" data-lang-jp="1. チュートリアル・レベル">1. Tutorial Levels</h2>
+                    <a class="button button-special play-button" href='#' data-lang-en="1-1 Gentle slopes"
+                        data-lang-jp="1-1 緩やかなスロープ" data-level="1-1">1-1 Gentle slopes</a>
+                    <a class="button button-special play-button" href='#' data-lang-en="1-2 Jumps"
+                        data-lang-jp="1-2 ジャンプ" data-level="1-2">1-2 Jumps</a>
+                    <a class="button button-special play-button" href='#' data-lang-en="1-3 Alternate Path"
+                        data-lang-jp="1-3 代替パス" data-level="1-3">1-3 Alternate Path</a>
+
+                </div>
+                <div class="row">
+                    <h2 data-lang-en="2. Bramble Forest" data-lang-jp="2. 荊棘林">2. Bramble Forest</h2>
+                    <a class="button button-special play-button" href='#' data-lang-en="2-1 Barrel Blast"
+                        data-lang-jp="2-1 バレル・ブラスト" data-level="2-1">2-1 Barrel Blast</a>
+                </div>
+                <div class="row">
+                    <a class="button button-special play-button" href='#' data-lang-en="?-? Random"
+                        data-lang-jp="?-? ランダム" data-level="?-?">?-? Random</a>
+                </div>
+                <div class="row">
+                    <a class="button button-primary" target='_blank' rel='noopener' href='https://discord.gg/tsundream'
+                        data-lang-en="Tsundream ◥" data-lang-jp="Tsundream◥">Tsundream ◥</a>
+                    <a class="button button-primary" target='_blank' rel='noopener'
+                        href='https://www.youtube.com/c/AmiyaCh%E3%82%A2%E3%83%9F%E3%83%A4-%E3%82%A2%E3%83%A9%E3%83%8B%E3%83%A3-Tsunderia'
+                        data-lang-en="Amiya ◥" data-lang-jp="アミヤ◥">Amiya ◥</a>
+                    <a class="button button-primary" target='_blank' rel='noopener'
+                        href='https://discord.gg/tsundream'>Alt+Music ◥</a>
+                </div>
+                <div class="row">
+                    <a class="button button-primary" target='_blank' rel='noopener' href='http://clips.shrikegames.com/'
+                        data-lang-en="Vtuber Clips ◥" data-lang-jp="Vtuber動画◥">Vtuber Clips ◥</a>
+                    <a class="button button-primary" target='_blank' rel='noopener' href='http://amiya.shrikegames.com/'
+                        data-lang-en="🕸Amiya🧵 Clips ◥" data-lang-jp="🕸アミヤ🧵動画◥">🕸Amiya🧵 Clips </a>
+                    <a class="button button-primary" target='_blank' rel='noopener'
+                        href='http://watame.shrikegames.com/' data-lang-en="🐏Watame Clips ◥"
+                        data-lang-jp="🐏角巻わため動画◥">🐏Watame Clips ◥</a>
+                    <a class="button button-primary" target='_blank' rel='noopener'
+                        href='http://noworld.shrikegames.com/' data-lang-en="🍮NoWorld🎹 Clips ◥"
+                        data-lang-jp="🍮NoWorld🎹動画◥">🍮NoWorld🎹 Clips ◥</a>
+                </div>
+
+                <div class="row">
+                    <p>Game developed by Shrike.<br />Music made by Alt+Music.</p>
+                </div>
+            </div>
+
+        </section>
+
     </div>
     <div class="hud hud--top">
-        
+
     </div>
-    
+
     <div class="hud hud--bottom">
         <p class="hud hud--debug"></p>
         <p class="hud hud--speed" style="width:0%;"></p>
         <p class="hud hud--stamina" style="width:0%;"></p>
     </div>
     <div id="container">
-        
+
     </div>
-	<script type="importmap">
+    <script type="importmap">
       {
         "imports": {
           "three": "./js/three.module.js"
         }
       }
     </script>
-	<script type="module" src="./js/amiyaroad.js"></script>
+    <script type="module" src="./js/amiyaroad.js"></script>
 </body>
-</html>
 
+</html>
