@@ -597,7 +597,7 @@ function initPlayer() {
 	scene.add(playerGroup);
 
 }
-function initSky() {
+function initSky(levelSelected) {
 
 	// Add Sky
 	sky = new Sky();
@@ -605,7 +605,7 @@ function initSky() {
 	scene.add(sky);
 
 	sun = new THREE.Vector3();
-	const effectController = {
+	let effectController = {
 		turbidity: 10,
 		rayleigh: 3,
 		mieCoefficient: 0.005,
@@ -614,6 +614,17 @@ function initSky() {
 		azimuth: 180,
 		exposure: 1
 	};
+	if (levelSelected == "?-?") {
+		effectController = {
+			turbidity: Math.random() * 20,
+			rayleigh: Math.random() * 6,
+			mieCoefficient: Math.random() * 0.001,
+			mieDirectionalG: Math.random(),
+			elevation: Math.random() * 4,
+			azimuth: Math.random() * 360,
+			exposure: Math.random()
+		}
+	}
 
 	const uniforms = sky.material.uniforms;
 	uniforms['turbidity'].value = effectController.turbidity;
@@ -739,7 +750,7 @@ function init(levelSelected = "") {
 		spotLight.shadow.camera.top = 1.5;
 		spotLight.shadow.camera.bottom = - 1.5;
 
-		initSky();
+		initSky(levelSelected);
 		initMusic();
 		initMap(levelSelected);
 		initPlayer();
