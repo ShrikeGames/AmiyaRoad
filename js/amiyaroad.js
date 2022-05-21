@@ -28,16 +28,16 @@ const radius = 0.3;
 //collision
 const forward = new THREE.Vector3(0, 0, -1);
 const GRAVITY = new THREE.Vector3(0, -40, 0);
-const MAX_Y_VEL = 6;
+const MAX_Y_VEL = 8;
 let onGround, timeLastOnGround;
 let jumpSpeed, maxJumpSpeed;
 
 const directions = [];
 const direction = new THREE.Vector3(0, -1, 0);
 directions.push(direction);
-for (let x = -1; x <= 1; x += 0.5) {
-	for (let y = -1; y <= 1; y += 0.5) {
-		for (let z = -1; z <= 1; z += 0.5) {
+for (let x = -1; x <= 1; x += 0.25) {
+	for (let y = -1; y <= 1; y += 0.25) {
+		for (let z = -1; z <= 1; z += 0.25) {
 			const direction = new THREE.Vector3(x, y, z);
 			directions.push(direction);
 		}
@@ -47,10 +47,10 @@ for (let x = -1; x <= 1; x += 0.5) {
 
 let acceleration, maxDriveSpeed, maxRegularSpeed, maxBoostSpeed, deacceleration, minDriveSpeed, handling;
 acceleration = 6;
-maxRegularSpeed = 15;
-maxBoostSpeed = 30;
+maxRegularSpeed = 10;
+maxBoostSpeed = 20;
 maxDriveSpeed = maxRegularSpeed;
-maxJumpSpeed = 8;
+maxJumpSpeed = 11;
 deacceleration = 10;
 minDriveSpeed = 0;
 handling = 4;
@@ -150,11 +150,9 @@ function collides(raycaster, direction, delta) {
 	}
 	return results;
 }
-
-
 function sphereCollision(delta) {
 	let raycasters = [];
-	let adjustedFar = 12;
+	let adjustedFar = 30;
 	const startPos = new THREE.Vector3(playerGroup.position.x, playerGroup.position.y, playerGroup.position.z);
 
 
@@ -172,6 +170,9 @@ function sphereCollision(delta) {
 		for (let c = 0; c < collisionResults.length; c++) {
 			let collisionResult = collisionResults[c];
 			if (collisionResult != null) {
+				if (collisionResult.object.name == "Player") {
+					continue;
+				}
 				if (collisionResult.object.name == "Goal") {
 					win();
 					return;
@@ -181,9 +182,8 @@ function sphereCollision(delta) {
 					playerVelocity.z = maxDriveSpeed;
 					playerVelocity.y = maxJumpSpeed * 4;
 					onGround = false;
-				} else {
-					maxDriveSpeed = maxRegularSpeed;
 				}
+				
 				if (collisionResult.object.name == "Death") {
 					reset();
 					return;
@@ -194,16 +194,14 @@ function sphereCollision(delta) {
 				playPosAdjustment.y += ((-direction.y * Math.abs(radius - collisionResult.distance)));
 
 				playPosAdjustment.z += ((-direction.z * Math.abs(radius - collisionResult.distance)));
-				if(collisionResult.object.name != "Boost"){
-					if (direction.z < 0 && direction.y >= 0 && direction.y < 1 && direction.x == 0) {
-						if (playerVelocity.z >= maxDriveSpeed / 2.0) {
-							reset();
-							return;
-						}
-	
+				if (collisionResult.object.name != "Boost" && direction.z < 0 && direction.y >= 0) {
+					if (collisionResult.distance <= radius / 2.0) {
+						console.log(collisionResult.distance);
+						reset();
+						return;
 					}
 				}
-				
+
 			}
 		}
 
@@ -234,7 +232,7 @@ function update(delta) {
 	}
 	if (stamina >= 0) {
 		if (keyStates.KeyW || keyStates.ArrowUp) {
-			playerVelocity.z = playerVelocity.z + (acceleration * delta);
+			playerVelocity.z = Math.min(playerVelocity.z + (acceleration * delta), maxDriveSpeed);
 		}
 		if (keyStates.KeyS || keyStates.ArrowDown) {
 			playerVelocity.z = Math.max(playerVelocity.z - (deacceleration * delta), 0);
@@ -267,8 +265,15 @@ function update(delta) {
 	if (!keyStates.Space && !keyStates.KeyZ && !keyStates.KeyM && !onGround && playerVelocity.y > 0) {
 		playerVelocity.y *= 0.75 * delta;
 	}
-	if (playerVelocity.z > maxRegularSpeed) {
-		playerVelocity.z -= acceleration * delta;
+	if (playerVelocity.z > maxBoostSpeed) {
+		playerVelocity.z = maxBoostSpeed;
+	}
+	if (onGround && maxDriveSpeed > maxRegularSpeed) {
+		maxDriveSpeed = Math.max(maxDriveSpeed - (10 * delta), maxRegularSpeed);
+		if (playerVelocity.z > maxDriveSpeed) {
+			playerVelocity.z = maxDriveSpeed;
+		}
+		console.log(maxDriveSpeed);
 	}
 	//trackGroup.position.add(new THREE.Vector3(0, 0, -forward.z * playerVelocity.z * delta));
 	playerGroup.position.add(new THREE.Vector3(0, 0, forward.z * playerVelocity.z * delta));
@@ -282,8 +287,7 @@ function update(delta) {
 	playerGroup.rotation.z += playerVelocity.x * delta;
 	$('.hud--debug').text(onGround + " " + (clock.elapsedTime - timeLastOnGround) + " " + playerGroup.position.x.toPrecision(2) + "," + playerGroup.position.y.toPrecision(2) + "," + playerGroup.position.z.toPrecision(2) + " " + playerVelocity.x.toPrecision(2) + "," + playerVelocity.y.toPrecision(2) + "," + playerVelocity.z.toPrecision(2));
 
-
-	if (playerVelocity.z <= maxRegularSpeed) {
+	if (playerVelocity.z < maxBoostSpeed) {
 		$('.hud--speed').text(playerVelocity.z.toPrecision(2));
 		$('.hud--speed').attr("style", "width:" + ((playerVelocity.z.toPrecision(2) / 10) * 50) + "%;");
 	} else {
@@ -317,7 +321,10 @@ function clearThree(obj) {
 function win() {
 	if (!won) {
 		clearThree(scene);
-		bgm.stop();
+		if (bgm != null) {
+			bgm.stop();
+		}
+
 		$('.menu--start-screen').removeClass('hide');
 		$('.hud').addClass('hide');
 		won = true;
@@ -372,7 +379,7 @@ function initPlayer() {
 	const radialSegments = 32;
 
 
-	const playerGeometry = new THREE.SphereGeometry(radius * 0.75, capSubdivisions, radialSegments);
+	const playerGeometry = new THREE.SphereGeometry(radius, capSubdivisions, radialSegments);
 	const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
 	//const playerMaterial = new THREE.MeshBasicMaterial( {color: 0xb9adeb, shininess: 0.5} );
 	playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
@@ -466,7 +473,7 @@ function initMusic() {
 			bgm.setBuffer(audioBuffer);
 
 			// play the audio
-			bgm.setVolume(0.05);
+			bgm.setVolume(0.0);
 			bgm.setLoop(true);
 			bgm.play();
 		},

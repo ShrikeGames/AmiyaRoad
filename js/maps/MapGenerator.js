@@ -378,7 +378,7 @@ class MapGenerator {
             } else if (i > 0 && i % 10 == 0) {
                 tileMesh = this.generateBrambleWall();
                 tileMesh.position.y = -0.2;
-            } else if (i > 0 && i % 4 == 0) {
+            } else if (i > 0 && (i+2) % 10 == 0) {
                 tileMesh = this.generateBoost(colour);
                 tileMesh.rotation.x = 0.2;
                 tileMesh.position.y = 0.2;
