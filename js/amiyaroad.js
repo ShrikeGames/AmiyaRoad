@@ -473,7 +473,7 @@ function initMusic() {
 			bgm.setBuffer(audioBuffer);
 
 			// play the audio
-			bgm.setVolume(0.0);
+			bgm.setVolume(0.05);
 			bgm.setLoop(true);
 			bgm.play();
 		},
