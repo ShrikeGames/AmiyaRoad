@@ -35,9 +35,9 @@ let jumpSpeed, maxJumpSpeed;
 const directions = [];
 const direction = new THREE.Vector3(0, -1, 0);
 directions.push(direction);
-for (let x = -1; x <= 1; x += 0.25) {
-	for (let y = -1; y <= 1; y += 0.25) {
-		for (let z = -1; z <= 1; z += 0.25) {
+for (let x = -1; x <= 1; x += 0.5) {
+	for (let y = -1; y <= 1; y += 0.5) {
+		for (let z = -1; z <= 1; z += 0.5) {
 			const direction = new THREE.Vector3(x, y, z);
 			directions.push(direction);
 		}
