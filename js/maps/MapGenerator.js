@@ -10,393 +10,244 @@ const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('../images/amiyaroad/Ami
 const TEXTURE_BRAMBLE = new THREE.TextureLoader().load('../images/amiyaroad/Bramble.png');
 const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/Boost.png');
 
-const MAP_SEGMENT_LENGTH = 250;
-const TILE_WIDTH = 2;
-const TILE_LENGTH = 4;
-let trackGroup;
+const material = new THREE.MeshLambertMaterial();
+
+let pos;
+let quad;
+let scene;
+let physicsWorld;
+let rigidBodies;
+const margin = 0.05;
+const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/AmiyaStare.png');
+
+const TILE_WIDTH = 6;
+const TILE_DEPTH = 12;
+
 class MapGenerator {
-    constructor() {
-
+    constructor(scene, physicsWorld) {
+        this.scene = scene;
+        this.physicsWorld = physicsWorld;
+        this.pos = new THREE.Vector3();
+        this.quat = new THREE.Quaternion();
+        this.rigidBodies = [];
     }
-    generateTile(colour, scale = 1) {
-        const boxGeometry = new THREE.BoxGeometry(TILE_WIDTH * scale, 0.8, TILE_LENGTH);
-
-        const material = new THREE.MeshPhongMaterial({ color: colour });
-        const mesh = new THREE.Mesh(boxGeometry, material);
-        mesh.name = "Floor Tile";
-        return mesh;
-    }
-    generatePillar(colour, scale = 1) {
-        const boxGeometry = new THREE.BoxGeometry(TILE_WIDTH * scale, 2, TILE_LENGTH);
-        const material = new THREE.MeshPhongMaterial({ color: colour });
-        const mesh = new THREE.Mesh(boxGeometry, material);
-        mesh.name = "Pillar";
-        return mesh;
-    }
-    generateBrambleWall() {
-        const boxGeometry = new THREE.BoxGeometry(TILE_WIDTH * 2, 3, TILE_LENGTH *0.5);
-        const material = new THREE.MeshPhongMaterial({ map: TEXTURE_BRAMBLE });
-        const mesh = new THREE.Mesh(boxGeometry, material);
-        mesh.name = "Death";
-        return mesh;
-    }
-    generateBoost(colour, scale = 1) {
-        const boxGeometry = new THREE.BoxGeometry(TILE_WIDTH * scale, 0.8, TILE_LENGTH);
-
-        const material = new THREE.MeshPhongMaterial({ map: TEXTURE_BOOST });
-        const mesh = new THREE.Mesh(boxGeometry, material);
-        mesh.name = "Boost";
-        return mesh;
-    }
-    generateAmiyaBar(scale = 1) {
-        const boxGeometry = new THREE.BoxGeometry(3, 0.1, 0.75);
-
-        const material = new THREE.MeshBasicMaterial({ map: TEXTURE_AMIYABAR });
-        const mesh = new THREE.Mesh(boxGeometry, material);
-        mesh.name = "AmiyaBar";
-        mesh.rotation.y = 1.5708;
-        return mesh;
-    }
-
-    getColour(i) {
-        if (i % 2 === 0) {
-            return COLOUR_SECONDARY;
+    initMap(levelSelected) {
+        if (levelSelected == "1-1") {
+            this.createMap11();
+        } else if (levelSelected == "1-2") {
+            this.createMap12();
+        } else if (levelSelected == "1-3") {
+            this.createMap13();
         }
-        return COLOUR_MAIN;
+
+
+        return this.rigidBodies;
+
     }
+    createMap11() {
+        let lastPos = new THREE.Vector3(0, 2, 0);
+        let lastQuat = new THREE.Quaternion();
+        const length = 61;
+        for (let i = 0; i > -length; i--) {
+            if (i % 5 == 0) {
+                this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
 
-    getBrambleColour(i) {
-        if (i % 2 === 0) {
-            return COLOUR_BRAMBLE_SECONDARY;
-        }
-        return COLOUR_BRAMBLE_MAIN;
-    }
-
-    generateGoal(lastTilePos) {
-        const geometry = new THREE.BoxGeometry(TILE_LENGTH, TILE_LENGTH, 1);
-        const material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        const goal = new THREE.Mesh(geometry, material);
-
-        goal.position.x = lastTilePos.x;
-        goal.position.y = lastTilePos.y;
-        goal.position.z = lastTilePos.z;
-        goal.name = "Goal";
-        goal.receiveShadow = true;
-        return goal;
-    }
-
-    generateRandomLevel() {
-        trackGroup = new THREE.Group();
-        let t = 0;
-        let lastTilePos;
-        for (let i = 0; i < MAP_SEGMENT_LENGTH; i++) {
-            t++;
-            let random_skip = Math.random();
-            if (random_skip <= 0.1 && i > 10 && i % 30 != 0) {
-
+                this.quat.set(-0.02 * i / 10.0, 0, 0, 1);
             } else {
-
-                let colour = COLOUR_MAIN;
-                if (i % 2 === 0) {
-                    colour = COLOUR_SECONDARY;
-                }
-
-                let tileMesh = this.generateTile(colour, 1);
-                tileMesh.position.y = -0.2;
-
-                if (i > 0 && i % 30 == 0) {
-                    tileMesh = this.generateAmiyaBar();
-                }
-
-                tileMesh.position.z = -i * TILE_LENGTH;
-                tileMesh.position.x = 0;
-                if (i >= 60) {
-                    tileMesh.position.x = Math.cos(t) * 1.5;
-                } else if (i >= 30) {
-                    tileMesh.position.x = Math.cos(t);
-                } else if (i >= 10) {
-                    tileMesh.position.x = Math.random() - 0.5;
-                }
-
-                if (i >= 20 && i % 30 != 0) {
-                    tileMesh.position.y += Math.floor(Math.random() * 2) * 0.3;
-                }
-                if (i >= 60) {
-                    tileMesh.rotation.x = Math.sin(t) * 0.10;
-                }
-                tileMesh.receiveShadow = true;
-                lastTilePos = tileMesh.position;
-                trackGroup.add(tileMesh);
+                this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
+                this.quat.set(0, 0, 0, 1);
             }
 
 
-            random_skip = Math.random();
-            if (random_skip <= 0.5 && i > 10) {
-
-            } else {
-                let colour = COLOUR_MAIN;
-                if (i % 2 === 0) {
-                    colour = COLOUR_SECONDARY;
-                }
-                let tileMesh = this.generatePillar(colour, 1);
-
-                tileMesh.position.z = -i * TILE_LENGTH;
-                tileMesh.position.x = -TILE_WIDTH;
-                if (i >= 60) {
-                    tileMesh.position.x = -TILE_WIDTH + Math.cos(t) * 1.5;
-                } else if (i >= 30) {
-                    tileMesh.position.x = -TILE_WIDTH + Math.cos(t);
-                } else if (i >= 10) {
-                    tileMesh.position.x = -TILE_WIDTH + Math.random() - 0.5;
-                }
-                tileMesh.position.y = 0.4;
-
-                if (i >= 20) {
-                    tileMesh.position.y += Math.floor(Math.random() * 2) * 0.3;
-                }
-                if (i >= 40) {
-                    tileMesh.rotation.x = Math.sin(t) * 0.05;
-                }
-                if (i >= 90) {
-                    tileMesh.rotation.z = Math.sin(t) * 0.05;
-                }
-                tileMesh.receiveShadow = true;
-                trackGroup.add(tileMesh);
-            }
-
-            random_skip = Math.random();
-            if (random_skip <= 0.5 && i > 10) {
-                continue;
-            } else {
-                let colour = COLOUR_MAIN;
-                if (i % 2 === 0) {
-                    colour = COLOUR_SECONDARY;
-                }
-                let tileMesh = this.generatePillar(colour, 1);
-
-                tileMesh.position.z = -i * TILE_LENGTH;
-                tileMesh.position.x = TILE_WIDTH;
-                if (i >= 60) {
-                    tileMesh.position.x = TILE_WIDTH + Math.cos(t) * 1.5;
-                } else if (i >= 30) {
-                    tileMesh.position.x = TILE_WIDTH + Math.cos(t);
-                } else if (i >= 10) {
-                    tileMesh.position.x = TILE_WIDTH + Math.random() - 0.5;
-                }
-                tileMesh.position.y = 0.4;
-                if (i >= 20) {
-                    tileMesh.position.y += Math.floor(Math.random() * 2) * 0.3;
-                }
-                if (i >= 40) {
-                    tileMesh.rotation.x = Math.sin(t) * 0.05;
-                }
-                if (i >= 90) {
-                    tileMesh.rotation.z = Math.sin(t) * 0.05;
-                }
-                tileMesh.receiveShadow = true;
-                //tileMesh.rotation.z = 0.5;
-                trackGroup.add(tileMesh);
-            }
-
-        }
-        const goal = this.generateGoal(lastTilePos);
-        trackGroup.add(goal);
-        return trackGroup;
-    }
-
-    generateLevel_1_1() {
-        trackGroup = new THREE.Group();
-        const mapLength = 40;
-        let direction = 0;
-        let lastTilePos;
-        for (let i = 0; i < mapLength; i++) {
-
-            let colour = this.getColour(i);
-            let tileMesh = this.generateTile(colour, 1);
-            if (i == 30) {
-                tileMesh = this.generateAmiyaBar();
-                tileMesh.position.y = 0.1;
-            }
-            if (i > 0 && i % 10 == 0) {
-                direction = 1 - direction;
-            }
-            if (i != 30) {
-                if (direction == 0) {
-                    tileMesh.position.y = -0.2 + ((-0.5 + Math.cos(i)) * 0.15);
-                } else if (direction == 1) {
-                    tileMesh.position.y = -0.2 + ((-0.5 + Math.sin(i)) * 0.15);
-                }
-            }
-
-            tileMesh.position.x = (-0.5 + Math.cos(i));
-            tileMesh.position.z = -i * TILE_LENGTH;
-            lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.y, tileMesh.position.z);
-            //tileMesh.rotation.x = Math.cos(i) * 0.06;
-            tileMesh.receiveShadow = true;
-            trackGroup.add(tileMesh);
-        }
-        const goal = this.generateGoal(lastTilePos);
-        trackGroup.add(goal);
-        return trackGroup;
-    }
-    generateLevel_1_2() {
-        trackGroup = new THREE.Group();
-        const mapLength = 80;
-        let direction = 0;
-        let lastTilePos;
-        for (let i = 0; i < mapLength; i++) {
-            if (i > 0) {
-                if (i % 3 == 0 || i % 7 == 0) {
-                    continue;
-                }
-            }
-
-            let colour = this.getColour(i);
-            let tileMesh = this.generateTile(colour, 1);
-            if (i == 41) {
-                tileMesh = this.generateAmiyaBar();
-                tileMesh.position.y = 0.2;
-            }
-
-            if (i > 0 && i % 10 == 0) {
-                direction = 1 - direction;
-            }
-
-            tileMesh.position.y = -0.2;
-
-            tileMesh.position.x = (-0.5 + Math.cos(i));
-            tileMesh.position.z = -i * TILE_LENGTH;
-            lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.y, tileMesh.position.z);
-            //tileMesh.rotation.x = Math.cos(i) * 0.06;
-            tileMesh.receiveShadow = true;
-            trackGroup.add(tileMesh);
-        }
-        const goal = this.generateGoal(lastTilePos);
-        trackGroup.add(goal);
-        return trackGroup;
-    }
-
-    generateLevel_1_3() {
-        trackGroup = new THREE.Group();
-        const mapLength = 120;
-        let direction = 0;
-        let lastTilePos;
-        for (let i = 0; i < mapLength; i++) {
-
-            if (i > 0 && i % 5 == 0) {
-                direction = 1 - direction;
-            }
-            if (direction == 1) {
-                continue;
-            }
-
-            let colour = this.getColour(i);
-            let tileMesh = this.generateTile(colour, 1);
-            if (i == 51) {
-                tileMesh = this.generateAmiyaBar();
-                tileMesh.position.y = 0.2;
-            }
-
-            tileMesh.position.y = -0.2;
-
-            tileMesh.position.x = (-0.5 + Math.cos(i));
-            tileMesh.position.z = -i * TILE_LENGTH;
-            lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.y, tileMesh.position.z);
-            //tileMesh.rotation.x = Math.sin(i) * 0.15;
-            tileMesh.receiveShadow = true;
-            trackGroup.add(tileMesh);
-        }
-        direction = 0;
-        for (let i = 0; i < mapLength; i++) {
-            if (i > 0 && i % 5 == 0) {
-                direction = 1 - direction;
-            }
-            if (direction == 0) {
-                continue;
-            }
-
-            let colour = this.getColour(i);
-            let tileMesh = this.generateTile(colour, 1);
-            if (i == 81) {
-                tileMesh = this.generateAmiyaBar();
-                tileMesh.position.y = 0.5;
-            } else if (i >= 50) {
-                tileMesh = this.generatePillar(colour, 1);
-            }
-
-            tileMesh.position.y = 0.3;
-
-            tileMesh.position.x = 2.5 + (-0.5 + Math.sin(i));
-            tileMesh.position.z = -i * TILE_LENGTH;
-            //tileMesh.rotation.z = Math.cos(i) * 0.25;
-            tileMesh.receiveShadow = true;
-            lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.y, tileMesh.position.z);
-            trackGroup.add(tileMesh);
-        }
-        direction = 0;
-        for (let i = 0; i < mapLength; i++) {
-            if (i > 0 && i % 5 == 0) {
-                direction = 1 - direction;
-            }
-            if (direction == 0) {
-                continue;
-            }
-
-            let colour = this.getColour(i);
-            let tileMesh = this.generatePillar(colour, 1);
-            if (i == 21) {
-                tileMesh = this.generateAmiyaBar();
-                tileMesh.position.y = -.02;
-            } else if (i >= 50) {
-                tileMesh = this.generateTile(colour, 1);
-            }
-
-            tileMesh.position.y = -0.4;
-
-            tileMesh.position.x = -2.5 + (-0.5 + Math.sin(i));
-            tileMesh.position.z = -i * TILE_LENGTH;
-            //tileMesh.rotation.z = Math.cos(i) * 0.25;
-            tileMesh.receiveShadow = true;
-            lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.y, tileMesh.position.z);
-            trackGroup.add(tileMesh);
-        }
-        const goal = this.generateGoal(lastTilePos);
-        trackGroup.add(goal);
-        return trackGroup;
-    }
-    generateLevel_2_1() {
-        trackGroup = new THREE.Group();
-        const mapLength = 123;
-        let lastTilePos;
-        for (let i = 0; i < mapLength; i++) {
-
-            let colour = this.getBrambleColour(i);
-            let tileMesh = this.generateTile(colour, 1);
-            if (i > 0 && i % 30 == 0) {
-                tileMesh = this.generateAmiyaBar();
-                tileMesh.position.y = 0.2;
-            } else if (i > 0 && i % 10 == 0) {
-                tileMesh = this.generateBrambleWall();
-                tileMesh.position.y = -0.2;
-            } else if (i > 0 && (i+2) % 10 == 0) {
-                tileMesh = this.generateBoost(colour);
-                tileMesh.rotation.x = 0.2;
-                tileMesh.position.y = 0.2;
+            let colour = this.createColour(i);
+            
+            if (i < 0 && (i % 30 == 0)) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                const ground = this.createAmiyaBarWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
+                ground.receiveShadow = true;
             }else{
-                tileMesh.position.y = -0.2;
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
+                ground.receiveShadow = true;
             }
+            
 
-            tileMesh.position.x = (-1 + Math.cos(i) + Math.sin(i))*0.5;
-            tileMesh.position.z = -i * TILE_LENGTH;
-            lastTilePos = new THREE.Vector3(tileMesh.position.x, tileMesh.position.y, tileMesh.position.z);
+            lastPos.x = this.pos.x;
+            lastPos.y = this.pos.y + 4;
+            lastPos.z = this.pos.z - 1;
 
-            tileMesh.receiveShadow = true;
-            trackGroup.add(tileMesh);
         }
-        const goal = this.generateGoal(lastTilePos);
-        trackGroup.add(goal);
-        return trackGroup;
+        for (let i = 0; i > -length; i--) {
+            if (i % 4 == 0) {
+                continue;
+            }
+            this.pos.set(TILE_WIDTH + 0.4 + Math.sin(i) * 2, 2, i * TILE_DEPTH);
+            this.quat.set(0.1, 0, 0.3, 1);
+
+            let colour = this.createColour(i - 1);
+            let material = new THREE.MeshPhongMaterial({ color: colour });
+            const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
+            ground.receiveShadow = true;
+        }
+        for (let i = 0; i > -length; i--) {
+            if (i % 6 == 0) {
+                continue;
+            }
+            this.pos.set(-TILE_WIDTH - 0.4 + Math.sin(i) * 2, 2, i * TILE_DEPTH);
+            this.quat.set(0.1, 0, -0.3, 1);
+
+            let colour = this.createColour(i - 1);
+            let material = new THREE.MeshPhongMaterial({ color: colour });
+            const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
+            ground.receiveShadow = true;
+        }
+
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+        const ground = this.createGoalWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, lastPos, lastQuat, material);
+
+
     }
+    createMap12() {
+    }
+    createMap13() {
+    }
+    createPlayer() {
+        this.pos.set(0, 2, 0);
+        this.quat.set(0, 0, 0, 1);
+        const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
+        let body = this.createPlayerWithPhysics(0.75, 2, this.pos, this.quat, playerMaterial);
+
+        return body;
+    }
+    createPlayerWithPhysics(radius, mass, pos, quat, material) {
+
+        const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
+        const shape = new Ammo.btSphereShape(radius);
+        //const object = new THREE.Mesh(new THREE.BoxGeometry(radius, radius * 0.2, radius, 1, 1, 1), material);
+        //const shape = new Ammo.btBoxShape(new Ammo.btVector3(radius * 0.5, radius * 0.2 * 0.5, radius * 0.5));
+        shape.setMargin(margin);
+        object.name = "Player";
+        object.receiveShadow = true;
+        object.castShadow = true;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
+
+        const wingsObject = new THREE.Mesh(new THREE.BoxGeometry(radius * 2, 0.2, radius, 1, 1, 1), material);
+        const wingsShape = new Ammo.btBoxShape(new Ammo.btVector3(radius * 2 * 0.5, 0.2 * 0.5, radius * 0.5));
+        wingsShape.setMargin(margin);
+        this.createRigidBody(wingsObject, wingsShape, 0, pos, quat, object);
+
+        return object;
+
+    }
+    createTileWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+        shape.setMargin(margin);
+        object.name = "Tile";
+        object.receiveShadow = true;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        return object;
+
+    }
+    createAmiyaBarWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+        shape.setMargin(margin);
+        object.name = "AmiyaBar";
+        object.receiveShadow = true;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        return object;
+
+    }
+    createGoalWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+        shape.setMargin(margin);
+        object.name = "Goal";
+
+        object.receiveShadow = true;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+
+        return object;
+    }
+
+    createRigidBody(object, physicsShape, mass, pos, quat, vel, angVel) {
+
+        if (pos) {
+
+            object.position.copy(pos);
+
+        } else {
+
+            pos = object.position;
+
+        }
+
+        if (quat) {
+
+            object.quaternion.copy(quat);
+
+        } else {
+
+            quat = object.quaternion;
+
+        }
+
+        const transform = new Ammo.btTransform();
+        transform.setIdentity();
+        transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+        transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+        const motionState = new Ammo.btDefaultMotionState(transform);
+
+        const localInertia = new Ammo.btVector3(0, 0, 0);
+        physicsShape.calculateLocalInertia(mass, localInertia);
+
+        const rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, physicsShape, localInertia);
+        const body = new Ammo.btRigidBody(rbInfo);
+
+        body.setFriction(0.5);
+
+        if (vel) {
+
+            body.setLinearVelocity(new Ammo.btVector3(vel.x, vel.y, vel.z));
+
+        }
+
+        if (angVel) {
+
+            body.setAngularVelocity(new Ammo.btVector3(angVel.x, angVel.y, angVel.z));
+
+        }
+
+        object.userData.physicsBody = body;
+        object.userData.collided = false;
+
+        this.scene.add(object);
+
+        if (mass > 0) {
+
+            this.rigidBodies.push(object);
+
+            // Disable deactivation
+            body.setActivationState(4);
+
+        }
+        body.name = object.name;
+        this.physicsWorld.addRigidBody(body);
+
+        return body;
+
+    }
+
+
+    createColour(i) {
+        if (i % 2 == 0) {
+            return COLOUR_MAIN
+        }
+        return COLOUR_SECONDARY;
+
+    }
+
 }
 
 export { MapGenerator };

@@ -175,6 +175,22 @@ async function AmmoPhysics() {
 		}
 
 	}
+	function getBody( mesh, index = 0 ) {
+
+		if ( mesh.isInstancedMesh ) {
+
+			const bodies = meshMap.get( mesh );
+			const body = bodies[ index ];
+			return body;
+
+		} else if ( mesh.isMesh ) {
+
+			const body = meshMap.get( mesh );
+			return body;
+
+		}
+
+	}
 
 	//
 
@@ -247,7 +263,8 @@ async function AmmoPhysics() {
 
 	return {
 		addMesh: addMesh,
-		setMeshPosition: setMeshPosition
+		setMeshPosition: setMeshPosition,
+		getBody: getBody,
 		// addCompoundMesh
 	};
 
