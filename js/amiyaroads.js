@@ -31,8 +31,8 @@ let container;
 const GRAVITY = 30;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 5;
-const acceleration = 3;
-const turnSpeed = 2;
+const acceleration = 5;
+const turnSpeed = 4;
 const jumpSpeed = 17;
 const maxSpeed = 30;
 const maxStamina = 500;
