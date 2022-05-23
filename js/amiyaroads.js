@@ -30,10 +30,10 @@ let container;
 // Physics variables
 const GRAVITY = 30;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
-const RESPONSIVE_ARTIFICAL_GRAVITY = 100;
-const acceleration = 30;
-const turnSpeed = 60;
-const jumpSpeed = 900;
+const RESPONSIVE_ARTIFICAL_GRAVITY = 5;
+const acceleration = 3;
+const turnSpeed = 2;
+const jumpSpeed = 17;
 const maxSpeed = 30;
 const maxStamina = 500;
 let seed;
@@ -47,13 +47,12 @@ let physicsWorld;
 
 let onGround;
 let timeLastOnGround;
-let coyoteTimeLimit = 0.1;
+let coyoteTimeLimit = 0.18;
 
 // Rigid bodies include all movable objects
 let rigidBodies;
 let transformAux1;
 let cbContactResult;
-let cbContactPairResult;
 
 //sounds
 let bgm;
@@ -251,15 +250,15 @@ function initMusic() {
 
 function initGraphics() {
 	console.log("initGraphics");
-	camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.2, 120);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 200);
 
-	camera.position.set(0, 14, 1);
-	camera.lookAt(0, 0.5, -1);
+	camera.position.set(0, 12, 21);
+	camera.lookAt(0, 0.5, 0);
 
 	const hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, 0.8);
 	scene.add(hemisphereLight);
 
-	spotLight = new THREE.SpotLight(0xffffff, 0.3);
+	spotLight= new THREE.DirectionalLight( 0xffffff, 0.3 );
 	spotLight.position.set(0, 20, 0);
 
 	spotLight.castShadow = true;
@@ -339,20 +338,20 @@ function setupContactResultCallback() {
 			dead = false;
 		} else if (tag == "AmiyaBar") {
 			stamina = maxStamina;
-			if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 2.98) {
-				console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
-				dead = true;
-				won = false;
-			}
+			// if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 2.98) {
+			// 	console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
+			// 	dead = true;
+			// 	won = false;
+			// }
 
 			timeLastOnGround = clock.elapsedTime;
 			onGround = true;
 		} else if (tag == "Tile") {
-			if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5.9) {
-				console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
-				dead = true;
-				won = false;
-			}
+			// if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5.9) {
+			// 	console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
+			// 	dead = true;
+			// 	won = false;
+			// }
 
 			timeLastOnGround = clock.elapsedTime;
 			onGround = true;
@@ -439,7 +438,7 @@ function updatePhysics(deltaTime) {
 
 	let velocity = player.body.getLinearVelocity();
 	$debug.text("Random Seed: "+seed);
-	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
+	stamina -= Math.abs((-velocity.z() *deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
 		stamina = 0;
 	}
@@ -464,13 +463,13 @@ function updatePhysics(deltaTime) {
 
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
-			let relVelChange = (-acceleration * deltaTime);
+			let relVelChange = (-acceleration);
 			if (velocity.z() + relVelChange >= -maxSpeed) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
 			}
 		}
 		if (keyStates.ArrowDown || keyStates.KeyS) {
-			let relVelChange = (acceleration * deltaTime);
+			let relVelChange = (acceleration);
 			if (velocity.z() + relVelChange <= 0) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
 			}
@@ -478,25 +477,25 @@ function updatePhysics(deltaTime) {
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
 			//allow doubling back to be twice as fast if traveling in the opposite direction
 			if (velocity.x() > 0) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * 2 * deltaTime, 0, 0));
+				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * 1.3, 0, 0));
 			} else {
-				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * deltaTime, 0, 0));
+				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed, 0, 0));
 			}
 
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
 			//allow doubling back to be twice as fast if traveling in the opposite direction
 			if (velocity.x() < 0) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * 2 * deltaTime, 0, 0));
+				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * 1.3, 0, 0));
 			} else {
-				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * deltaTime, 0, 0));
+				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed, 0, 0));
 			}
 		}
 	}
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
-			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed * deltaTime, velocity.z());
+			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
 			player.body.setLinearVelocity(jumpImpulse);
 			onGround = false;
 		}
@@ -504,7 +503,7 @@ function updatePhysics(deltaTime) {
 	} else if (!onGround) {
 		//not actively trying to jump and not on the ground
 		//fall faster
-		player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY * deltaTime, 0));
+		player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY, 0));
 	}
 	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z(), -9), 0, -velocity.x());
 	player.body.setAngularVelocity(angularVelocity);
@@ -534,7 +533,7 @@ function updatePhysics(deltaTime) {
 
 	}
 
-	camera.position.set(0, 7, player.position.z + 10);
+	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(0, 20, player.position.z);
 }
@@ -545,6 +544,7 @@ function win() {
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
 	bgm.stop();
+	mapGenerator.clear();
 	scene.clear();
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud').addClass('hide');
@@ -557,12 +557,10 @@ function reset() {
 	dead = true;
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
-	while (scene.children.length > 0) {
-		scene.remove(scene.children[0]);
-	}
+	mapGenerator.clear();
 	scene.clear();
 	init(lastSelectedLevel);
-	camera.position.set(0, 7, player.position.z + 10);
+	camera.position.set(0, 12, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(0, 20, player.position.z);
 

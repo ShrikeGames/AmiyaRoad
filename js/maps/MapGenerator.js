@@ -18,6 +18,7 @@ let quad;
 let scene;
 let physicsWorld;
 let rigidBodies;
+let allBodies;
 const margin = 0.05;
 const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/AmiyaStare.png');
 
@@ -37,6 +38,7 @@ class MapGenerator {
         this.pos = new THREE.Vector3();
         this.quat = new THREE.Quaternion();
         this.rigidBodies = [];
+        this.allBodies = [];
     }
     initMap(levelSelected, seed) {
         this.seed = seed;
@@ -45,6 +47,7 @@ class MapGenerator {
         this.pos = new THREE.Vector3();
         this.quat = new THREE.Quaternion();
         this.rigidBodies = [];
+        this.allBodies = [];
         if (levelSelected == "1-1") {
             this.createMap11();
         } else if (levelSelected == "1-2") {
@@ -266,7 +269,7 @@ class MapGenerator {
             }
 
             let colour = this.createColour(i);
-            if (i < 0 && (Math.random()*100 < 5)) {
+            if (i < 0 && (Math.random() * 100 < 5)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                 this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
 
@@ -281,8 +284,8 @@ class MapGenerator {
             lastPos.z = this.pos.z - 1;
 
         }
-        
-        
+
+
 
         let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
         this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
@@ -414,6 +417,7 @@ class MapGenerator {
 
         }
         body.name = object.name;
+        this.allBodies.push(body);
         this.physicsWorld.addRigidBody(body);
 
         return body;
@@ -426,6 +430,16 @@ class MapGenerator {
             return COLOUR_MAIN
         }
         return COLOUR_SECONDARY;
+
+    }
+    clear() {
+        console.log("clear");
+        for (let i = 0; i < this.rigidBodies.length; i++) {
+            this.physicsWorld.removeRigidBody(this.rigidBodies[i]);
+        }
+        for (let i = 0; i < this.allBodies.length; i++) {
+            this.physicsWorld.removeRigidBody(this.allBodies[i]);
+        }
 
     }
 
