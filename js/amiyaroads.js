@@ -32,8 +32,9 @@ const acceleration = 30;
 const turnSpeed = 60;
 const jumpSpeed = 1700;
 const maxSpeed = 30;
-const minContactDistance = 0.5;
+const minContactDistance = 0.15;
 const maxStamina = 500;
+
 let stamina;
 let collisionConfiguration;
 let dispatcher;
@@ -42,11 +43,13 @@ let solver;
 let physicsWorld;
 
 let jumpReset;
+let onGround = false;
 
 // Rigid bodies include all movable objects
 let rigidBodies;
-
 let transformAux1;
+let cbContactResult;
+let cbContactPairResult;
 
 //sounds
 let bgm;
@@ -278,9 +281,83 @@ function initPhysics() {
 
 	jumpReset = true;
 	stamina = maxStamina;
+	setupContactResultCallback();
+	setupContactPairResultCallback();
+
+}
+function setupContactResultCallback() {
+
+	cbContactResult = new Ammo.ConcreteContactResultCallback();
+
+	cbContactResult.addSingleResult = function (cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1) {
+		let contactPoint = Ammo.wrapPointer(cp, Ammo.btManifoldPoint);
+
+		const distance = contactPoint.getDistance();
+
+		if (distance > 0) return;
+
+		onGround = true;
+		jumpReset = true;
+
+		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
+		//console.log(colWrapper0.getCollisionObject());
+		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
+
+		let colWrapper1 = Ammo.wrapPointer(colObj1Wrap, Ammo.btCollisionObjectWrapper);
+		//console.log(colWrapper1.getCollisionObject());
+		let rb1 = Ammo.castObject(colWrapper1.getCollisionObject(), Ammo.btRigidBody);
+
+		let tag, localPos, worldPos
+
+		if (rb0.name != "Player") {
+
+			tag = rb0.name;
+			localPos = contactPoint.get_m_localPointA();
+			worldPos = contactPoint.get_m_positionWorldOnA();
+
+		} else {
+
+			tag = rb1.name;
+			localPos = contactPoint.get_m_localPointB();
+			worldPos = contactPoint.get_m_positionWorldOnB();
+		}
+		if (tag == "Goal") {
+			win();
+			return;
+		} else if (tag == "AmiyaBar") {
+			stamina = maxStamina;
+		} else if (tag != "" && tag != "Tile") {
+			//if it's some other special case I have not looked for then log it out
+			let localPosDisplay = { x: localPos.x(), y: localPos.y(), z: localPos.z() };
+			let worldPosDisplay = { x: worldPos.x(), y: worldPos.y(), z: worldPos.z() };
+
+			console.log({ tag, localPosDisplay, worldPosDisplay });
+		}
+
+
+	}
 
 }
 
+function setupContactPairResultCallback() {
+
+	cbContactPairResult = new Ammo.ConcreteContactResultCallback();
+
+	cbContactPairResult.hasContact = false;
+
+	cbContactPairResult.addSingleResult = function (cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1) {
+
+		let contactPoint = Ammo.wrapPointer(cp, Ammo.btManifoldPoint);
+
+		const distance = contactPoint.getDistance();
+
+		if (distance > 0) return;
+
+		this.hasContact = true;
+
+	}
+
+}
 function createObjects(levelSelected) {
 	mapGenerator = new MapGenerator(scene, physicsWorld);
 
@@ -311,7 +388,9 @@ function initInput() {
 	document.addEventListener('keyup', (event) => {
 		keyStates[event.code] = false;
 	});
-
+	document.addEventListener("collidestart", function () {
+		console.log("HIT");
+	});
 }
 
 function onWindowResize() {
@@ -347,36 +426,9 @@ function render() {
 	renderer.render(scene, camera);
 
 }
-function calculateOnGround() {
-	let numManifolds = dispatcher.getNumManifolds();
 
-	let onGround = false;
-	let distance = 0;
-	for (let i = 0; i < numManifolds; i++) {
-		const contactManifold = dispatcher.getManifoldByIndexInternal(i);
-
-		let body0 = contactManifold.getBody0();
-		let body1 = contactManifold.getBody1();
-		if (!body0 && !body1) {
-			continue;
-		}
-		let rb0 = Ammo.castObject(contactManifold.getBody0(), Ammo.btRigidBody);
-		let rb1 = Ammo.castObject(contactManifold.getBody1(), Ammo.btRigidBody);
-		if (rb0.name == "Goal" || rb1.name == "Goal") {
-			win();
-			return;
-		} else if (rb0.name == "AmiyaBar" || rb1.name == "AmiyaBar") {
-			stamina = maxStamina;
-		}
-
-		let contactPoint = contactManifold.getContactPoint();
-		distance = contactPoint.getDistance();
-		if (Math.abs(contactPoint.getDistance()) < minContactDistance) {
-			onGround = true;
-		}
-
-	}
-	return onGround;
+function checkContact() {
+	physicsWorld.contactTest(player.body, cbContactResult);
 }
 function updatePhysics(deltaTime) {
 	if (won) {
@@ -387,17 +439,17 @@ function updatePhysics(deltaTime) {
 		return;
 	}
 	let velocity = player.body.getLinearVelocity();
-
-	stamina -= (-velocity.z() * deltaTime);//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
+	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
 		stamina = 0;
 	}
-	$('.hud--speed').text(-velocity.z().toPrecision(4));
-	$('.hud--speed').attr("style", "width:" + ((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
+	$('.hud--speed').text(Math.abs(-velocity.z().toPrecision(4)));
+	$('.hud--speed').attr("style", "width:" + Math.abs((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
 	$('.hud--stamina').text(Math.round(stamina));
 	$('.hud--stamina').attr("style", "width:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
 
-	let onGround = calculateOnGround();
+	checkContact();
+
 
 	//console.log(velocity.z());
 	if (stamina > 0) {
@@ -414,10 +466,21 @@ function updatePhysics(deltaTime) {
 			}
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
-			player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * deltaTime, 0, 0));
+			//allow doubling back to be twice as fast if traveling in the opposite direction
+			if (velocity.x() > 0) {
+				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * 2 * deltaTime, 0, 0));
+			} else {
+				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * deltaTime, 0, 0));
+			}
+
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
-			player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * deltaTime, 0, 0));
+			//allow doubling back to be twice as fast if traveling in the opposite direction
+			if (velocity.x() < 0) {
+				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * 2 * deltaTime, 0, 0));
+			} else {
+				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * deltaTime, 0, 0));
+			}
 		}
 	}
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
@@ -430,12 +493,11 @@ function updatePhysics(deltaTime) {
 	} else if (!onGround) {
 		player.body.applyCentralImpulse(new Ammo.btVector3(0, velocity.y() * 0.25 * deltaTime, 0));
 	}
-	if (velocity.y() <= 0) {
-		jumpReset = true;
-	}
+
 
 	// Step world
 	physicsWorld.stepSimulation(deltaTime, 10);
+
 
 	// Update rigid bodies
 	for (let i = 0, il = rigidBodies.length; i < il; i++) {
