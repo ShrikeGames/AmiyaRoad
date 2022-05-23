@@ -15,6 +15,7 @@ let mapGenerator;
 let initialized = false;
 let keyStates;
 let won = false;
+let dead = false;
 let scene;
 let renderer;
 let camera;
@@ -74,7 +75,6 @@ function initFirstTime() {
 		return;
 	}
 
-
 	$('.play-button').on('click', function (e) {
 		let $this = $(this);
 		lastSelectedLevel = $this.attr("data-level");
@@ -84,8 +84,6 @@ function initFirstTime() {
 		$('.menu--start-screen').addClass('hide');
 	});
 
-	window.addEventListener('resize', onWindowResize);
-
 	$(".hud--volume-slider").slider({
 		orientation: "vertical",
 		range: "min",
@@ -93,28 +91,47 @@ function initFirstTime() {
 		max: 100,
 		value: 5,
 		slide: function (event, ui) {
-			musicVolume = ui.value/100.0;
+			musicVolume = ui.value / 100.0;
 			bgm.setVolume(musicVolume);
-			$(".hud--volume-display").text((musicVolume*100)+"%");
+			$(".hud--volume-display").text((musicVolume * 100) + "%");
 		}
 	});
-	musicVolume = $(".hud--volume-slider").slider("value")/100.0;
-	$(".hud--volume-display").text((musicVolume*100)+"%");
+	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
+	$(".hud--volume-display").text((musicVolume * 100) + "%");
+
+	container = document.getElementById('container');
+
+	scene = new THREE.Scene();
+	scene.background = new THREE.Color(0xbfd1e5);
+
+	renderer = new THREE.WebGLRenderer();
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
+
+	container.appendChild(renderer.domElement);
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.top = '0px';
+	container.appendChild(stats.domElement);
+
 	initInput();
+
+
+	initPhysics();
+	window.addEventListener('resize', onWindowResize);
 
 
 	initialized = true;
 }
 
 function init(levelSelected) {
-
+	console.log("init");
 	clock = new THREE.Clock();
 
 	rigidBodies = [];
 
 	initGraphics();
-
-	initPhysics();
 
 	createObjects(levelSelected);
 
@@ -125,7 +142,8 @@ function init(levelSelected) {
 	$('.hud').removeClass('hide');
 	$('#container').removeClass('hide');
 	$('.menu--loading-screen').addClass('hide');
-
+	dead = false;
+	won = false;
 }
 
 function initSky(levelSelected) {
@@ -228,24 +246,11 @@ function initMusic() {
 
 
 function initGraphics() {
-
-
-	container = document.getElementById('container');
-	container.innerHTML = "";
+	console.log("initGraphics");
 	camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.2, 120);
-
-	scene = new THREE.Scene();
-	scene.background = new THREE.Color(0xbfd1e5);
 
 	camera.position.set(0, 14, 1);
 	camera.lookAt(0, 0.5, -1);
-
-	renderer = new THREE.WebGLRenderer();
-	renderer.setPixelRatio(window.devicePixelRatio);
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.shadowMap.enabled = true;
-
-	container.appendChild(renderer.domElement);
 
 	const hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, 0.8);
 	scene.add(hemisphereLight);
@@ -268,19 +273,14 @@ function initGraphics() {
 
 	scene.add(spotLight);
 
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	container.appendChild(stats.domElement);
 
 	//
 
-	window.addEventListener('resize', onWindowResize);
 
 }
 
 function initPhysics() {
-
+	console.log("ininitPhysicsitGraphics");
 	// Physics configuration
 
 	collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
@@ -291,14 +291,12 @@ function initPhysics() {
 	physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
 
 	transformAux1 = new Ammo.btTransform();
-	onGround = false;
-	stamina = maxStamina;
+
 	setupContactResultCallback();
-	setupContactPairResultCallback();
 
 }
 function setupContactResultCallback() {
-
+	console.log("setupContactResultCallback");
 	cbContactResult = new Ammo.ConcreteContactResultCallback();
 
 	cbContactResult.addSingleResult = function (cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1) {
@@ -331,50 +329,39 @@ function setupContactResultCallback() {
 			localPos = contactPoint.get_m_localPointB();
 			worldPos = contactPoint.get_m_positionWorldOnB();
 		}
-		if (tag == "Goal") {
-			win();
-			return;
+
+
+
+		if (tag == "Death") {
+			dead = true;
+			won = false;
+		} else if (tag == "Goal") {
+			won = true;
+			dead = false;
 		} else if (tag == "AmiyaBar") {
 			stamina = maxStamina;
-		} else if (tag != "" && tag != "Tile") {
-			//if it's some other special case I have not looked for then log it out
-			let localPosDisplay = { x: localPos.x(), y: localPos.y(), z: localPos.z() };
-			let worldPosDisplay = { x: worldPos.x(), y: worldPos.y(), z: worldPos.z() };
-
-			console.log({ tag, localPosDisplay, worldPosDisplay });
+		} else if (tag != "Player") {
+			if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5) {
+				console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
+				dead = true;
+				won = false;
+			}
 		}
 
-
 	}
 
 }
 
-function setupContactPairResultCallback() {
-
-	cbContactPairResult = new Ammo.ConcreteContactResultCallback();
-
-	cbContactPairResult.hasContact = false;
-
-	cbContactPairResult.addSingleResult = function (cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1) {
-
-		let contactPoint = Ammo.wrapPointer(cp, Ammo.btManifoldPoint);
-
-		const distance = contactPoint.getDistance();
-
-		if (distance > 0) return;
-
-		this.hasContact = true;
-
-	}
-
-}
 function createObjects(levelSelected) {
+	console.log("createObjects");
+	onGround = false;
+	stamina = maxStamina;
 	mapGenerator = new MapGenerator(scene, physicsWorld);
-
+	keyStates = {};
 	// Ground
 	rigidBodies = mapGenerator.initMap(levelSelected);
 	player = mapGenerator.createPlayer();
-
+	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
 	spotLight.target = player;
 
 }
@@ -394,7 +381,8 @@ function initInput() {
 }
 
 function onWindowResize() {
-	if (won) {
+	console.log("onWindowResize");
+	if (won || dead) {
 		return;
 	}
 	camera.aspect = window.innerWidth / window.innerHeight;
@@ -405,7 +393,7 @@ function onWindowResize() {
 }
 
 function animate() {
-	if (won) {
+	if (won || dead) {
 		return;
 	}
 	requestAnimationFrame(animate);
@@ -416,9 +404,10 @@ function animate() {
 }
 
 function render() {
-	if (won) {
+	if (won || dead) {
 		return;
 	}
+
 	const deltaTime = clock.getDelta();
 
 	updatePhysics(deltaTime);
@@ -428,14 +417,13 @@ function render() {
 }
 
 function checkContact() {
+	if (won || dead) {
+		return;
+	}
 	physicsWorld.contactTest(player.body, cbContactResult);
 }
 function updatePhysics(deltaTime) {
-	if (won) {
-		return;
-	}
-	if (player.position.y <= -5) {
-		reset();
+	if (won || dead) {
 		return;
 	}
 
@@ -451,6 +439,14 @@ function updatePhysics(deltaTime) {
 	$('.hud--stamina').attr("style", "width:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
 
 	checkContact();
+	if (won) {
+		win();
+		return;
+	}
+	if (player.position.y <= -5 || dead) {
+		reset();
+		return;
+	}
 	if (keyStates.KeyI) {
 		//debug info key
 		console.log(player);
@@ -533,7 +529,9 @@ function updatePhysics(deltaTime) {
 	spotLight.position.set(0, 20, player.position.z);
 }
 function win() {
+	console.log("win");
 	won = true;
+	dead = false;
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
 	bgm.stop();
@@ -544,13 +542,20 @@ function win() {
 }
 
 function reset() {
+	console.log("reset");
+	won = false;
+	dead = true;
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
+	while (scene.children.length > 0) {
+		scene.remove(scene.children[0]);
+	}
 	scene.clear();
 	init(lastSelectedLevel);
 	camera.position.set(0, 7, player.position.z + 10);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(0, 20, player.position.z);
+
 
 }
 

@@ -11,6 +11,7 @@ const TEXTURE_BRAMBLE = new THREE.TextureLoader().load('../images/amiyaroad/Bram
 const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/Boost.png');
 
 const material = new THREE.MeshLambertMaterial();
+const deathMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_BRAMBLE });
 
 let pos;
 let quad;
@@ -21,10 +22,13 @@ const margin = 0.05;
 const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/AmiyaStare.png');
 
 const TILE_WIDTH = 6;
+const TILE_HEIGHT = 4;
 const TILE_DEPTH = 12;
 const GOAL_WIDTH = 12;
 const GOAL_HEIGHT = 12;
 const GOAL_DEPTH = 4;
+
+const DEATH_MARGIN = 0.5;
 
 class MapGenerator {
     constructor(scene, physicsWorld) {
@@ -35,6 +39,9 @@ class MapGenerator {
         this.rigidBodies = [];
     }
     initMap(levelSelected) {
+        this.pos = new THREE.Vector3();
+        this.quat = new THREE.Quaternion();
+        this.rigidBodies = [];
         if (levelSelected == "1-1") {
             this.createMap11();
         } else if (levelSelected == "1-2") {
@@ -51,11 +58,13 @@ class MapGenerator {
         let lastPos = new THREE.Vector3(0, 2, 0);
         let lastQuat = new THREE.Quaternion();
         const length = 61;
+        const rightSideRotation = new THREE.Euler(0, 0, 0.25, 'XYZ')
+        const leftSideRotation = new THREE.Euler(0, 0, -0.25, 'XYZ')
         for (let i = 0; i > -length; i--) {
             if (i % 5 == 0) {
                 this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
 
-                this.quat.set(-0.02 * i / 10.0, 0, 0, 1);
+                this.quat.set(-0.05 * i / 10.0, 0, 0, 1);
             } else {
                 this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
                 this.quat.set(0, 0, 0, 1);
@@ -66,47 +75,45 @@ class MapGenerator {
 
             if (i < 0 && (i % 30 == 0)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                const ground = this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH/2.0, 0, this.pos, this.quat, material);
-                ground.receiveShadow = true;
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH/2.0, 0, this.pos, this.quat, material);
             } else {
                 let material = new THREE.MeshPhongMaterial({ color: colour });
-                const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
-                ground.receiveShadow = true;
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                
             }
-
-
             lastPos.x = this.pos.x;
             lastPos.y = this.pos.y + 4;
             lastPos.z = this.pos.z - 1;
 
         }
         for (let i = 0; i > -length; i--) {
-            if (i % 4 == 0) {
+            if (i % 5 == 0) {
                 continue;
+            } else {
+                this.pos.set(TILE_WIDTH + Math.sin(i) * 2, 1, i * TILE_DEPTH);
+                this.quat.setFromEuler (rightSideRotation);
             }
-            this.pos.set(TILE_WIDTH + 0.4 + Math.sin(i) * 2, 2, i * TILE_DEPTH);
-            this.quat.set(0.1, 0, 0.3, 1);
 
-            let colour = this.createColour(i - 1);
+            let colour = this.createColour(i);
             let material = new THREE.MeshPhongMaterial({ color: colour });
-            const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
-            ground.receiveShadow = true;
+            this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            
         }
         for (let i = 0; i > -length; i--) {
-            if (i % 6 == 0) {
+            if (i % 5 == 0) {
                 continue;
+            } else {
+                this.pos.set(-TILE_WIDTH + Math.sin(i) * 2, 1, i * TILE_DEPTH);
+                this.quat.setFromEuler (leftSideRotation);
             }
-            this.pos.set(-TILE_WIDTH - 0.4 + Math.sin(i) * 2, 2, i * TILE_DEPTH);
-            this.quat.set(0.1, 0, -0.3, 1);
 
-            let colour = this.createColour(i - 1);
+            let colour = this.createColour(i);
             let material = new THREE.MeshPhongMaterial({ color: colour });
-            const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
-            ground.receiveShadow = true;
+            this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            
         }
-
         let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        const ground = this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
     }
     createMap12() {
         let lastPos = new THREE.Vector3(0, 2, 0);
@@ -126,12 +133,12 @@ class MapGenerator {
 
             if (i < 0 && (i % 32 == 0)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                const ground = this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH/2.0, 0, this.pos, this.quat, material);
-                ground.receiveShadow = true;
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH/2.0, 0, this.pos, this.quat, material);
+                
             } else {
                 let material = new THREE.MeshPhongMaterial({ color: colour });
-                const ground = this.createTileWithPhysics(TILE_WIDTH, 4, TILE_DEPTH, 0, this.pos, this.quat, material);
-                ground.receiveShadow = true;
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH-0.1, 0, this.pos, this.quat, material);
+                
             }
 
 
@@ -142,12 +149,12 @@ class MapGenerator {
         }
 
         let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        const ground = this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
     }
     createMap13() {
     }
     createPlayer() {
-        this.pos.set(0, 2, 0);
+        this.pos.set(0, 3, 0);
         this.quat.set(0, 0, 0, 1);
         const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
         let body = this.createPlayerWithPhysics(0.75, 2, this.pos, this.quat, playerMaterial);
@@ -158,19 +165,11 @@ class MapGenerator {
 
         const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
         const shape = new Ammo.btSphereShape(radius);
-        //const object = new THREE.Mesh(new THREE.BoxGeometry(radius, radius * 0.2, radius, 1, 1, 1), material);
-        //const shape = new Ammo.btBoxShape(new Ammo.btVector3(radius * 0.5, radius * 0.2 * 0.5, radius * 0.5));
         shape.setMargin(margin);
         object.name = "Player";
         object.receiveShadow = true;
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
-
-        const wingsObject = new THREE.Mesh(new THREE.BoxGeometry(radius * 2, 0.2, radius, 1, 1, 1), material);
-        const wingsShape = new Ammo.btBoxShape(new Ammo.btVector3(radius * 2 * 0.5, 0.2 * 0.5, radius * 0.5));
-        wingsShape.setMargin(margin);
-        this.createRigidBody(wingsObject, wingsShape, 0, pos, quat, object);
-
         return object;
 
     }
@@ -181,6 +180,18 @@ class MapGenerator {
         object.name = "Tile";
         object.receiveShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        //this.pos.set(this.pos.x, this.pos.y, this.pos.z +(TILE_DEPTH/2.0));
+        //this.createDeathWithPhysics(TILE_WIDTH -DEATH_MARGIN, TILE_HEIGHT-DEATH_MARGIN, 0.1, 0, this.pos, this.quat, deathMaterial);
+        return object;
+
+    }
+    createDeathWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+        shape.setMargin(margin);
+        object.name = "Death";
+        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+
         return object;
 
     }
