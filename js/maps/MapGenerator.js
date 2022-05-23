@@ -205,8 +205,9 @@ class MapGenerator {
         const rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, physicsShape, localInertia);
         const body = new Ammo.btRigidBody(rbInfo);
 
-        body.setFriction(0.5);
-
+        body.setFriction(0);
+        body.setRollingFriction(0);
+        //body.setDamping(0.5);
         if (vel) {
 
             body.setLinearVelocity(new Ammo.btVector3(vel.x, vel.y, vel.z));

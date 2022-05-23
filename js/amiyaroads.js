@@ -30,9 +30,8 @@ let container;
 const GRAVITY = 30;
 const acceleration = 30;
 const turnSpeed = 60;
-const jumpSpeed = 1700;
+const jumpSpeed = 900;
 const maxSpeed = 30;
-const minContactDistance = 0.15;
 const maxStamina = 500;
 
 let stamina;
@@ -43,7 +42,9 @@ let solver;
 let physicsWorld;
 
 let jumpReset;
-let onGround = false;
+let onGround;
+let timeLastOnGround;
+let coyoteTimeLimit = 0.18;
 
 // Rigid bodies include all movable objects
 let rigidBodies;
@@ -196,7 +197,7 @@ function initMusic() {
 			bgm.setBuffer(audioBuffer);
 
 			// play the audio
-			bgm.setVolume(0.05);
+			bgm.setVolume(0.00);
 			bgm.setLoop(true);
 			bgm.play();
 		},
@@ -278,8 +279,8 @@ function initPhysics() {
 	physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
 
 	transformAux1 = new Ammo.btTransform();
-
-	jumpReset = true;
+	jumpReset = false;
+	onGround = false;
 	stamina = maxStamina;
 	setupContactResultCallback();
 	setupContactPairResultCallback();
@@ -291,20 +292,19 @@ function setupContactResultCallback() {
 
 	cbContactResult.addSingleResult = function (cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1) {
 		let contactPoint = Ammo.wrapPointer(cp, Ammo.btManifoldPoint);
-
+		onGround = false;
 		const distance = contactPoint.getDistance();
-
+		
 		if (distance > 0) return;
-
+		
+		timeLastOnGround = clock.elapsedTime;
 		onGround = true;
 		jumpReset = true;
 
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
-		//console.log(colWrapper0.getCollisionObject());
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
 
 		let colWrapper1 = Ammo.wrapPointer(colObj1Wrap, Ammo.btCollisionObjectWrapper);
-		//console.log(colWrapper1.getCollisionObject());
 		let rb1 = Ammo.castObject(colWrapper1.getCollisionObject(), Ammo.btRigidBody);
 
 		let tag, localPos, worldPos
@@ -366,15 +366,6 @@ function createObjects(levelSelected) {
 	player = mapGenerator.createPlayer();
 
 	spotLight.target = player;
-	// textureLoader.load( 'textures/grid.png', function ( texture ) {
-
-	// 	texture.wrapS = THREE.RepeatWrapping;
-	// 	texture.wrapT = THREE.RepeatWrapping;
-	// 	texture.repeat.set( 40, 40 );
-	// 	ground.material.map = texture;
-	// 	ground.material.needsUpdate = true;
-
-	// } );
 
 }
 
@@ -387,9 +378,6 @@ function initInput() {
 
 	document.addEventListener('keyup', (event) => {
 		keyStates[event.code] = false;
-	});
-	document.addEventListener("collidestart", function () {
-		console.log("HIT");
 	});
 }
 
@@ -420,7 +408,7 @@ function render() {
 		return;
 	}
 	const deltaTime = clock.getDelta();
-
+	
 	updatePhysics(deltaTime);
 
 	renderer.render(scene, camera);
@@ -438,7 +426,9 @@ function updatePhysics(deltaTime) {
 		reset();
 		return;
 	}
+	
 	let velocity = player.body.getLinearVelocity();
+	$('.hud--debug').text(velocity.x());
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
 		stamina = 0;
@@ -449,7 +439,10 @@ function updatePhysics(deltaTime) {
 	$('.hud--stamina').attr("style", "width:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
 
 	checkContact();
-
+	if (keyStates.KeyI){
+		//debug info key
+		console.log(player);
+	}
 
 	//console.log(velocity.z());
 	if (stamina > 0) {
@@ -484,16 +477,16 @@ function updatePhysics(deltaTime) {
 		}
 	}
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
-		if (stamina > 0 && onGround && jumpReset) {
-			player.body.applyCentralImpulse(new Ammo.btVector3(0, jumpSpeed * deltaTime, 0));
+		velocity = player.body.getLinearVelocity();
+		if (stamina > 0 && (onGround ||  (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
+			let jumpImpulse = new Ammo.btVector3( velocity.x(), jumpSpeed * deltaTime, velocity.z() );
+			player.body.setLinearVelocity( jumpImpulse );
 			onGround = false;
-			jumpReset = false;
 		}
 
-	} else if (!onGround) {
-		player.body.applyCentralImpulse(new Ammo.btVector3(0, velocity.y() * 0.25 * deltaTime, 0));
 	}
-
+	let angularVelocity = new Ammo.btVector3( Math.max(velocity.z(), -9), 0, -velocity.x());
+	player.body.setAngularVelocity( angularVelocity );
 
 	// Step world
 	physicsWorld.stepSimulation(deltaTime, 10);
