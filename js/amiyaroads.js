@@ -28,6 +28,8 @@ let container;
 // Physics
 // Physics variables
 const GRAVITY = 30;
+//to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
+const RESPONSIVE_ARTIFICAL_GRAVITY = 100;
 const acceleration = 30;
 const turnSpeed = 60;
 const jumpSpeed = 900;
@@ -41,7 +43,6 @@ let broadphase;
 let solver;
 let physicsWorld;
 
-let jumpReset;
 let onGround;
 let timeLastOnGround;
 let coyoteTimeLimit = 0.18;
@@ -55,7 +56,7 @@ let cbContactPairResult;
 //sounds
 let bgm;
 let lastSelectedLevel;
-
+let musicVolume = 0.05;
 
 //ui
 let $debug = $('.hud.hud--debug');
@@ -85,7 +86,21 @@ function initFirstTime() {
 
 	window.addEventListener('resize', onWindowResize);
 
-
+	$(".hud--volume-slider").slider({
+		orientation: "vertical",
+		range: "min",
+		min: 0,
+		max: 100,
+		value: 5,
+		slide: function (event, ui) {
+			musicVolume = ui.value/100.0;
+			bgm.setVolume(musicVolume);
+			$(".hud--volume-display").text((musicVolume*100)+"%");
+		}
+	});
+	musicVolume = $(".hud--volume-slider").slider("value")/100.0;
+	$(".hud--volume-display").text((musicVolume*100)+"%");
+	initInput();
 
 
 	initialized = true;
@@ -96,15 +111,12 @@ function init(levelSelected) {
 	clock = new THREE.Clock();
 
 	rigidBodies = [];
-	keyStates = {};
 
 	initGraphics();
 
 	initPhysics();
 
 	createObjects(levelSelected);
-
-	initInput();
 
 	initSky(levelSelected);
 
@@ -197,7 +209,7 @@ function initMusic() {
 			bgm.setBuffer(audioBuffer);
 
 			// play the audio
-			bgm.setVolume(0.00);
+			bgm.setVolume(musicVolume);
 			bgm.setLoop(true);
 			bgm.play();
 		},
@@ -279,7 +291,6 @@ function initPhysics() {
 	physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
 
 	transformAux1 = new Ammo.btTransform();
-	jumpReset = false;
 	onGround = false;
 	stamina = maxStamina;
 	setupContactResultCallback();
@@ -294,12 +305,11 @@ function setupContactResultCallback() {
 		let contactPoint = Ammo.wrapPointer(cp, Ammo.btManifoldPoint);
 		onGround = false;
 		const distance = contactPoint.getDistance();
-		
+
 		if (distance > 0) return;
-		
+
 		timeLastOnGround = clock.elapsedTime;
 		onGround = true;
-		jumpReset = true;
 
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
@@ -372,6 +382,8 @@ function createObjects(levelSelected) {
 
 function initInput() {
 	console.log("initInput");
+
+	keyStates = {};
 	document.addEventListener('keydown', (event) => {
 		keyStates[event.code] = true;
 	});
@@ -408,7 +420,7 @@ function render() {
 		return;
 	}
 	const deltaTime = clock.getDelta();
-	
+
 	updatePhysics(deltaTime);
 
 	renderer.render(scene, camera);
@@ -426,7 +438,7 @@ function updatePhysics(deltaTime) {
 		reset();
 		return;
 	}
-	
+
 	let velocity = player.body.getLinearVelocity();
 	$('.hud--debug').text(velocity.x());
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
@@ -439,12 +451,11 @@ function updatePhysics(deltaTime) {
 	$('.hud--stamina').attr("style", "width:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
 
 	checkContact();
-	if (keyStates.KeyI){
+	if (keyStates.KeyI) {
 		//debug info key
 		console.log(player);
 	}
 
-	//console.log(velocity.z());
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
 			let relVelChange = (-acceleration * deltaTime);
@@ -478,15 +489,19 @@ function updatePhysics(deltaTime) {
 	}
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
-		if (stamina > 0 && (onGround ||  (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
-			let jumpImpulse = new Ammo.btVector3( velocity.x(), jumpSpeed * deltaTime, velocity.z() );
-			player.body.setLinearVelocity( jumpImpulse );
+		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
+			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed * deltaTime, velocity.z());
+			player.body.setLinearVelocity(jumpImpulse);
 			onGround = false;
 		}
 
+	} else if (!onGround) {
+		//not actively trying to jump and not on the ground
+		//fall faster
+		player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY * deltaTime, 0));
 	}
-	let angularVelocity = new Ammo.btVector3( Math.max(velocity.z(), -9), 0, -velocity.x());
-	player.body.setAngularVelocity( angularVelocity );
+	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z(), -9), 0, -velocity.x());
+	player.body.setAngularVelocity(angularVelocity);
 
 	// Step world
 	physicsWorld.stepSimulation(deltaTime, 10);
