@@ -36,6 +36,7 @@ const turnSpeed = 60;
 const jumpSpeed = 900;
 const maxSpeed = 30;
 const maxStamina = 500;
+let seed;
 
 let stamina;
 let collisionConfiguration;
@@ -46,7 +47,7 @@ let physicsWorld;
 
 let onGround;
 let timeLastOnGround;
-let coyoteTimeLimit = 0.18;
+let coyoteTimeLimit = 0.1;
 
 // Rigid bodies include all movable objects
 let rigidBodies;
@@ -77,6 +78,9 @@ function initFirstTime() {
 
 	$('.play-button').on('click', function (e) {
 		let $this = $(this);
+		//random seed when you click play on a level
+		//retries within the level will regenerate the same way.
+		seed = "amiyaroads_" + Math.random() * 256000;
 		lastSelectedLevel = $this.attr("data-level");
 		won = false;
 		init(lastSelectedLevel);
@@ -117,8 +121,6 @@ function initFirstTime() {
 
 	initInput();
 
-
-	initPhysics();
 	window.addEventListener('resize', onWindowResize);
 
 
@@ -132,6 +134,8 @@ function init(levelSelected) {
 	rigidBodies = [];
 
 	initGraphics();
+
+	initPhysics();
 
 	createObjects(levelSelected);
 
@@ -306,9 +310,6 @@ function setupContactResultCallback() {
 
 		if (distance > 0) return;
 
-		timeLastOnGround = clock.elapsedTime;
-		onGround = true;
-
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
 
@@ -330,8 +331,6 @@ function setupContactResultCallback() {
 			worldPos = contactPoint.get_m_positionWorldOnB();
 		}
 
-
-
 		if (tag == "Death") {
 			dead = true;
 			won = false;
@@ -340,12 +339,23 @@ function setupContactResultCallback() {
 			dead = false;
 		} else if (tag == "AmiyaBar") {
 			stamina = maxStamina;
-		} else if (tag != "Player") {
-			if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5) {
+			if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 2.98) {
 				console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 				dead = true;
 				won = false;
 			}
+
+			timeLastOnGround = clock.elapsedTime;
+			onGround = true;
+		} else if (tag == "Tile") {
+			if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5.9) {
+				console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
+				dead = true;
+				won = false;
+			}
+
+			timeLastOnGround = clock.elapsedTime;
+			onGround = true;
 		}
 
 	}
@@ -359,7 +369,7 @@ function createObjects(levelSelected) {
 	mapGenerator = new MapGenerator(scene, physicsWorld);
 	keyStates = {};
 	// Ground
-	rigidBodies = mapGenerator.initMap(levelSelected);
+	rigidBodies = mapGenerator.initMap(levelSelected, seed);
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
 	spotLight.target = player;
@@ -428,7 +438,7 @@ function updatePhysics(deltaTime) {
 	}
 
 	let velocity = player.body.getLinearVelocity();
-	$('.hud--debug').text(velocity.x());
+	$debug.text("Random Seed: "+seed);
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
 		stamina = 0;
@@ -558,4 +568,3 @@ function reset() {
 
 
 }
-
