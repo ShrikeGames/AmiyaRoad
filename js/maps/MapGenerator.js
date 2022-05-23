@@ -294,7 +294,7 @@ class MapGenerator {
         this.pos.set(0, 3, 0);
         this.quat.set(0, 0, 0, 1);
         const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
-        let body = this.createPlayerWithPhysics(0.75, 2, this.pos, this.quat, playerMaterial);
+        let body = this.createPlayerWithPhysics(0.75, 4, this.pos, this.quat, playerMaterial);
 
         return body;
     }

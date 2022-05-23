@@ -258,7 +258,7 @@ function initGraphics() {
 	const hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, 0.8);
 	scene.add(hemisphereLight);
 
-	spotLight= new THREE.DirectionalLight( 0xffffff, 0.3 );
+	spotLight = new THREE.DirectionalLight(0xffffff, 0.3);
 	spotLight.position.set(0, 20, 0);
 
 	spotLight.castShadow = true;
@@ -309,6 +309,9 @@ function setupContactResultCallback() {
 
 		if (distance > 0) return;
 
+		
+		
+
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
 
@@ -343,18 +346,23 @@ function setupContactResultCallback() {
 			// 	dead = true;
 			// 	won = false;
 			// }
-
-			timeLastOnGround = clock.elapsedTime;
-			onGround = true;
+			if(localPos.y() >= 2){
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
+			}
+			
 		} else if (tag == "Tile") {
+			
 			// if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5.9) {
 			// 	console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 			// 	dead = true;
 			// 	won = false;
 			// }
-
-			timeLastOnGround = clock.elapsedTime;
-			onGround = true;
+			if(localPos.y() >= 2){
+				//console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
+			}
 		}
 
 	}
@@ -437,8 +445,8 @@ function updatePhysics(deltaTime) {
 	}
 
 	let velocity = player.body.getLinearVelocity();
-	$debug.text("Random Seed: "+seed);
-	stamina -= Math.abs((-velocity.z() *deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
+	$debug.text("Random Seed: " + seed);
+	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
 		stamina = 0;
 	}
@@ -535,7 +543,7 @@ function updatePhysics(deltaTime) {
 
 	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
-	spotLight.position.set(0, 20, player.position.z);
+	spotLight.position.set(player.position.x, 20, player.position.z);
 }
 function win() {
 	console.log("win");
