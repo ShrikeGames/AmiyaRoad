@@ -20,7 +20,10 @@ let physicsWorld;
 let rigidBodies;
 let allBodies;
 const margin = 0.05;
-const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/AmiyaStare.png');
+const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
+TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
+TEXTURE_PLAYER.wrapT = THREE.RepeatWrapping;
+TEXTURE_PLAYER.repeat.set( 1, 1 );
 
 const TILE_WIDTH = 6;
 const TILE_HEIGHT = 4;
@@ -292,7 +295,7 @@ class MapGenerator {
     }
     createPlayer() {
         this.pos.set(0, 3, 0);
-        this.quat.set(0, 0, 0, 1);
+        this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
         let body = this.createPlayerWithPhysics(0.75, 4, this.pos, this.quat, playerMaterial);
 

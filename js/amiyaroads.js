@@ -309,8 +309,8 @@ function setupContactResultCallback() {
 
 		if (distance > 0) return;
 
-		
-		
+
+
 
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
@@ -346,19 +346,19 @@ function setupContactResultCallback() {
 			// 	dead = true;
 			// 	won = false;
 			// }
-			if(localPos.y() >= 2){
+			if (localPos.y() >= 2) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
-			
+
 		} else if (tag == "Tile") {
-			
+
 			// if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5.9) {
 			// 	console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 			// 	dead = true;
 			// 	won = false;
 			// }
-			if(localPos.y() >= 2){
+			if (localPos.y() >= 2) {
 				//console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
@@ -474,12 +474,18 @@ function updatePhysics(deltaTime) {
 			let relVelChange = (-acceleration);
 			if (velocity.z() + relVelChange >= -maxSpeed) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
+			} else {
+				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), -maxSpeed);
+				player.body.setLinearVelocity(impulse);
 			}
 		}
 		if (keyStates.ArrowDown || keyStates.KeyS) {
 			let relVelChange = (acceleration);
 			if (velocity.z() + relVelChange <= 0) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
+			} else {
+				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), 0);
+				player.body.setLinearVelocity(impulse);
 			}
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
