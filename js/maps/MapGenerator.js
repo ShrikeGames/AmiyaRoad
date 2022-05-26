@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { ConvexGeometry } from '../jsm/geometries/ConvexGeometry.js';
+
 const COLOUR_MAIN = new THREE.Color(0xc0bdf2);
 const COLOUR_SECONDARY = new THREE.Color(0xffbef4);
 const COLOUR_PILLAR = new THREE.Color(0xe0afff);
@@ -23,7 +25,7 @@ const margin = 0.05;
 const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
 TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
 TEXTURE_PLAYER.wrapT = THREE.RepeatWrapping;
-TEXTURE_PLAYER.repeat.set( 1, 1 );
+TEXTURE_PLAYER.repeat.set(1, 1);
 
 const TILE_WIDTH = 6;
 const TILE_HEIGHT = 4;
@@ -57,6 +59,8 @@ class MapGenerator {
             this.createMap12();
         } else if (levelSelected == "1-3") {
             this.createMap13();
+        } else if (levelSelected == "1-4") {
+            this.createMap14();
         } else if (levelSelected == "?-?") {
             this.createMapRandomChaos();
         }
@@ -65,234 +69,11 @@ class MapGenerator {
         return this.rigidBodies;
 
     }
-    createMap11() {
-        let lastPos = new THREE.Vector3(0, 0, 0);
-        let lastQuat = new THREE.Quaternion();
-        const length = 61;
-        const rightSideRotation = new THREE.Euler(0, 0, 0.25, 'XYZ')
-        const leftSideRotation = new THREE.Euler(0, 0, -0.25, 'XYZ')
-        for (let i = 0; i > -length; i--) {
-            if (i % 5 == 0) {
-                this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
-                this.quat.setFromEuler(new THREE.Euler(-0.05 * i / 10.0, 0, 0, 'XYZ'));
-            } else {
-                this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
-                this.quat.set(0, 0, 0, 1);
-            }
 
-
-            let colour = this.createColour(i);
-
-            if (i < 0 && (i % 30 == 0)) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-            } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-
-            }
-            lastPos.x = this.pos.x;
-            lastPos.y = this.pos.y + 4;
-            lastPos.z = this.pos.z - 1;
-
-        }
-        for (let i = 0; i > -length; i--) {
-            if (i % 5 == 0) {
-                continue;
-            } else {
-                this.pos.set(TILE_WIDTH + Math.sin(i) * 2, 1, i * TILE_DEPTH);
-                this.quat.setFromEuler(rightSideRotation);
-            }
-
-            let colour = this.createColour(i);
-            let material = new THREE.MeshPhongMaterial({ color: colour });
-            this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-
-        }
-        for (let i = 0; i > -length; i--) {
-            if (i % 5 == 0) {
-                continue;
-            } else {
-                this.pos.set(-TILE_WIDTH + Math.sin(i) * 2, 1, i * TILE_DEPTH);
-                this.quat.setFromEuler(leftSideRotation);
-            }
-
-            let colour = this.createColour(i);
-            let material = new THREE.MeshPhongMaterial({ color: colour });
-            this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-
-        }
-        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+    v3(x, y, z) {
+        return new THREE.Vector3(x, y, z);
     }
-    createMap12() {
-        let lastPos = new THREE.Vector3(0, 0, 0);
-        let lastQuat = new THREE.Quaternion();
-        const length = 61;
-        for (let i = 0; i > -length; i--) {
-            if (i < 0) {
-                if (i % 10 == 0 || (i - 1) % 10 == 0) {
-                    continue;
-                }
-            }
 
-            this.pos.set(Math.cos(i) * 2, Math.sin(i), i * TILE_DEPTH);
-            this.quat.set(0, 0, 0, 1);
-
-            let colour = this.createColour(i);
-
-            if (i < 0 && (i % 32 == 0)) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-
-            } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
-
-            }
-
-
-            lastPos.x = this.pos.x;
-            lastPos.y = this.pos.y + 4;
-            lastPos.z = this.pos.z - 1;
-
-        }
-
-        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
-    }
-    createMap13() {
-        let lastPos = new THREE.Vector3(0, 0, 0);
-        let lastQuat = new THREE.Quaternion();
-        const length = 61;
-        let direction = 0;
-        for (let i = 0; i > -length; i--) {
-            if (i < 0 && i % 10 == 0) {
-                direction = 1 - direction;
-            }
-            if (direction == 1) {
-                continue;
-            }
-            if (i < 0 && (i % 5 == 0 || (i - 1) % 5 == 0)) {
-                continue;
-            }
-            this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
-            this.quat.set(0, 0, 0, 1);
-
-            let colour = this.createColour(i);
-
-            if (i < 0 && (i % 16 == 0)) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-            } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-
-            }
-
-        }
-        for (let i = 0; i > -length; i--) {
-            if (i < 0 && i % 10 == 0) {
-                direction = 1 - direction;
-            }
-            if (direction == 0) {
-                continue;
-            }
-            if (i < 0 && i % 5 == 0) {
-                continue;
-            }
-            this.pos.set(TILE_WIDTH + Math.sin(i) * 2, 1.5, i * TILE_DEPTH);
-            this.quat.set(0, 0, 0, 1);
-
-            let colour = this.createColour(i);
-
-            if (i < 0 && i == -35) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-            } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-
-            }
-
-        }
-        for (let i = 0; i > -length; i--) {
-            if (i < 0 && i % 10 == 0) {
-                direction = 1 - direction;
-            }
-            if (direction == 0) {
-                continue;
-            }
-            if (i < 0 && i % 3 == 0) {
-                continue;
-            }
-            this.pos.set(-TILE_WIDTH + Math.sin(i) + Math.cos(i) * 3, -1, i * TILE_DEPTH);
-            this.quat.set(0, 0, 0, 1);
-
-            let colour = this.createColour(i);
-            if (i < 0 && i == -16) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-            } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-            }
-
-
-
-        }
-
-        lastPos.x = this.pos.x;
-        lastPos.y = this.pos.y + 4;
-        lastPos.z = this.pos.z - 1;
-        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
-    }
-    createMapRandomChaos() {
-        let lastPos = new THREE.Vector3(0, 0, 0);
-        let lastQuat = new THREE.Quaternion();
-        const length = 256;
-        for (let i = 0; i > -length; i--) {
-            this.quat.set(0, 0, 0, 1);
-            if (i < -200) {
-                this.pos.set(Math.sin(i) + Math.cos(i) * 3, Math.sin(i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.2 * Math.sin(i), (-0.5 + Math.random()) * 0.2 * Math.cos(i), (-0.5 + Math.random()) * 0.2 * Math.sin(i), 'XYZ'));
-            } else if (i < -120) {
-                this.pos.set(Math.sin(i) + Math.cos(i) * 2.5, Math.sin(i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.1 * Math.sin(i), (-0.5 + Math.random()) * 0.1 * Math.cos(i), (-0.5 + Math.random()) * 0.1 * Math.sin(i), 'XYZ'));
-            } else if (i < -60) {
-                this.pos.set(Math.sin(i) + Math.cos(i) * 2, Math.sin(i) * (0.05 * i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.1 * Math.sin(i), 0, 0, 'XYZ'));
-            } else {
-                this.pos.set(Math.sin(i) + Math.cos(i), Math.sin(i) * (0.05 * i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
-            }
-            if (i < 0 && Math.floor(Math.random() * 10) == 0) {
-                continue;
-            }
-
-            let colour = this.createColour(i);
-            if (i < 0 && (Math.random() * 100 < 5)) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-
-            } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
-
-            }
-
-            lastPos.x = this.pos.x;
-            lastPos.y = this.pos.y + 4;
-            lastPos.z = this.pos.z - 1;
-
-        }
-
-
-
-        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
-    }
     createPlayer() {
         this.pos.set(0, 3, 0);
         this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
@@ -446,7 +227,243 @@ class MapGenerator {
 
     }
 
+    createMap11() {
+        let lastPos = new THREE.Vector3(0, 0, 0);
+        let lastQuat = new THREE.Quaternion();
+        const length = 61;
+        const rightSideRotation = new THREE.Euler(0, 0, 0.25, 'XYZ')
+        const leftSideRotation = new THREE.Euler(0, 0, -0.25, 'XYZ')
+        for (let i = 0; i > -length; i--) {
+            if (i % 5 == 0) {
+                this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
+                this.quat.setFromEuler(new THREE.Euler(-0.05 * i / 10.0, 0, 0, 'XYZ'));
+            } else {
+                this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
+                this.quat.set(0, 0, 0, 1);
+            }
 
+
+            let colour = this.createColour(i);
+
+            if (i < 0 && (i % 30 == 0)) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            } else {
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+            }
+            lastPos.x = this.pos.x;
+            lastPos.y = this.pos.y + 4;
+            lastPos.z = this.pos.z - 1;
+
+        }
+        for (let i = 0; i > -length; i--) {
+            if (i % 5 == 0) {
+                continue;
+            } else {
+                this.pos.set(TILE_WIDTH + Math.sin(i) * 2, 1, i * TILE_DEPTH);
+                this.quat.setFromEuler(rightSideRotation);
+            }
+
+            let colour = this.createColour(i);
+            let material = new THREE.MeshPhongMaterial({ color: colour });
+            this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+        }
+        for (let i = 0; i > -length; i--) {
+            if (i % 5 == 0) {
+                continue;
+            } else {
+                this.pos.set(-TILE_WIDTH + Math.sin(i) * 2, 1, i * TILE_DEPTH);
+                this.quat.setFromEuler(leftSideRotation);
+            }
+
+            let colour = this.createColour(i);
+            let material = new THREE.MeshPhongMaterial({ color: colour });
+            this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+        }
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+    }
+    createMap12() {
+        let lastPos = new THREE.Vector3(0, 0, 0);
+        let lastQuat = new THREE.Quaternion();
+        const length = 61;
+        for (let i = 0; i > -length; i--) {
+            if (i < 0) {
+                if (i % 10 == 0 || (i - 1) % 10 == 0) {
+                    continue;
+                }
+                this.pos.set(Math.cos(i) * 4, Math.sin(i), i * TILE_DEPTH);
+            }else{
+                this.pos.set(0, Math.sin(i), i * TILE_DEPTH);
+            }
+
+            
+            this.quat.set(0, 0, 0, 1);
+
+            let colour = this.createColour(i);
+
+            if (i < 0 && (i % 32 == 0)) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+
+            } else {
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
+
+            }
+            if (i < 0 && (i % 12 == 0)) {
+                let material = new THREE.MeshPhongMaterial({ color: this.createColour(i+1) });
+                this.pos.set(Math.cos(i) * 4, 4 + Math.sin(i), i * TILE_DEPTH);
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
+            }
+
+
+            lastPos.x = this.pos.x;
+            lastPos.y = this.pos.y + 4;
+            lastPos.z = this.pos.z - 1;
+
+        }
+
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+    }
+    createMap13() {
+        let lastPos = new THREE.Vector3(0, 0, 0);
+        let lastQuat = new THREE.Quaternion();
+        const length = 61;
+        let direction = 0;
+        for (let i = 0; i > -length; i--) {
+            if (i < 0 && i % 10 == 0) {
+                direction = 1 - direction;
+            }
+            if (direction == 1) {
+                continue;
+            }
+            if (i < 0 && (i % 5 == 0 || (i - 1) % 5 == 0)) {
+                continue;
+            }
+            this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
+            this.quat.set(0, 0, 0, 1);
+
+            let colour = this.createColour(i);
+
+            if (i < 0 && (i % 16 == 0)) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            } else {
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+            }
+
+        }
+        for (let i = 0; i > -length; i--) {
+            if (i < 0 && i % 10 == 0) {
+                direction = 1 - direction;
+            }
+            if (direction == 0) {
+                continue;
+            }
+            if (i < 0 && i % 5 == 0) {
+                continue;
+            }
+            this.pos.set(TILE_WIDTH + Math.sin(i) * 2, 1.5, i * TILE_DEPTH);
+            this.quat.set(0, 0, 0, 1);
+
+            let colour = this.createColour(i);
+
+            if (i < 0 && i == -35) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            } else {
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+            }
+
+        }
+        for (let i = 0; i > -length; i--) {
+            if (i < 0 && i % 10 == 0) {
+                direction = 1 - direction;
+            }
+            if (direction == 0) {
+                continue;
+            }
+            if (i < 0 && i % 3 == 0) {
+                continue;
+            }
+            this.pos.set(-TILE_WIDTH + Math.sin(i) + Math.cos(i) * 3, -1, i * TILE_DEPTH);
+            this.quat.set(0, 0, 0, 1);
+
+            let colour = this.createColour(i);
+            if (i < 0 && i == -16) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            } else {
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            }
+
+
+
+        }
+
+        lastPos.x = this.pos.x;
+        lastPos.y = this.pos.y + 4;
+        lastPos.z = this.pos.z - 1;
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+    }
+
+    createMapRandomChaos() {
+        let lastPos = new THREE.Vector3(0, 0, 0);
+        let lastQuat = new THREE.Quaternion();
+        const length = 256;
+        for (let i = 0; i > -length; i--) {
+            this.quat.set(0, 0, 0, 1);
+            if (i < -200) {
+                this.pos.set(Math.sin(i) + Math.cos(i) * 3, Math.sin(i), i * TILE_DEPTH);
+                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.2 * Math.sin(i), (-0.5 + Math.random()) * 0.2 * Math.cos(i), (-0.5 + Math.random()) * 0.2 * Math.sin(i), 'XYZ'));
+            } else if (i < -120) {
+                this.pos.set(Math.sin(i) + Math.cos(i) * 2.5, Math.sin(i), i * TILE_DEPTH);
+                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.1 * Math.sin(i), (-0.5 + Math.random()) * 0.1 * Math.cos(i), (-0.5 + Math.random()) * 0.1 * Math.sin(i), 'XYZ'));
+            } else if (i < -60) {
+                this.pos.set(Math.sin(i) + Math.cos(i) * 2, Math.sin(i) * (0.05 * i), i * TILE_DEPTH);
+                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.1 * Math.sin(i), 0, 0, 'XYZ'));
+            } else {
+                this.pos.set(Math.sin(i) + Math.cos(i), Math.sin(i) * (0.05 * i), i * TILE_DEPTH);
+                //this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+            }
+            if (i < 0 && Math.floor(Math.random() * 10) == 0) {
+                continue;
+            }
+
+            let colour = this.createColour(i);
+            if (i < 0 && (Math.random() * 100 < 5)) {
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+
+            } else {
+                let material = new THREE.MeshPhongMaterial({ color: colour });
+                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
+
+            }
+
+            lastPos.x = this.pos.x;
+            lastPos.y = this.pos.y + 4;
+            lastPos.z = this.pos.z - 1;
+
+        }
+
+
+
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+    }
 }
 
 export { MapGenerator };

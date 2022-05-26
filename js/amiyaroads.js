@@ -48,6 +48,9 @@ let physicsWorld;
 let onGround;
 let timeLastOnGround;
 let coyoteTimeLimit = 0.18;
+let velocity;
+let updates;
+let lastUpdateVelocity;
 
 // Rigid bodies include all movable objects
 let rigidBodies;
@@ -300,16 +303,35 @@ function initPhysics() {
 }
 function setupContactResultCallback() {
 	console.log("setupContactResultCallback");
+
+	if (won || dead) {
+		return;
+	}
+
 	cbContactResult = new Ammo.ConcreteContactResultCallback();
 
 	cbContactResult.addSingleResult = function (cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1) {
+		if (won || dead) {
+			return;
+		}
 		let contactPoint = Ammo.wrapPointer(cp, Ammo.btManifoldPoint);
 		onGround = false;
 		const distance = contactPoint.getDistance();
 
 		if (distance > 0) return;
 
+		if (lastUpdateVelocity.z <= -maxSpeed / 2.0 && velocity.z() >= -0.1) {
+			//last frame going very fast, now stopped completely, hit a wall too hard
+			//die
+			won = false;
+			dead = true;
 
+			console.log("previous velocity", lastUpdateVelocity.z);
+			console.log("current velocity", velocity.z());
+
+			reset();
+			return;
+		}
 
 
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
@@ -380,7 +402,8 @@ function createObjects(levelSelected) {
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
 	spotLight.target = player;
-
+	lastUpdateVelocity = new THREE.Vector3(0, 0, 0);
+	updates = 0;
 }
 
 
@@ -417,6 +440,12 @@ function animate() {
 
 	render();
 	stats.update();
+	updates++;
+	if (updates >= 5) {
+		lastUpdateVelocity.z = velocity.z();
+		updates = 0;
+	}
+
 
 }
 
@@ -443,8 +472,9 @@ function updatePhysics(deltaTime) {
 	if (won || dead) {
 		return;
 	}
+	velocity = player.body.getLinearVelocity();
 
-	let velocity = player.body.getLinearVelocity();
+
 	$debug.text("Random Seed: " + seed);
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
@@ -541,11 +571,11 @@ function updatePhysics(deltaTime) {
 			objThree.position.set(p.x(), p.y(), p.z());
 			objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
 
-			objThree.userData.collided = false;
-
 		}
 
 	}
+
+
 
 	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
@@ -557,7 +587,10 @@ function win() {
 	dead = false;
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
-	bgm.stop();
+	if (bgm && bgm.isPlaying) {
+		bgm.stop();
+	}
+
 	mapGenerator.clear();
 	scene.clear();
 	$('.menu--start-screen').removeClass('hide');
