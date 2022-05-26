@@ -28,13 +28,14 @@ let container;
 
 // Physics
 // Physics variables
-const GRAVITY = 30;
+const GRAVITY = 60;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
-const RESPONSIVE_ARTIFICAL_GRAVITY = 5;
+const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
 const acceleration = 5;
 const turnSpeed = 4;
+const maxTurnSpeed = 4;
 const jumpSpeed = 17;
-const maxSpeed = 30;
+const maxSpeed = 40;
 const maxStamina = 500;
 let seed;
 
@@ -520,19 +521,37 @@ function updatePhysics(deltaTime) {
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
 			//allow doubling back to be twice as fast if traveling in the opposite direction
+			let relVelChange = (-turnSpeed);
 			if (velocity.x() > 0) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed * 1.3, 0, 0));
+				relVelChange = (-turnSpeed) * 1.3;
+			}
+			if (!onGround) {
+				relVelChange *= 0.75;
+			}
+
+			if (velocity.z() + relVelChange <= 0) {
+				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
-				player.body.applyCentralImpulse(new Ammo.btVector3(-turnSpeed, 0, 0));
+				let impulse = new Ammo.btVector3(-maxTurnSpeed, velocity.y(), velocity.z());
+				player.body.setLinearVelocity(impulse);
 			}
 
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
 			//allow doubling back to be twice as fast if traveling in the opposite direction
+			let relVelChange = (turnSpeed);
 			if (velocity.x() < 0) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed * 1.3, 0, 0));
+				relVelChange = (turnSpeed) * 1.3;
+			}
+			if (!onGround) {
+				relVelChange *= 0.75;
+			}
+
+			if (velocity.z() + relVelChange <= 0) {
+				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
-				player.body.applyCentralImpulse(new Ammo.btVector3(turnSpeed, 0, 0));
+				let impulse = new Ammo.btVector3(maxTurnSpeed, velocity.y(), velocity.z());
+				player.body.setLinearVelocity(impulse);
 			}
 		}
 	}
