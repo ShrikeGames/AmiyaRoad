@@ -306,7 +306,7 @@ class MapGenerator {
 
             let colour = this.createColour(i);
 
-            if (i < 0 && (i % 16 == 0)) {
+            if (i < 0 && (i % 15 == 0)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                 this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
 
@@ -315,9 +315,9 @@ class MapGenerator {
                 this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
 
             }
-            if (i < 0 && (i % 12 == 0)) {
+            if (i < 0 && (i % 11 == 0)) {
                 let material = new THREE.MeshPhongMaterial({ color: this.createColour(i + 1) });
-                this.pos.set(Math.cos(i) * 4, 4 + Math.sin(i), i * TILE_DEPTH);
+                this.pos.set(3+ Math.cos(i) * 4, 4 + Math.sin(i), (i-0.5) * TILE_DEPTH);
                 this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
             }
 

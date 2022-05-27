@@ -293,14 +293,17 @@ function initPhysics() {
 	console.log("ininitPhysicsitGraphics");
 	// Physics configuration
 
-	collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
-	dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
-	broadphase = new Ammo.btDbvtBroadphase();
-	solver = new Ammo.btSequentialImpulseConstraintSolver();
-	physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-	physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
-
-	transformAux1 = new Ammo.btTransform();
+	if(!collisionConfiguration){
+		collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+		dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+		broadphase = new Ammo.btDbvtBroadphase();
+		solver = new Ammo.btSequentialImpulseConstraintSolver();
+		physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
+	
+		transformAux1 = new Ammo.btTransform();
+	}
+	
 
 	setupContactResultCallback();
 
