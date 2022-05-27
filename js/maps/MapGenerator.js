@@ -297,11 +297,11 @@ class MapGenerator {
                     continue;
                 }
                 this.pos.set(Math.cos(i) * 4, Math.sin(i), i * TILE_DEPTH);
-            }else{
+            } else {
                 this.pos.set(0, Math.sin(i), i * TILE_DEPTH);
             }
 
-            
+
             this.quat.set(0, 0, 0, 1);
 
             let colour = this.createColour(i);
@@ -316,7 +316,7 @@ class MapGenerator {
 
             }
             if (i < 0 && (i % 12 == 0)) {
-                let material = new THREE.MeshPhongMaterial({ color: this.createColour(i+1) });
+                let material = new THREE.MeshPhongMaterial({ color: this.createColour(i + 1) });
                 this.pos.set(Math.cos(i) * 4, 4 + Math.sin(i), i * TILE_DEPTH);
                 this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
             }
@@ -423,40 +423,101 @@ class MapGenerator {
         let lastPos = new THREE.Vector3(0, 0, 0);
         let lastQuat = new THREE.Quaternion();
         const length = 256;
-        for (let i = 0; i > -length; i--) {
+        for (let i = 0; i < length; i++) {
             this.quat.set(0, 0, 0, 1);
-            if (i < -200) {
-                this.pos.set(Math.sin(i) + Math.cos(i) * 3, Math.sin(i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.2 * Math.sin(i), (-0.5 + Math.random()) * 0.2 * Math.cos(i), (-0.5 + Math.random()) * 0.2 * Math.sin(i), 'XYZ'));
-            } else if (i < -120) {
-                this.pos.set(Math.sin(i) + Math.cos(i) * 2.5, Math.sin(i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.1 * Math.sin(i), (-0.5 + Math.random()) * 0.1 * Math.cos(i), (-0.5 + Math.random()) * 0.1 * Math.sin(i), 'XYZ'));
-            } else if (i < -60) {
-                this.pos.set(Math.sin(i) + Math.cos(i) * 2, Math.sin(i) * (0.05 * i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler((-0.5 + Math.random()) * 0.1 * Math.sin(i), 0, 0, 'XYZ'));
-            } else {
-                this.pos.set(Math.sin(i) + Math.cos(i), Math.sin(i) * (0.05 * i), i * TILE_DEPTH);
-                //this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
-            }
-            if (i < 0 && Math.floor(Math.random() * 10) == 0) {
-                continue;
-            }
 
-            let colour = this.createColour(i);
-            if (i < 0 && (Math.random() * 100 < 5)) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            let random_skip = Math.random();
+            if (random_skip <= 0.1 && i > 6 && (i % 30) != 0) {
 
             } else {
-                let material = new THREE.MeshPhongMaterial({ color: colour });
-                this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH - 0.1, 0, this.pos, this.quat, material);
+                let colour = this.createColour(i);
 
+                let x = 0;
+                let y = -0.2;
+                let z = -i * TILE_DEPTH;
+
+                if (i >= 60) {
+                    x = Math.cos(i) * 1.5;
+                } else if (i >= 30) {
+                    x = Math.cos(i);
+                } else if (i >= 10) {
+                    x = Math.random() - 0.5;
+                }
+                if (i >= 20 && i % 30 != 0) {
+                    y += Math.floor(Math.random() * 2) * 0.3;
+                }
+                this.pos.set(x, y, z);
+                if (i > 0 && i % 30 == 0) {
+                    let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                    this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                } else {
+                    let material = new THREE.MeshPhongMaterial({ color: colour });
+                    this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                }
             }
-
             lastPos.x = this.pos.x;
             lastPos.y = this.pos.y + 4;
             lastPos.z = this.pos.z - 1;
 
+            random_skip = Math.random();
+            if (random_skip <= 0.1 && i > 6) {
+
+            } else {
+                let colour = this.createColour(i);
+
+                let x = -TILE_WIDTH;
+                let y = 3;
+                let z = -i * TILE_DEPTH;
+
+                if (i >= 60) {
+                    x = -TILE_WIDTH + Math.cos(i) * 1.5;
+                } else if (i >= 30) {
+                    x = -TILE_WIDTH + Math.cos(i);
+                } else if (i >= 10) {
+                    x = -TILE_WIDTH + Math.random() - 0.5;
+                }
+                if (i >= 20 && i % 30 != 0) {
+                    y += Math.floor(Math.random() * 2) * 0.3;
+                }
+                this.pos.set(x, y, z);
+                if (i > 0 && Math.random() <= 0.05) {
+                    let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                    this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                } else {
+                    let material = new THREE.MeshPhongMaterial({ color: colour });
+                    this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                }
+            }
+
+            random_skip = Math.random();
+            if (random_skip <= 0.1 && i > 6) {
+
+            } else {
+                let colour = this.createColour(i);
+
+                let x = TILE_WIDTH;
+                let y = 3;
+                let z = -i * TILE_DEPTH;
+
+                if (i >= 60) {
+                    x = TILE_WIDTH + Math.cos(i) * 1.5;
+                } else if (i >= 30) {
+                    x = TILE_WIDTH + Math.cos(i);
+                } else if (i >= 10) {
+                    x = TILE_WIDTH + Math.random() - 0.5;
+                }
+                if (i >= 20 && i % 30 != 0) {
+                    y += Math.floor(Math.random() * 2) * 0.3;
+                }
+                this.pos.set(x, y, z);
+                if (i > 0 && Math.random() <= 0.05) {
+                    let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                    this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                } else {
+                    let material = new THREE.MeshPhongMaterial({ color: colour });
+                    this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                }
+            }
         }
 
 
