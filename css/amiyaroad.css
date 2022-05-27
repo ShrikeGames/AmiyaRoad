@@ -7,7 +7,16 @@
 	display:block;
 	color: #ffffff;
 }
-
+.version{
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 100%;
+	text-align: right;
+	z-index: 100;
+	display:block;
+	color: #ffffff;
+}
 .hud--bottom {
 	position: absolute;
 	bottom: 0px;

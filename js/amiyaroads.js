@@ -7,6 +7,8 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
+const versionString = "PRE-ALPHA Build 0.1 \"Arachnid\"";
+
 let stats;
 
 const languageToggle = new LanguageToggle();
@@ -78,6 +80,7 @@ function initFirstTime() {
 	if (initialized) {
 		return;
 	}
+	$('.version').text(versionString);
 
 	$('.play-button').on('click', function (e) {
 		let $this = $(this);
