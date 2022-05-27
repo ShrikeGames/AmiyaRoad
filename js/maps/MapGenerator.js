@@ -306,7 +306,7 @@ class MapGenerator {
 
             let colour = this.createColour(i);
 
-            if (i < 0 && (i % 32 == 0)) {
+            if (i < 0 && (i % 16 == 0)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                 this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
 
@@ -351,6 +351,10 @@ class MapGenerator {
 
             let colour = this.createColour(i);
 
+            if (i < -20 && i > -30) {
+                this.quat.set(0, 0, 0.04, 1);
+            }
+
             if (i < 0 && (i % 16 == 0)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                 this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
@@ -375,8 +379,12 @@ class MapGenerator {
             this.quat.set(0, 0, 0, 1);
 
             let colour = this.createColour(i);
+            
+            if (i < -30 && i > -40) {
+                this.quat.set(0, 0, 0.04, 1);
+            }
 
-            if (i < 0 && i == -35) {
+            if (i < 0 && (i == -35 || i == -18)) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                 this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
             } else {
@@ -398,6 +406,10 @@ class MapGenerator {
             }
             this.pos.set(-TILE_WIDTH + Math.sin(i) + Math.cos(i) * 3, -1, i * TILE_DEPTH);
             this.quat.set(0, 0, 0, 1);
+            
+            if (i < -30 && i > -40) {
+                this.quat.set(0, 0, -0.04, 1);
+            }
 
             let colour = this.createColour(i);
             if (i < 0 && i == -16) {
