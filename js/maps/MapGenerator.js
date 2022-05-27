@@ -422,7 +422,7 @@ class MapGenerator {
     createMapRandomChaos() {
         let lastPos = new THREE.Vector3(0, 0, 0);
         let lastQuat = new THREE.Quaternion();
-        const length = 256;
+        const length = 100;
         for (let i = 0; i < length; i++) {
             this.quat.set(0, 0, 0, 1);
 
@@ -466,7 +466,7 @@ class MapGenerator {
                 let colour = this.createColour(i);
 
                 let x = -TILE_WIDTH;
-                let y = 3;
+                let y = 2;
                 let z = -i * TILE_DEPTH;
 
                 if (i >= 60) {
@@ -478,6 +478,11 @@ class MapGenerator {
                 }
                 if (i >= 20 && i % 30 != 0) {
                     y += Math.floor(Math.random() * 2) * 0.3;
+                }
+                if (i >= 50) {
+                    this.quat.set(0, 0, Math.random() * -0.2, 1);
+                } else if (i > 50) {
+                    this.quat.set(0, 0, (0.5 - Math.random()) * 0.1, 1);
                 }
                 this.pos.set(x, y, z);
                 if (i > 0 && Math.random() <= 0.05) {
@@ -496,7 +501,7 @@ class MapGenerator {
                 let colour = this.createColour(i);
 
                 let x = TILE_WIDTH;
-                let y = 3;
+                let y = 2;
                 let z = -i * TILE_DEPTH;
 
                 if (i >= 60) {
@@ -509,6 +514,12 @@ class MapGenerator {
                 if (i >= 20 && i % 30 != 0) {
                     y += Math.floor(Math.random() * 2) * 0.3;
                 }
+                if (i >= 50) {
+                    this.quat.set(0, 0, Math.random() * 0.2, 1);
+                } else if (i > 50) {
+                    this.quat.set(0, 0, (0.5 - Math.random()) * 0.1, 1);
+                }
+
                 this.pos.set(x, y, z);
                 if (i > 0 && Math.random() <= 0.05) {
                     let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
