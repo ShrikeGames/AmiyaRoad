@@ -343,7 +343,7 @@ class MapGenerator {
             if (direction == 1) {
                 continue;
             }
-            if (i < 0 && (i % 5 == 0 || (i - 1) % 5 == 0)) {
+            if (i < 0 && (i % 5 == 0 || (i - 1) % 5 == 0 || Math.random() <= 0.02)) {
                 continue;
             }
             this.pos.set(Math.sin(i) * 2, 0, i * TILE_DEPTH);
@@ -379,7 +379,7 @@ class MapGenerator {
             this.quat.set(0, 0, 0, 1);
 
             let colour = this.createColour(i);
-            
+
             if (i < -30 && i > -40) {
                 this.quat.set(0, 0, 0.04, 1);
             }
@@ -406,7 +406,7 @@ class MapGenerator {
             }
             this.pos.set(-TILE_WIDTH + Math.sin(i) + Math.cos(i) * 3, -1, i * TILE_DEPTH);
             this.quat.set(0, 0, 0, 1);
-            
+
             if (i < -30 && i > -40) {
                 this.quat.set(0, 0, -0.04, 1);
             }
@@ -439,7 +439,7 @@ class MapGenerator {
             this.quat.set(0, 0, 0, 1);
 
             let random_skip = Math.random();
-            if (random_skip <= 0.1 && i > 6 && (i % 30) != 0) {
+            if (random_skip <= 0.2 && i > 6 && (i % 30) != 0) {
 
             } else {
                 let colour = this.createColour(i);
@@ -449,14 +449,15 @@ class MapGenerator {
                 let z = -i * TILE_DEPTH;
 
                 if (i >= 60) {
-                    x = Math.cos(i) * 1.5;
+                    x = Math.cos(i) * 2.5;
                 } else if (i >= 30) {
-                    x = Math.cos(i);
+                    x = Math.cos(i) * 1.5;
                 } else if (i >= 10) {
                     x = Math.random() - 0.5;
                 }
                 if (i >= 20 && i % 30 != 0) {
                     y += Math.floor(Math.random() * 2) * 0.3;
+                    this.quat.set(0.10*(i/100.0), 0, 0, 1);
                 }
                 this.pos.set(x, y, z);
                 if (i > 0 && i % 30 == 0) {
@@ -472,7 +473,7 @@ class MapGenerator {
             lastPos.z = this.pos.z - 1;
 
             random_skip = Math.random();
-            if (random_skip <= 0.1 && i > 6) {
+            if (random_skip <= 0.33 && i > 6) {
 
             } else {
                 let colour = this.createColour(i);
@@ -482,9 +483,9 @@ class MapGenerator {
                 let z = -i * TILE_DEPTH;
 
                 if (i >= 60) {
-                    x = -TILE_WIDTH + Math.cos(i) * 1.5;
+                    x = -TILE_WIDTH + Math.cos(i) * 2.5;
                 } else if (i >= 30) {
-                    x = -TILE_WIDTH + Math.cos(i);
+                    x = -TILE_WIDTH + Math.cos(i) * 1.5;
                 } else if (i >= 10) {
                     x = -TILE_WIDTH + Math.random() - 0.5;
                 }
@@ -492,12 +493,12 @@ class MapGenerator {
                     y += Math.floor(Math.random() * 2) * 0.3;
                 }
                 if (i >= 50) {
-                    this.quat.set(0, 0, Math.random() * -0.2, 1);
-                } else if (i > 50) {
+                    this.quat.set(0, 0, Math.random() * 0.2, 1);
+                } else {
                     this.quat.set(0, 0, (0.5 - Math.random()) * 0.1, 1);
                 }
                 this.pos.set(x, y, z);
-                if (i > 0 && Math.random() <= 0.05) {
+                if (i > 0 && Math.random() <= 0.02) {
                     let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                     this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
@@ -507,7 +508,7 @@ class MapGenerator {
             }
 
             random_skip = Math.random();
-            if (random_skip <= 0.1 && i > 6) {
+            if (random_skip <= 0.33 && i > 6) {
 
             } else {
                 let colour = this.createColour(i);
@@ -517,9 +518,9 @@ class MapGenerator {
                 let z = -i * TILE_DEPTH;
 
                 if (i >= 60) {
-                    x = TILE_WIDTH + Math.cos(i) * 1.5;
+                    x = TILE_WIDTH + Math.cos(i) * 2.5;
                 } else if (i >= 30) {
-                    x = TILE_WIDTH + Math.cos(i);
+                    x = TILE_WIDTH + Math.cos(i) * 1.5;
                 } else if (i >= 10) {
                     x = TILE_WIDTH + Math.random() - 0.5;
                 }
@@ -527,13 +528,13 @@ class MapGenerator {
                     y += Math.floor(Math.random() * 2) * 0.3;
                 }
                 if (i >= 50) {
-                    this.quat.set(0, 0, Math.random() * 0.2, 1);
-                } else if (i > 50) {
+                    this.quat.set(0, 0, Math.random() * -0.2, 1);
+                } else {
                     this.quat.set(0, 0, (0.5 - Math.random()) * 0.1, 1);
                 }
 
                 this.pos.set(x, y, z);
-                if (i > 0 && Math.random() <= 0.05) {
+                if (i > 0 && Math.random() <= 0.02) {
                     let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                     this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
