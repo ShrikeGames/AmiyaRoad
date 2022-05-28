@@ -293,17 +293,17 @@ function initPhysics() {
 	console.log("ininitPhysicsitGraphics");
 	// Physics configuration
 
-	if(!collisionConfiguration){
+	if (!collisionConfiguration) {
 		collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
 		dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
 		broadphase = new Ammo.btDbvtBroadphase();
 		solver = new Ammo.btSequentialImpulseConstraintSolver();
 		physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
-	
+
 		transformAux1 = new Ammo.btTransform();
 	}
-	
+
 
 	setupContactResultCallback();
 
@@ -361,7 +361,10 @@ function setupContactResultCallback() {
 			localPos = contactPoint.get_m_localPointB();
 			worldPos = contactPoint.get_m_positionWorldOnB();
 		}
-
+		if (keyStates.KeyB || keyStates.KeyZ) {
+			//debug block key
+			console.log(tag);
+		}
 		if (tag == "Death") {
 			dead = true;
 			won = false;
@@ -370,23 +373,12 @@ function setupContactResultCallback() {
 			dead = false;
 		} else if (tag == "AmiyaBar") {
 			stamina = maxStamina;
-			// if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 2.98) {
-			// 	console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
-			// 	dead = true;
-			// 	won = false;
-			// }
 			if (localPos.y() >= 2) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
 
-		} else if (tag == "Tile") {
-
-			// if (localPos.y() < 1.98 && Math.abs(localPos.z()) > 5.9) {
-			// 	console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
-			// 	dead = true;
-			// 	won = false;
-			// }
+		} else if (tag.indexOf("Tile") >= 0) {
 			if (localPos.y() >= 2) {
 				//console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 				timeLastOnGround = clock.elapsedTime;
@@ -507,7 +499,7 @@ function updatePhysics(deltaTime) {
 	}
 	if (keyStates.KeyI) {
 		//debug info key
-		console.log(player);
+		console.log(mapGenerator.generateLevelString());
 	}
 
 	if (stamina > 0) {
