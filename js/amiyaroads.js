@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.1 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.2 \"Arachnid\"";
 
 let stats;
 
