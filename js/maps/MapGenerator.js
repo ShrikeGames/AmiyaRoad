@@ -41,6 +41,11 @@ const GOAL_DEPTH = 4;
 const DEATH_MARGIN = 0.5;
 let seed;
 let levelString;
+
+let rollOverMesh, rollOverMaterial;
+let cubeGeo, cubeMaterial;
+
+
 class MapGenerator {
     constructor(scene, physicsWorld) {
         this.scene = scene;
@@ -55,16 +60,20 @@ class MapGenerator {
     }
     loadMap(levelSelected) {
         this.levelString = mapData[levelSelected];
+        this.loadMapFromLevelString(this.levelString);
+    }
+    loadMapFromLevelString(levelString) {
         let mapTiles = this.levelString.split("|");
         console.log(mapTiles.length);
         for (let i = 0; i < mapTiles.length; i++) {
             const tile = mapTiles[i].split(",");
             let tileType = tile[0];
+            console.log(tileType);
             let materialHex = "#" + tile[1];
             this.pos.set(tile[2], tile[3], tile[4]);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
-            
-            if (tileType == "Tile") {
+
+            if (tileType.indexOf("Tile") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex });
                 this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
             } else if (tileType == "AmiyaBar") {
@@ -79,6 +88,7 @@ class MapGenerator {
     initMap(levelSelected, seed) {
         this.levelString = "";
         this.seed = seed;
+        console.log(levelSelected == "?-?");
         console.log(seed);
         Math.seedrandom(seed);
         this.pos = new THREE.Vector3();
@@ -86,8 +96,13 @@ class MapGenerator {
         this.rigidBodies = [];
         this.allBodies = [];
         if (levelSelected == "?-?") {
+            console.log("A");
             this.createMapRandomChaos();
+        } else if (levelSelected == "*-*") {
+            console.log("B");
+            this.createMapBuilder();
         } else {
+            console.log("C");
             this.loadMap(levelSelected);
         }
 
@@ -216,7 +231,9 @@ class MapGenerator {
         object.userData.physicsBody = body;
         object.userData.collided = false;
         let materialInfo = object.material.color.getHexString();
-
+        if (!quat.x || !quat.y || !quat.z) {
+            quat = new THREE.Quaternion(0, 0, 0, 1);
+        }
         this.levelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + quat.x + "," + quat.y + "," + quat.z + "|";
 
         this.scene.add(object);
@@ -290,7 +307,7 @@ class MapGenerator {
                     this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
                     let material = new THREE.MeshPhongMaterial({ color: colour });
-                    this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                    this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
                 }
             }
             lastPos.x = this.pos.x;
@@ -328,7 +345,7 @@ class MapGenerator {
                     this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
                     let material = new THREE.MeshPhongMaterial({ color: colour });
-                    this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                    this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
                 }
             }
 
@@ -364,7 +381,7 @@ class MapGenerator {
                     this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
                     let material = new THREE.MeshPhongMaterial({ color: colour });
-                    this.createTileWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                    this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
                 }
             }
         }
@@ -373,7 +390,30 @@ class MapGenerator {
 
         let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
         this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+
     }
+
+    createMapBuilder() {
+        console.log("Map builder");
+        this.pos.set(0, 0, 0);
+        this.quat.set(0, 0, 0, 1);
+
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_MAIN });
+        this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+        // grid
+        const gridTileCount = 200;
+        const gridSize = TILE_WIDTH * gridTileCount;
+        const gridHelper = new THREE.GridHelper(gridSize, gridTileCount);
+        gridHelper.position.x = -TILE_WIDTH / 2;
+        gridHelper.position.z = -TILE_WIDTH / 2;
+        this.scene.add(gridHelper);
+
+        this.allBodies.push(this.plane);
+
+
+    }
+
 }
 
 export { MapGenerator };

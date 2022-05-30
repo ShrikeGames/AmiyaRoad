@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.2 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.3 \"Arachnid\"";
 
 let stats;
 
@@ -80,15 +80,18 @@ function initFirstTime() {
 	if (initialized) {
 		return;
 	}
+	
 	$('.version').text(versionString);
 
 	$('.play-button').on('click', function (e) {
+		console.log("Play");
 		let $this = $(this);
 		//random seed when you click play on a level
 		//retries within the level will regenerate the same way.
 		seed = "amiyaroads_" + Math.random() * 256000;
 		lastSelectedLevel = $this.attr("data-level");
 		won = false;
+		dead = false;
 		init(lastSelectedLevel);
 		animate();
 		$('.menu--start-screen').addClass('hide');
@@ -417,6 +420,7 @@ function initInput() {
 	document.addEventListener('keyup', (event) => {
 		keyStates[event.code] = false;
 	});
+
 }
 
 function onWindowResize() {
@@ -522,7 +526,7 @@ function updatePhysics(deltaTime) {
 			}
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
-			//allow doubling back to be twice as fast if traveling in the opposite direction
+			//allow doubling back to be faster if traveling in the opposite direction
 			let relVelChange = (-turnSpeed);
 			if (velocity.x() > 0) {
 				relVelChange = (-turnSpeed) * 1.3;
