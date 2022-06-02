@@ -37,6 +37,7 @@ const TILE_DEPTH = 12;
 const GOAL_WIDTH = 12;
 const GOAL_HEIGHT = 12;
 const GOAL_DEPTH = 4;
+const playerRadius = 0.75;
 
 const DEATH_MARGIN = 0.5;
 let seed;
@@ -119,7 +120,7 @@ class MapGenerator {
         this.pos.set(0, 3, 0);
         this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
-        let body = this.createPlayerWithPhysics(0.75, 4, this.pos, this.quat, playerMaterial);
+        let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, playerMaterial);
 
         return body;
     }
@@ -412,6 +413,18 @@ class MapGenerator {
         this.allBodies.push(this.plane);
 
 
+    }
+
+    addTile(playerPos, direction) {
+        console.log("Add tile");
+        let newZ = playerPos.z + (direction.z * TILE_DEPTH);
+        this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT/2.0) + direction.y * TILE_HEIGHT, newZ);
+        this.quat.set(0, 0, 0, 1);
+
+        let colour = this.createColour(this.allBodies.length);
+
+        let material = new THREE.MeshPhongMaterial({ color: colour });
+        this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
     }
 
 }

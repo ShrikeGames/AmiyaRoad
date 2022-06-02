@@ -34,8 +34,8 @@ const GRAVITY = 60;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
 const acceleration = 5;
-const turnSpeed = 4;
-const maxTurnSpeed = 4;
+const turnSpeed = 5;
+const maxTurnSpeed = 5;
 const jumpSpeed = 17;
 const maxSpeed = 40;
 const maxStamina = 500;
@@ -68,6 +68,7 @@ let musicVolume = 0.05;
 //ui
 let $debug = $('.hud.hud--debug');
 
+
 Ammo().then(function (AmmoLib) {
 
 	Ammo = AmmoLib;
@@ -80,7 +81,7 @@ function initFirstTime() {
 	if (initialized) {
 		return;
 	}
-	
+
 	$('.version').text(versionString);
 
 	$('.play-button').on('click', function (e) {
@@ -418,6 +419,11 @@ function initInput() {
 	});
 
 	document.addEventListener('keyup', (event) => {
+		if (lastSelectedLevel == "*-*") {
+			if (keyStates.Digit1 && event.code == "Digit1") {
+				mapGenerator.addTile(player.position, new THREE.Vector3(0, 0, -1));
+			}
+		}
 		keyStates[event.code] = false;
 	});
 
@@ -529,25 +535,7 @@ function updatePhysics(deltaTime) {
 			//allow doubling back to be faster if traveling in the opposite direction
 			let relVelChange = (-turnSpeed);
 			if (velocity.x() > 0) {
-				relVelChange = (-turnSpeed) * 1.3;
-			}
-			if (!onGround) {
-				relVelChange *= 0.75;
-			}
-
-			if (velocity.z() + relVelChange <= 0) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
-			} else {
-				let impulse = new Ammo.btVector3(-maxTurnSpeed, velocity.y(), velocity.z());
-				player.body.setLinearVelocity(impulse);
-			}
-
-		}
-		if (keyStates.ArrowRight || keyStates.KeyD) {
-			//allow doubling back to be twice as fast if traveling in the opposite direction
-			let relVelChange = (turnSpeed);
-			if (velocity.x() < 0) {
-				relVelChange = (turnSpeed) * 1.3;
+				relVelChange = (-turnSpeed) * 2;
 			}
 			if (!onGround) {
 				relVelChange *= 0.75;
@@ -557,6 +545,24 @@ function updatePhysics(deltaTime) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
 				let impulse = new Ammo.btVector3(maxTurnSpeed, velocity.y(), velocity.z());
+				player.body.setLinearVelocity(impulse);
+			}
+
+		}
+		if (keyStates.ArrowRight || keyStates.KeyD) {
+			//allow doubling back to be twice as fast if traveling in the opposite direction
+			let relVelChange = (turnSpeed);
+			if (velocity.x() < 0) {
+				relVelChange = (turnSpeed) * 2;
+			}
+			if (!onGround) {
+				relVelChange *= 0.75;
+			}
+
+			if (velocity.z() + relVelChange <= 0) {
+				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+			} else {
+				let impulse = new Ammo.btVector3(-maxTurnSpeed, velocity.y(), velocity.z());
 				player.body.setLinearVelocity(impulse);
 			}
 		}
