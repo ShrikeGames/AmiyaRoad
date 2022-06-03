@@ -12,6 +12,11 @@ const COLOUR_GOAL = new THREE.Color(0x00ff00);
 
 const COLOUR_BRAMBLE_MAIN = new THREE.Color(0x264e24);
 const COLOUR_BRAMBLE_SECONDARY = new THREE.Color(0x65783e);
+const TEXTURE_TILE_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/TileMain.png');
+TEXTURE_TILE_MAIN.wrapS = THREE.RepeatWrapping;
+TEXTURE_TILE_MAIN.wrapT = THREE.RepeatWrapping;
+TEXTURE_TILE_MAIN.repeat.set(2, 2);
+const TEXTURE_TILE_SECONDARY = new THREE.TextureLoader().load('../images/amiyaroad/TileSecondary.png');
 const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('../images/amiyaroad/Amiyabars-logo.png');
 const TEXTURE_BRAMBLE = new THREE.TextureLoader().load('../images/amiyaroad/Bramble.png');
 const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/Boost.png');
@@ -75,7 +80,7 @@ class MapGenerator {
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
 
             if (tileType.indexOf("Tile") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN , shininess:30, specular: 0xd4aae7});
                 this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
             } else if (tileType == "AmiyaBar") {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
@@ -119,7 +124,7 @@ class MapGenerator {
     createPlayer() {
         this.pos.set(0, 3, 0);
         this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
-        const playerMaterial = new THREE.MeshBasicMaterial({ map: TEXTURE_PLAYER, name: "Player" });
+        const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player" , shininess:30, specular: 0xd4aae7 });
         let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, playerMaterial);
 
         return body;
@@ -142,6 +147,7 @@ class MapGenerator {
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
+        object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
         //this.pos.set(this.pos.x, this.pos.y, this.pos.z +(TILE_DEPTH/2.0));
         //this.createDeathWithPhysics(TILE_WIDTH -DEATH_MARGIN, TILE_HEIGHT-DEATH_MARGIN, 0.1, 0, this.pos, this.quat, deathMaterial);
@@ -153,6 +159,8 @@ class MapGenerator {
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
         shape.setMargin(margin);
         object.name = "Death";
+        object.receiveShadow = true;
+        object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
 
         return object;
@@ -164,6 +172,7 @@ class MapGenerator {
         shape.setMargin(margin);
         object.name = "AmiyaBar";
         object.receiveShadow = true;
+        object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
         return object;
 
@@ -173,8 +182,8 @@ class MapGenerator {
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
         shape.setMargin(margin);
         object.name = "Goal";
-
-        object.receiveShadow = true;
+        object.receiveShadow = false;
+        object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
 
         return object;

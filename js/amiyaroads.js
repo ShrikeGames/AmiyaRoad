@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.3 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.4 \"Arachnid\"";
 
 let stats;
 
@@ -164,8 +164,11 @@ function initSky(levelSelected) {
 	console.log("initSky");
 	// Add Sky
 	sky = new Sky();
-	sky.scale.setScalar(450000);
+	sky.scale.setScalar(150000);
 	scene.add(sky);
+	const fogColour = new THREE.Color( 0xfbddff );
+	const fog = new THREE.FogExp2(fogColour, 0.008);
+	scene.fog = fog;
 
 	sun = new THREE.Vector3();
 	let effectController = {
@@ -173,7 +176,7 @@ function initSky(levelSelected) {
 		rayleigh: 3,
 		mieCoefficient: 0.005,
 		mieDirectionalG: 0.7,
-		elevation: 2,
+		elevation: 3,
 		azimuth: 180,
 		exposure: 1
 	};
@@ -202,6 +205,60 @@ function initSky(levelSelected) {
 
 	uniforms['sunPosition'].value.copy(sun);
 
+
+	const materials = [];
+
+	const geometry = new THREE.BufferGeometry();
+	const vertices = [];
+
+	const textureLoader = new THREE.TextureLoader();
+
+	const sprite1 = textureLoader.load( './images/amiyaroad/Bucko.png' );
+	const sprite2 = textureLoader.load( './images/amiyaroad/Bucko2.png' );
+	const sprite3 = textureLoader.load( './images/amiyaroad/Bucko3.png' );
+	const sprite4 = textureLoader.load( './images/amiyaroad/Bucko4.png' );
+	const sprite5 = textureLoader.load( './images/amiyaroad/Bucko5.png' );
+
+	for ( let i = 0; i < 50; i ++ ) {
+
+		const x = -50 + i*2;
+		const y = -15;
+		const z = -1200 + Math.random() * 1200;
+
+		vertices.push( x, y, z );
+
+	}
+
+	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+	let parameters = [
+		[[ 1.0, 0.2, 0.5 ], sprite1, 5 ],
+		[[ 0.95, 0.1, 0.5 ], sprite2, 3 ],
+		[[ 0.90, 0.05, 0.5 ], sprite3, 2 ],
+		[[ 0.85, 0, 0.5 ], sprite4, 1 ],
+		[[ 0.80, 0, 0.5 ], sprite5, 0.5 ]
+	];
+
+	for ( let i = 0; i < parameters.length; i ++ ) {
+
+		const color = parameters[ i ][ 0 ];
+		const sprite = parameters[ i ][ 1 ];
+		const size = parameters[ i ][ 2 ];
+
+		materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: true, transparent: true } );
+		materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
+
+		const particles = new THREE.Points( geometry, materials[ i ] );
+
+		//particles.rotation.x = Math.random() * 6;
+		//particles.rotation.y = Math.random() * 6;
+		particles.rotation.z = Math.random() * 12;
+
+		scene.add( particles );
+
+	}
+
+	
 
 	renderer.toneMappingExposure = effectController.exposure;
 
@@ -261,16 +318,16 @@ function initMusic() {
 
 function initGraphics() {
 	console.log("initGraphics");
-	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 200);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 600);
 
 	camera.position.set(0, 12, 21);
 	camera.lookAt(0, 0.5, 0);
 
-	const hemisphereLight = new THREE.HemisphereLight(0xfceafc, 0x000000, 0.8);
+	const hemisphereLight = new THREE.HemisphereLight(0xc0bdf2, 0xffbef4, 0.9);
 	scene.add(hemisphereLight);
 
-	spotLight = new THREE.DirectionalLight(0xffffff, 0.3);
-	spotLight.position.set(0, 20, 0);
+	spotLight = new THREE.DirectionalLight(0xffd0fe, 0.4);
+	spotLight.position.set(0, 60, 0);
 
 	spotLight.castShadow = true;
 
