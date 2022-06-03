@@ -550,10 +550,10 @@ function updatePhysics(deltaTime) {
 	if (stamina < 0) {
 		stamina = 0;
 	}
-	$('.hud--speed').text(Math.abs(-velocity.z().toPrecision(4)));
-	$('.hud--speed').attr("style", "width:" + Math.abs((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
-	$('.hud--stamina').text(Math.round(stamina));
-	$('.hud--stamina').attr("style", "width:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
+	//$('.hud--speed').text(Math.abs(-velocity.z().toPrecision(4)));
+	//$('.hud--speed').attr("style", "height:" + Math.abs((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
+	$('.hud--stamina-label').text(Math.round(stamina));
+	$('.hud--stamina-value').attr("style", "height:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
 
 	checkContact();
 	if (won) {
