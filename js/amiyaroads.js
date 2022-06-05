@@ -34,8 +34,9 @@ const GRAVITY = 60;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
 const acceleration = 5;
-const turnSpeed = 5;
-const maxTurnSpeed = 5;
+const turnSpeed = 2.5;
+const turnSpeedOnGround = 5;
+const maxTurnSpeed = 10;
 const jumpSpeed = 17;
 const maxSpeed = 40;
 const maxStamina = 500;
@@ -166,7 +167,7 @@ function initSky(levelSelected) {
 	sky = new Sky();
 	sky.scale.setScalar(150000);
 	scene.add(sky);
-	const fogColour = new THREE.Color( 0xfbddff );
+	const fogColour = new THREE.Color(0xfbddff);
 	const fog = new THREE.FogExp2(fogColour, 0.008);
 	scene.fog = fog;
 
@@ -213,52 +214,52 @@ function initSky(levelSelected) {
 
 	const textureLoader = new THREE.TextureLoader();
 
-	const sprite1 = textureLoader.load( './images/amiyaroad/Bucko.png' );
-	const sprite2 = textureLoader.load( './images/amiyaroad/Bucko2.png' );
-	const sprite3 = textureLoader.load( './images/amiyaroad/Bucko3.png' );
-	const sprite4 = textureLoader.load( './images/amiyaroad/Bucko4.png' );
-	const sprite5 = textureLoader.load( './images/amiyaroad/Bucko5.png' );
+	const sprite1 = textureLoader.load('./images/amiyaroad/Bucko.png');
+	const sprite2 = textureLoader.load('./images/amiyaroad/Bucko2.png');
+	const sprite3 = textureLoader.load('./images/amiyaroad/Bucko3.png');
+	const sprite4 = textureLoader.load('./images/amiyaroad/Bucko4.png');
+	const sprite5 = textureLoader.load('./images/amiyaroad/Bucko5.png');
 
-	for ( let i = 0; i < 50; i ++ ) {
+	for (let i = 0; i < 50; i++) {
 
-		const x = -50 + i*2;
+		const x = -50 + i * 2;
 		const y = -15;
 		const z = -1200 + Math.random() * 1200;
 
-		vertices.push( x, y, z );
+		vertices.push(x, y, z);
 
 	}
 
-	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
 	let parameters = [
-		[[ 1.0, 0.2, 0.5 ], sprite1, 5 ],
-		[[ 0.95, 0.1, 0.5 ], sprite2, 3 ],
-		[[ 0.90, 0.05, 0.5 ], sprite3, 2 ],
-		[[ 0.85, 0, 0.5 ], sprite4, 1 ],
-		[[ 0.80, 0, 0.5 ], sprite5, 0.5 ]
+		[[1.0, 0.2, 0.5], sprite1, 5],
+		[[0.95, 0.1, 0.5], sprite2, 3],
+		[[0.90, 0.05, 0.5], sprite3, 2],
+		[[0.85, 0, 0.5], sprite4, 1],
+		[[0.80, 0, 0.5], sprite5, 0.5]
 	];
 
-	for ( let i = 0; i < parameters.length; i ++ ) {
+	for (let i = 0; i < parameters.length; i++) {
 
-		const color = parameters[ i ][ 0 ];
-		const sprite = parameters[ i ][ 1 ];
-		const size = parameters[ i ][ 2 ];
+		const color = parameters[i][0];
+		const sprite = parameters[i][1];
+		const size = parameters[i][2];
 
-		materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: true, transparent: true } );
-		materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
+		materials[i] = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: true, transparent: true });
+		materials[i].color.setHSL(color[0], color[1], color[2]);
 
-		const particles = new THREE.Points( geometry, materials[ i ] );
+		const particles = new THREE.Points(geometry, materials[i]);
 
 		//particles.rotation.x = Math.random() * 6;
 		//particles.rotation.y = Math.random() * 6;
 		particles.rotation.z = Math.random() * 12;
 
-		scene.add( particles );
+		scene.add(particles);
 
 	}
 
-	
+
 
 	renderer.toneMappingExposure = effectController.exposure;
 
@@ -456,7 +457,7 @@ function createObjects(levelSelected) {
 	onGround = false;
 	stamina = maxStamina;
 	mapGenerator = new MapGenerator(scene, physicsWorld);
-	keyStates = {};
+	
 	// Ground
 	rigidBodies = mapGenerator.initMap(levelSelected, seed);
 	player = mapGenerator.createPlayer();
@@ -552,8 +553,9 @@ function updatePhysics(deltaTime) {
 	}
 	//$('.hud--speed').text(Math.abs(-velocity.z().toPrecision(4)));
 	//$('.hud--speed').attr("style", "height:" + Math.abs((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
-	$('.hud--stamina-label').text(Math.round(stamina));
-	$('.hud--stamina-value').attr("style", "height:" + ((stamina / maxStamina).toPrecision(2) * 100) + "%;");
+	let staminaPercent = ((stamina / maxStamina).toPrecision(2) * 100);
+	$('.hud--stamina-label').text(Math.round(staminaPercent) + "%");
+	$('.hud--stamina-value').attr("style", "height:" + staminaPercent + "%;");
 
 	checkContact();
 	if (won) {
@@ -589,38 +591,26 @@ function updatePhysics(deltaTime) {
 			}
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
-			//allow doubling back to be faster if traveling in the opposite direction
-			let relVelChange = (-turnSpeed);
-			if (velocity.x() > 0) {
-				relVelChange = (-turnSpeed) * 2;
-			}
 			if (!onGround) {
-				relVelChange *= 0.75;
-			}
-
-			if (velocity.z() + relVelChange <= 0) {
+				//apply forces if not on the ground
+				let relVelChange = (-turnSpeed);
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
-				let impulse = new Ammo.btVector3(maxTurnSpeed, velocity.y(), velocity.z());
-				player.body.setLinearVelocity(impulse);
+				//better handling on the ground
+				let relVelChange = (-turnSpeedOnGround);
+				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
-			//allow doubling back to be twice as fast if traveling in the opposite direction
-			let relVelChange = (turnSpeed);
-			if (velocity.x() < 0) {
-				relVelChange = (turnSpeed) * 2;
-			}
 			if (!onGround) {
-				relVelChange *= 0.75;
-			}
-
-			if (velocity.z() + relVelChange <= 0) {
+				//apply forces if not on the ground
+				let relVelChange = (turnSpeed);
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
-				let impulse = new Ammo.btVector3(-maxTurnSpeed, velocity.y(), velocity.z());
-				player.body.setLinearVelocity(impulse);
+				//better handling on the ground
+				let relVelChange = (turnSpeedOnGround);
+				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
 	}
@@ -640,6 +630,13 @@ function updatePhysics(deltaTime) {
 	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z(), -9), 0, -velocity.x());
 	player.body.setAngularVelocity(angularVelocity);
 
+	//limit some speeds
+	let linearX = Math.min(maxTurnSpeed, Math.max(-maxTurnSpeed, player.body.getLinearVelocity().x()));
+	let linearY = player.body.getLinearVelocity().y();
+	let linearZ = player.body.getLinearVelocity().z();
+	let linearVelocity = new Ammo.btVector3(linearX, linearY, linearZ);
+	player.body.setLinearVelocity(linearVelocity);
+	
 	// Step world
 	physicsWorld.stepSimulation(deltaTime, 10);
 
