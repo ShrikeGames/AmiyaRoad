@@ -80,7 +80,7 @@ class MapGenerator {
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
 
             if (tileType.indexOf("Tile") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN , shininess:30, specular: 0xd4aae7});
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
                 this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
             } else if (tileType == "AmiyaBar") {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
@@ -94,7 +94,7 @@ class MapGenerator {
     initMap(levelSelected, seed) {
         this.levelString = "";
         this.seed = seed;
-        console.log(levelSelected == "?-?");
+        this.levelSelected = levelSelected;
         console.log(seed);
         Math.seedrandom(seed);
         this.pos = new THREE.Vector3();
@@ -124,7 +124,8 @@ class MapGenerator {
     createPlayer() {
         this.pos.set(0, 3, 0);
         this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
-        const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player" , shininess:30, specular: 0xd4aae7 });
+        const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
+        
         let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, playerMaterial);
 
         return body;
@@ -137,7 +138,7 @@ class MapGenerator {
         object.name = "Player";
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
+        object.body = this.createRigidBody(object, shape, 4, pos, quat, scene);
         return object;
 
     }
@@ -408,9 +409,9 @@ class MapGenerator {
         this.pos.set(0, 0, 0);
         this.quat.set(0, 0, 0, 1);
 
-        let material = new THREE.MeshPhongMaterial({ color: COLOUR_MAIN });
-        this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-
+        let material = new THREE.MeshPhongMaterial({ color: COLOUR_MAIN, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
+        let firstTile = this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+        this.allBodies.push(firstTile);
         // grid
         const gridTileCount = 200;
         const gridSize = TILE_WIDTH * gridTileCount;
@@ -419,21 +420,30 @@ class MapGenerator {
         gridHelper.position.z = -TILE_WIDTH / 2;
         this.scene.add(gridHelper);
 
-        this.allBodies.push(this.plane);
-
-
     }
 
     addTile(playerPos, direction) {
         console.log("Add tile");
-        let newZ = playerPos.z + (direction.z * TILE_DEPTH);
-        this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT/2.0) + direction.y * TILE_HEIGHT, newZ);
+        let newZ = playerPos.z + Math.round((direction.z * TILE_DEPTH) / TILE_DEPTH);
+        this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT / 2.0) + direction.y * TILE_HEIGHT, newZ);
         this.quat.set(0, 0, 0, 1);
 
-        let colour = this.createColour(this.allBodies.length);
+        let materialHex = this.createColour(this.allBodies.length);
 
-        let material = new THREE.MeshPhongMaterial({ color: colour });
+        let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
         this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+    }
+
+    addAmiyaBar(playerPos, direction) {
+        console.log("Add amiyabar");
+        let newZ = playerPos.z + Math.round((direction.z * (TILE_DEPTH / 2.0)) / (TILE_DEPTH / 2.0));
+        this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT / 2.0) + direction.y * TILE_HEIGHT, newZ);
+        this.quat.set(0, 0, 0, 1);
+
+        console.log(this.pos);
+
+        let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+        this.createAmiyaBarWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
     }
 
 }

@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.4 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.5 \"Arachnid\"";
 
 let stats;
 
@@ -68,6 +68,9 @@ let musicVolume = 0.05;
 
 //ui
 let $debug = $('.hud.hud--debug');
+
+//level editor
+const BUILD_CAMERA_SPEED = 10;
 
 
 Ammo().then(function (AmmoLib) {
@@ -361,10 +364,15 @@ function initPhysics() {
 		broadphase = new Ammo.btDbvtBroadphase();
 		solver = new Ammo.btSequentialImpulseConstraintSolver();
 		physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
 
 		transformAux1 = new Ammo.btTransform();
 	}
+	if (lastSelectedLevel == "*-*") {
+		physicsWorld.setGravity(new Ammo.btVector3(0, 0, 0));
+	} else {
+		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
+	}
+
 
 
 	setupContactResultCallback();
@@ -457,7 +465,7 @@ function createObjects(levelSelected) {
 	onGround = false;
 	stamina = maxStamina;
 	mapGenerator = new MapGenerator(scene, physicsWorld);
-	
+
 	// Ground
 	rigidBodies = mapGenerator.initMap(levelSelected, seed);
 	player = mapGenerator.createPlayer();
@@ -472,14 +480,18 @@ function initInput() {
 	console.log("initInput");
 
 	keyStates = {};
+
 	document.addEventListener('keydown', (event) => {
 		keyStates[event.code] = true;
 	});
 
 	document.addEventListener('keyup', (event) => {
+		console.log(event.code);
 		if (lastSelectedLevel == "*-*") {
 			if (keyStates.Digit1 && event.code == "Digit1") {
 				mapGenerator.addTile(player.position, new THREE.Vector3(0, 0, -1));
+			} else if (keyStates.Digit2 && event.code == "Digit2") {
+				mapGenerator.addAmiyaBar(player.position, new THREE.Vector3(0, 0, -1));
 			}
 		}
 		keyStates[event.code] = false;
@@ -511,6 +523,11 @@ function animate() {
 
 	render();
 	stats.update();
+
+	if (lastSelectedLevel == "*-*") {
+		return;
+	}
+
 	updates++;
 	if (updates >= 5) {
 		lastUpdateVelocity.z = velocity.z();
@@ -539,8 +556,65 @@ function checkContact() {
 	}
 	physicsWorld.contactTest(player.body, cbContactResult);
 }
+function updateWorld(deltaTime) {
+	// Step world
+	physicsWorld.stepSimulation(deltaTime, 10);
+
+
+	// Update rigid bodies
+	for (let i = 0, il = rigidBodies.length; i < il; i++) {
+
+		const objThree = rigidBodies[i];
+		const objPhys = objThree.userData.physicsBody;
+		const ms = objPhys.getMotionState();
+
+		if (ms) {
+
+			ms.getWorldTransform(transformAux1);
+			const p = transformAux1.getOrigin();
+			const q = transformAux1.getRotation();
+			objThree.position.set(p.x(), p.y(), p.z());
+			objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
+
+		}
+
+	}
+
+	camera.position.set(0, 10, player.position.z + 20);
+	camera.lookAt(0, 0.5, player.position.z);
+	spotLight.position.set(player.position.x, 20, player.position.z);
+
+}
 function updatePhysics(deltaTime) {
 	if (won || dead) {
+		return;
+	}
+	if (lastSelectedLevel == "*-*") {
+		let impulse = new Ammo.btVector3(0, 0, 0);
+		if (keyStates.ArrowUp || keyStates.KeyW) {
+			impulse.setZ(-BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.ArrowDown || keyStates.KeyS) {
+			impulse.setZ(BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.ArrowRight || keyStates.KeyD) {
+			impulse.setX(BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.ArrowLeft || keyStates.KeyA) {
+			impulse.setX(-BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.Space) {
+			impulse.setY(BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.ControlLeft) {
+			impulse.setY(-BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.KeyI) {
+			//debug info key
+			console.log(mapGenerator.generateLevelString());
+		}
+		player.body.setLinearVelocity(impulse);
+		updateWorld(deltaTime);
 		return;
 	}
 	velocity = player.body.getLinearVelocity();
@@ -566,10 +640,7 @@ function updatePhysics(deltaTime) {
 		reset();
 		return;
 	}
-	if (keyStates.KeyI) {
-		//debug info key
-		console.log(mapGenerator.generateLevelString());
-	}
+
 
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
@@ -636,35 +707,12 @@ function updatePhysics(deltaTime) {
 	let linearZ = player.body.getLinearVelocity().z();
 	let linearVelocity = new Ammo.btVector3(linearX, linearY, linearZ);
 	player.body.setLinearVelocity(linearVelocity);
-	
-	// Step world
-	physicsWorld.stepSimulation(deltaTime, 10);
 
-
-	// Update rigid bodies
-	for (let i = 0, il = rigidBodies.length; i < il; i++) {
-
-		const objThree = rigidBodies[i];
-		const objPhys = objThree.userData.physicsBody;
-		const ms = objPhys.getMotionState();
-
-		if (ms) {
-
-			ms.getWorldTransform(transformAux1);
-			const p = transformAux1.getOrigin();
-			const q = transformAux1.getRotation();
-			objThree.position.set(p.x(), p.y(), p.z());
-			objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
-
-		}
-
-	}
+	updateWorld(deltaTime);
 
 
 
-	camera.position.set(0, 10, player.position.z + 20);
-	camera.lookAt(0, 0.5, player.position.z);
-	spotLight.position.set(player.position.x, 20, player.position.z);
+
 }
 function win() {
 	console.log("win");
@@ -687,14 +735,15 @@ function reset() {
 	console.log("reset");
 	won = false;
 	dead = true;
+
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
+
 	mapGenerator.clear();
 	scene.clear();
 	init(lastSelectedLevel);
+
 	camera.position.set(0, 12, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(0, 20, player.position.z);
-
-
 }
