@@ -373,8 +373,6 @@ function initPhysics() {
 		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
 	}
 
-
-
 	setupContactResultCallback();
 
 }
@@ -464,6 +462,8 @@ function createObjects(levelSelected) {
 	console.log("createObjects");
 	onGround = false;
 	stamina = maxStamina;
+	timeLastOnGround = 0;
+
 	mapGenerator = new MapGenerator(scene, physicsWorld);
 
 	// Ground
