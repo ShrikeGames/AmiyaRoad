@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.7 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.8 \"Arachnid\"";
 
 let stats;
 
@@ -91,6 +91,7 @@ function initFirstTime() {
 
 	$('.play-button').on('click', function (e) {
 		console.log("Play");
+		$('.hud--tile_selection').addClass("hide");
 		let $this = $(this);
 		//random seed when you click play on a level
 		//retries within the level will regenerate the same way.
@@ -102,9 +103,9 @@ function initFirstTime() {
 		animate();
 		$('.menu--start-screen').addClass('hide');
 
-	if (lastSelectedLevel == "*-*") {
-		$('.hud--tile_selection').removeClass("hide");
-	}
+		if (lastSelectedLevel == "*-*") {
+			$('.hud--tile_selection').removeClass("hide");
+		}
 	});
 
 	$(".hud--volume-slider").slider({
@@ -151,8 +152,6 @@ function init(levelSelected) {
 	clock = new THREE.Clock();
 
 	rigidBodies = [];
-
-	$('.hud--tile_selection').addClass("hide");
 
 	initGraphics();
 
@@ -509,6 +508,8 @@ function initInput() {
 
 			if (keyStates.Enter && event.code == "Enter") {
 				mapGenerator.addTile(player, new THREE.Vector3(0, 0, -1), tileSelection);
+			} else if (keyStates.Backspace && event.code == "Backspace") {
+				mapGenerator.undoLastTile();
 			}
 
 		}

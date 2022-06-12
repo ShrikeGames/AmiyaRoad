@@ -7,11 +7,7 @@ mapData["1-3"] = "Tile,c0bdf2,0,0,0,0,0,0|Tile,ffbef4,-1.682941969615793,0,-12,0
 
 const COLOUR_MAIN = new THREE.Color(0xc0bdf2);
 const COLOUR_SECONDARY = new THREE.Color(0xffbef4);
-const COLOUR_PILLAR = new THREE.Color(0xe0afff);
 const COLOUR_GOAL = new THREE.Color(0x00ff00);
-
-const COLOUR_BRAMBLE_MAIN = new THREE.Color(0x264e24);
-const COLOUR_BRAMBLE_SECONDARY = new THREE.Color(0x65783e);
 
 const TEXTURE_TILE_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile1.png');
 TEXTURE_TILE_MAIN.wrapS = THREE.RepeatWrapping;
@@ -26,16 +22,13 @@ const TEXTURE_GOAL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/T
 const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile4.png');
 const TEXTURE_BRAMBLE = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile5.png');
 
-
-const material = new THREE.MeshLambertMaterial();
-const deathMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_BRAMBLE });
-
 let pos;
 let quad;
 let scene;
 let physicsWorld;
 let rigidBodies;
 let allBodies;
+let allObjects;
 const margin = 0.05;
 const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
 TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
@@ -66,6 +59,7 @@ class MapGenerator {
         this.quat = new THREE.Quaternion();
         this.rigidBodies = [];
         this.allBodies = [];
+        this.allObjects = [];
     }
     generateLevelString() {
         return this.levelString.slice(0, -1);
@@ -109,6 +103,7 @@ class MapGenerator {
         this.quat = new THREE.Quaternion();
         this.rigidBodies = [];
         this.allBodies = [];
+        this.allObjects = [];
         if (levelSelected == "?-?") {
             console.log("A");
             this.createMapRandomChaos();
@@ -251,13 +246,14 @@ class MapGenerator {
         object.userData.collided = false;
         let materialInfo = object.material.color.getHexString();
         var rotation = new THREE.Euler().setFromQuaternion(quat, "XYZ");
-        if (object.name != "GhostTile") {
+        if (object.name.indexOf("GhostTile") < 0) {
             this.levelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "|";
         }
         this.scene.add(object);
+        
 
         if (mass > 0) {
-            if (object.name != "GhostTile") {
+            if (object.name.indexOf("GhostTile") < 0) {
                 this.rigidBodies.push(object);
             }
 
@@ -267,7 +263,8 @@ class MapGenerator {
         }
         body.name = object.name;
         this.allBodies.push(body);
-        if (object.name != "GhostTile") {
+        this.allObjects.push(object);
+        if (object.name.indexOf("GhostTile") < 0) {
             this.physicsWorld.addRigidBody(body);
         }
 
@@ -442,12 +439,12 @@ class MapGenerator {
 
         this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
         this.quat.set(rotation.x, 0, rotation.z, 1);
-        
+
         if (this.lastTileSelection != tileSelection) {
             this.scene.remove(this.ghostTile);
             this.ghostTile = null;
         }
-        
+
         if (tileSelection > 0) {
             if (this.ghostTile != null) {
                 this.ghostTile.position.x = this.pos.x;
@@ -483,7 +480,7 @@ class MapGenerator {
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
-            return this.createTileWithPhysics(tileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            return this.createTileWithPhysics(tileName + this.allBodies.length, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
         } else if (tileSelection == 2) {
             console.log("Add amiyabar");
 
@@ -510,6 +507,33 @@ class MapGenerator {
         this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
         this.quat.set(rotation.x, 0, rotation.z, 1);
         return this.getTileFromSelection(tileSelection);
+    }
+    undoLastTile() {
+        console.log("Undo");
+        let index = this.allObjects.length - 1;
+        let lastObject = this.allObjects[index];
+        
+        if (lastObject) {
+            let lastTile = lastObject.body;
+            console.log(lastObject);
+            console.log(lastTile);
+            while (lastTile.name.indexOf("GhostTile") >= 0 || lastTile.name.indexOf("Player") >= 0) {
+                index--;
+                if (index < 0) {
+                    return;
+                }
+                lastTile = this.allBodies[index];
+
+            }
+
+            this.physicsWorld.removeRigidBody(lastTile);
+            this.scene.remove(lastObject);
+
+            this.allObjects.splice(index,index+1);
+            this.allBodies.splice(index,index+1);
+            
+        }
+
     }
 
 
