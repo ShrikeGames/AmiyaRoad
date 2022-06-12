@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.5 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.6 \"Arachnid\"";
 
 let stats;
 
@@ -71,7 +71,8 @@ let $debug = $('.hud.hud--debug');
 
 //level editor
 const BUILD_CAMERA_SPEED = 10;
-
+const BUILD_ROTATION_SPEED = 1;
+let tileSelection = 0;
 
 Ammo().then(function (AmmoLib) {
 
@@ -488,11 +489,22 @@ function initInput() {
 	document.addEventListener('keyup', (event) => {
 		console.log(event.code);
 		if (lastSelectedLevel == "*-*") {
-			if (keyStates.Digit1 && event.code == "Digit1") {
-				mapGenerator.addTile(player.position, new THREE.Vector3(0, 0, -1));
+			if (keyStates.Digit0 && event.code == "Digit0") {
+				tileSelection = 0;
+			} else if (keyStates.Digit1 && event.code == "Digit1") {
+				tileSelection = 1;
 			} else if (keyStates.Digit2 && event.code == "Digit2") {
-				mapGenerator.addAmiyaBar(player.position, new THREE.Vector3(0, 0, -1));
+				tileSelection = 2;
+			} else if (keyStates.Digit3 && event.code == "Digit3") {
+				tileSelection = 3;
+			} else if (keyStates.Digit4 && event.code == "Digit4") {
+				tileSelection = 4;
 			}
+
+			if (keyStates.Enter && event.code == "Enter") {
+				mapGenerator.addTile(player, new THREE.Vector3(0, 0, -1), tileSelection);
+			}
+
 		}
 		keyStates[event.code] = false;
 	});
@@ -591,17 +603,31 @@ function updatePhysics(deltaTime) {
 	}
 	if (lastSelectedLevel == "*-*") {
 		let impulse = new Ammo.btVector3(0, 0, 0);
-		if (keyStates.ArrowUp || keyStates.KeyW) {
+		let angularImpulse = new Ammo.btVector3(0, 0, 0);
+
+		if (keyStates.ArrowUp) {
 			impulse.setZ(-BUILD_CAMERA_SPEED);
 		}
-		if (keyStates.ArrowDown || keyStates.KeyS) {
+		if (keyStates.ArrowDown) {
 			impulse.setZ(BUILD_CAMERA_SPEED);
 		}
-		if (keyStates.ArrowRight || keyStates.KeyD) {
+		if (keyStates.ArrowRight) {
 			impulse.setX(BUILD_CAMERA_SPEED);
 		}
-		if (keyStates.ArrowLeft || keyStates.KeyA) {
+		if (keyStates.ArrowLeft) {
 			impulse.setX(-BUILD_CAMERA_SPEED);
+		}
+		if (keyStates.KeyW) {
+			angularImpulse.setX(-BUILD_ROTATION_SPEED);
+		}
+		if (keyStates.KeyS) {
+			angularImpulse.setX(BUILD_ROTATION_SPEED);
+		}
+		if (keyStates.KeyD) {
+			angularImpulse.setZ(-BUILD_ROTATION_SPEED);
+		}
+		if (keyStates.KeyA) {
+			angularImpulse.setZ(BUILD_ROTATION_SPEED);
 		}
 		if (keyStates.Space) {
 			impulse.setY(BUILD_CAMERA_SPEED);
@@ -614,6 +640,10 @@ function updatePhysics(deltaTime) {
 			console.log(mapGenerator.generateLevelString());
 		}
 		player.body.setLinearVelocity(impulse);
+		player.body.setAngularVelocity(angularImpulse);
+		if (lastSelectedLevel == "*-*") {
+			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, -1), tileSelection);
+		}
 		updateWorld(deltaTime);
 		return;
 	}
