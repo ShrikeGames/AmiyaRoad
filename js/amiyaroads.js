@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.8 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.9 \"Arachnid\"";
 
 let stats;
 
@@ -88,11 +88,36 @@ function initFirstTime() {
 	}
 
 	$('.version').text(versionString);
+	$('.playtest-button').on('click', function (e) {
+		e.preventDefault();
+		console.log("Playtest");
+		lose();
+		lastSelectedLevel = "T-T";
+		init(lastSelectedLevel);
 
+		$('.menu--start-screen').addClass('hide');
+		$('.hud--tile_selection').removeClass("hide");
+		$('.playtest-button').addClass("hide");
+		$('.editor-button').removeClass("hide");
+	
+
+	});
+	$('.editor-button').on('click', function (e) {
+		e.preventDefault();
+		console.log("Playtest");
+		lose();
+		lastSelectedLevel = "*-*";
+		init(lastSelectedLevel);
+
+		$('.menu--start-screen').addClass('hide');
+		$('.hud--tile_selection').addClass("hide");
+		$('.playtest-button').removeClass("hide");
+		$('.editor-button').addClass("hide");
+
+	});
 	$('.play-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Play");
-		lose();
 
 		$('.hud--tile_selection').addClass("hide");
 		$('.playtest-button').addClass("hide");
@@ -102,8 +127,7 @@ function initFirstTime() {
 		//retries within the level will regenerate the same way.
 		seed = "amiyaroads_" + Math.random() * 256000;
 		lastSelectedLevel = $this.attr("data-level");
-		won = false;
-		dead = false;
+
 		init(lastSelectedLevel);
 		animate();
 		$('.menu--start-screen').addClass('hide');
@@ -508,7 +532,6 @@ function initInput() {
 	});
 
 	document.addEventListener('keyup', (event) => {
-		console.log(event.code);
 		if (lastSelectedLevel == "*-*") {
 			if (keyStates.Digit0 && event.code == "Digit0") {
 				tileSelection = 0;
@@ -762,10 +785,6 @@ function updatePhysics(deltaTime) {
 	player.body.setLinearVelocity(linearVelocity);
 
 	updateWorld(deltaTime);
-
-
-
-
 }
 function lose() {
 	console.log("lose");
@@ -776,13 +795,10 @@ function lose() {
 	if (bgm && bgm.isPlaying) {
 		bgm.stop();
 	}
+	mapGenerator.clear();
 
-	if (mapGenerator != null) {
-		mapGenerator.clear();
-	}
-	if (scene != null) {
-		scene.clear();
-	}
+	scene.clear();
+
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud').addClass('hide');
 	$('.menu--loading-screen').addClass('hide');

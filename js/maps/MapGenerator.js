@@ -27,7 +27,6 @@ let quad;
 let scene;
 let physicsWorld;
 let rigidBodies;
-let allBodies;
 let allObjects;
 const margin = 0.05;
 const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
@@ -58,7 +57,6 @@ class MapGenerator {
         this.pos = new THREE.Vector3();
         this.quat = new THREE.Quaternion();
         this.rigidBodies = [];
-        this.allBodies = [];
         this.allObjects = [];
         this.levelString = "";
     }
@@ -67,7 +65,6 @@ class MapGenerator {
         console.log("Generate level string");
         for (let i = 0; i < this.allObjects.length; i++) {
             let object = this.allObjects[i];
-            console.log(object);
             let materialInfo = object.material.color.getHexString();
             let pos = object.position;
             let rotation = new THREE.Euler().setFromQuaternion(object.quaternion, "XYZ");
@@ -76,7 +73,6 @@ class MapGenerator {
             }
         }
         this.levelString = newLevelString.slice(0, -1);
-        console.log(this.levelString);
         return this.levelString;
     }
     loadMap(levelSelected) {
@@ -84,23 +80,26 @@ class MapGenerator {
         this.loadMapFromLevelString(this.levelString);
     }
     loadMapFromLevelString(levelString = "") {
+        this.rigidBodies = [];
+        this.allObjects = [];
         let mapTiles = levelString.split("|");
-        console.log(mapTiles.length);
+        
         for (let i = 0; i < mapTiles.length; i++) {
             const tile = mapTiles[i].split(",");
             let tileType = tile[0];
-            console.log(tileType);
             let materialHex = "#" + tile[1];
             this.pos.set(tile[2], tile[3], tile[4]);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
-
+            if (tileType.indexOf("GhostTile") >= 0) {
+                continue;
+            }
             if (tileType.indexOf("Tile") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
                 this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-            } else if (tileType == "AmiyaBar") {
+            } else if (tileType.indexOf("AmiyaBar") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
                 this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-            } else if (tileType == "Goal") {
+            } else if (tileType.indexOf("Goal") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex });
                 this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, material);
             }
@@ -116,7 +115,6 @@ class MapGenerator {
         this.pos = new THREE.Vector3();
         this.quat = new THREE.Quaternion();
         this.rigidBodies = [];
-        this.allBodies = [];
         this.allObjects = [];
         if (levelSelected == "T-T") {
             console.log("Test");
@@ -277,9 +275,9 @@ class MapGenerator {
 
         }
         body.name = object.name;
-        this.allBodies.push(body);
-        this.allObjects.push(object);
+
         if (object.name.indexOf("GhostTile") < 0) {
+            this.allObjects.push(object);
             this.physicsWorld.addRigidBody(body);
         }
 
@@ -301,9 +299,11 @@ class MapGenerator {
         for (let i = 0; i < this.rigidBodies.length; i++) {
             this.physicsWorld.removeRigidBody(this.rigidBodies[i]);
         }
-        for (let i = 0; i < this.allBodies.length; i++) {
-            this.physicsWorld.removeRigidBody(this.allBodies[i]);
+        for (let i = 0; i < this.allObjects.length; i++) {
+            this.physicsWorld.removeRigidBody(this.allObjects[i].body);
         }
+        this.allObjects = [];
+        this.rigidBodies = [];
 
     }
 
@@ -433,10 +433,6 @@ class MapGenerator {
         this.quat.set(0, 0, 0, 1);
         if (this.levelString != "") {
             this.loadMapFromLevelString(this.levelString);
-        } else {
-            let material = new THREE.MeshPhongMaterial({ color: COLOUR_MAIN, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
-            let firstTile = this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-            this.allBodies.push(firstTile);
         }
 
         // grid
@@ -471,7 +467,7 @@ class MapGenerator {
 
             } else {
 
-                let materialHex = this.createColour(this.allBodies.length);
+                let materialHex = this.createColour(this.allObjects.length);
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GHOST_TILE, transparent: true, opacity: 0.75 });
 
                 this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
@@ -483,19 +479,27 @@ class MapGenerator {
 
 
     }
-    getTileFromSelection(tileSelection, tileName = "Tile", tileMaterial = null) {
+    getOrDefault(value, defaultValue) {
+        if (value && value != "") {
+            return value;
+        }
+        return defaultValue;
+    }
+    getTileFromSelection(tileSelection, tileName, tileMaterial = null) {
+
 
         if (tileSelection == 1) {
             console.log("Add tile");
 
             //+1 for ghost tile
-            let materialHex = this.createColour(this.allBodies.length+1);
+            let materialHex = this.createColour(this.allObjects.length + 1);
             let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
-            return this.createTileWithPhysics(tileName + this.allBodies.length, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            let actualTileName = this.getOrDefault(tileName, "Tile" + this.allObjects.length);
+            return this.createTileWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
         } else if (tileSelection == 2) {
             console.log("Add amiyabar");
 
@@ -503,7 +507,8 @@ class MapGenerator {
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
-            return this.createAmiyaBarWithPhysics(tileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            let actualTileName = this.getOrDefault(tileName, "AmiyaBar" + this.allObjects.length);
+            return this.createAmiyaBarWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
         } else if (tileSelection == 3) {
             console.log("Add goal");
 
@@ -511,7 +516,8 @@ class MapGenerator {
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
-            return this.createGoalWithPhysics(tileName, GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, material);
+            let actualTileName = this.getOrDefault(tileName, "Goal");
+            return this.createGoalWithPhysics(actualTileName, GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, material);
         }
         return null;
     }
@@ -532,22 +538,24 @@ class MapGenerator {
 
         if (lastObject) {
             let lastTile = lastObject.body;
-            console.log(lastObject);
-            console.log(lastTile);
             while (lastTile.name.indexOf("GhostTile") >= 0 || lastTile.name.indexOf("Player") >= 0) {
+                console.log("Last Tile", lastTile.name);
                 index--;
                 if (index < 0) {
                     return;
                 }
-                lastTile = this.allBodies[index];
+                lastObject = this.allObjects[index];
+                lastTile = lastObject.body;
 
+            }
+            if (index < 0) {
+                return;
             }
 
             this.physicsWorld.removeRigidBody(lastTile);
             this.scene.remove(lastObject);
 
-            this.allObjects.splice(index, index + 1);
-            this.allBodies.splice(index, index + 1);
+            this.allObjects.splice(index, 1);
 
         }
         this.generateLevelString();
