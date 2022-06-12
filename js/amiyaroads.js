@@ -642,7 +642,7 @@ function updatePhysics(deltaTime) {
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
 		if (lastSelectedLevel == "*-*") {
-			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, -1), tileSelection);
+			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileSelection);
 		}
 		updateWorld(deltaTime);
 		return;

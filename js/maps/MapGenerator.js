@@ -127,12 +127,13 @@ class MapGenerator {
 
     createPlayer() {
         this.pos.set(0, 3, 0);
-        this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
+        this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
 
         let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, playerMaterial);
 
         return body;
+
     }
     createPlayerWithPhysics(radius, mass, pos, quat, material) {
 
@@ -142,7 +143,8 @@ class MapGenerator {
         object.name = "Player";
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, 4, pos, quat, scene);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
+        
         return object;
 
     }
@@ -154,8 +156,6 @@ class MapGenerator {
         object.receiveShadow = true;
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
-        //this.pos.set(this.pos.x, this.pos.y, this.pos.z +(TILE_DEPTH/2.0));
-        //this.createDeathWithPhysics(TILE_WIDTH -DEATH_MARGIN, TILE_HEIGHT-DEATH_MARGIN, 0.1, 0, this.pos, this.quat, deathMaterial);
         return object;
 
     }
@@ -436,8 +436,7 @@ class MapGenerator {
         let playerPos = player.position;
         let rotation = player.quaternion;
 
-        let newZ = playerPos.z + Math.round((direction.z * TILE_DEPTH) / TILE_DEPTH);
-        this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT / 2.0) + direction.y * TILE_HEIGHT, newZ);
+        this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
         this.quat.set(rotation.x, 0, rotation.z, 1);
         if (tileSelection > 0) {
             if (this.ghostTile != null) {
@@ -460,31 +459,22 @@ class MapGenerator {
         let playerPos = player.position;
         let rotation = player.quaternion;
 
-
+        this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
+        this.quat.set(rotation.x, 0, rotation.z, 1);
         if (tileSelection == 1) {
             console.log("Add tile");
-            let newZ = playerPos.z + Math.round((direction.z * TILE_DEPTH) / TILE_DEPTH);
-            this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT / 2.0) + direction.y * TILE_HEIGHT, newZ);
-            this.quat.set(rotation.x, 0, rotation.z, 1);
 
             //+1 for ghost tile
             let materialHex = this.createColour(this.allBodies.length + 1);
-
             let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
             this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
         } else if (tileSelection == 2) {
             console.log("Add amiyabar");
-            let newZ = playerPos.z + Math.round((direction.z * (TILE_DEPTH / 2.0)) / (TILE_DEPTH / 2.0));
-            this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT / 2.0) + direction.y * TILE_HEIGHT, newZ);
-            this.quat.set(rotation.x, 0, rotation.z, 1);
 
             let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
             this.createAmiyaBarWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
         } else if (tileSelection == 3) {
             console.log("Add goal");
-            let newZ = playerPos.z + Math.round((direction.z * TILE_DEPTH) / TILE_DEPTH);
-            this.pos.set(playerPos.x + direction.x * TILE_WIDTH, playerPos.y - playerRadius - (TILE_HEIGHT / 2.0) + direction.y * TILE_HEIGHT, newZ);
-            this.quat.set(rotation.x, 0, rotation.z, 1);
 
             let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
             this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, material);
