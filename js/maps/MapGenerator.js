@@ -60,16 +60,31 @@ class MapGenerator {
         this.rigidBodies = [];
         this.allBodies = [];
         this.allObjects = [];
+        this.levelString = "";
     }
     generateLevelString() {
-        return this.levelString.slice(0, -1);
+        let newLevelString = "";
+        console.log("Generate level string");
+        for (let i = 0; i < this.allObjects.length; i++) {
+            let object = this.allObjects[i];
+            console.log(object);
+            let materialInfo = object.material.color.getHexString();
+            let pos = object.position;
+            let rotation = new THREE.Euler().setFromQuaternion(object.quaternion, "XYZ");
+            if (object.name.indexOf("GhostTile") < 0) {
+                newLevelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "|";
+            }
+        }
+        this.levelString = newLevelString.slice(0, -1);
+        console.log(this.levelString);
+        return this.levelString;
     }
     loadMap(levelSelected) {
         this.levelString = mapData[levelSelected];
         this.loadMapFromLevelString(this.levelString);
     }
-    loadMapFromLevelString(levelString) {
-        let mapTiles = this.levelString.split("|");
+    loadMapFromLevelString(levelString = "") {
+        let mapTiles = levelString.split("|");
         console.log(mapTiles.length);
         for (let i = 0; i < mapTiles.length; i++) {
             const tile = mapTiles[i].split(",");
@@ -92,7 +107,6 @@ class MapGenerator {
         }
     }
     initMap(levelSelected, seed, levelString = "") {
-        this.levelString = levelString;
         this.seed = seed;
         this.levelSelected = levelSelected;
         this.lastTileSelection = 0;
@@ -104,18 +118,23 @@ class MapGenerator {
         this.rigidBodies = [];
         this.allBodies = [];
         this.allObjects = [];
-        if (levelSelected == "?-?") {
+        if (levelSelected == "T-T") {
+            console.log("Test");
+            this.loadMapFromLevelString(this.levelString);
+        } else if (levelSelected == "?-?") {
             console.log("A");
+            this.levelString = "";
             this.createMapRandomChaos();
         } else if (levelSelected == "*-*") {
             console.log("B");
             this.createMapBuilder();
         } else {
             console.log("C");
+            this.levelString = "";
             this.loadMap(levelSelected);
         }
 
-
+        this.generateLevelString();
         return this.rigidBodies;
 
     }
@@ -244,13 +263,9 @@ class MapGenerator {
 
         object.userData.physicsBody = body;
         object.userData.collided = false;
-        let materialInfo = object.material.color.getHexString();
-        var rotation = new THREE.Euler().setFromQuaternion(quat, "XYZ");
-        if (object.name.indexOf("GhostTile") < 0) {
-            this.levelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "|";
-        }
+
         this.scene.add(object);
-        
+
 
         if (mass > 0) {
             if (object.name.indexOf("GhostTile") < 0) {
@@ -474,7 +489,7 @@ class MapGenerator {
             console.log("Add tile");
 
             //+1 for ghost tile
-            let materialHex = this.createColour(this.allBodies.length);
+            let materialHex = this.createColour(this.allBodies.length+1);
             let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
 
             if (tileMaterial != null) {
@@ -506,13 +521,15 @@ class MapGenerator {
 
         this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
         this.quat.set(rotation.x, 0, rotation.z, 1);
-        return this.getTileFromSelection(tileSelection);
+        let newTile = this.getTileFromSelection(tileSelection);
+        this.generateLevelString();
+        return newTile;
     }
     undoLastTile() {
         console.log("Undo");
         let index = this.allObjects.length - 1;
         let lastObject = this.allObjects[index];
-        
+
         if (lastObject) {
             let lastTile = lastObject.body;
             console.log(lastObject);
@@ -529,11 +546,11 @@ class MapGenerator {
             this.physicsWorld.removeRigidBody(lastTile);
             this.scene.remove(lastObject);
 
-            this.allObjects.splice(index,index+1);
-            this.allBodies.splice(index,index+1);
-            
-        }
+            this.allObjects.splice(index, index + 1);
+            this.allBodies.splice(index, index + 1);
 
+        }
+        this.generateLevelString();
     }
 
 

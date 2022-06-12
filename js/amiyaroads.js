@@ -90,8 +90,13 @@ function initFirstTime() {
 	$('.version').text(versionString);
 
 	$('.play-button').on('click', function (e) {
+		e.preventDefault();
 		console.log("Play");
+		lose();
+
 		$('.hud--tile_selection').addClass("hide");
+		$('.playtest-button').addClass("hide");
+		$('.editor-button').addClass("hide");
 		let $this = $(this);
 		//random seed when you click play on a level
 		//retries within the level will regenerate the same way.
@@ -105,8 +110,18 @@ function initFirstTime() {
 
 		if (lastSelectedLevel == "*-*") {
 			$('.hud--tile_selection').removeClass("hide");
+			$('.playtest-button').removeClass("hide");
+		}
+		if (lastSelectedLevel == "T-T") {
+			$('.editor-button').removeClass("hide");
 		}
 	});
+	$('.button--menu').on('click', function (e) {
+		e.preventDefault();
+		console.log("Go to main menu");
+		lose();
+	});
+
 
 	$(".hud--volume-slider").slider({
 		orientation: "vertical",
@@ -470,8 +485,9 @@ function createObjects(levelSelected) {
 	stamina = maxStamina;
 	timeLastOnGround = 0;
 	tileSelection = 0;
-	mapGenerator = new MapGenerator(scene, physicsWorld);
-
+	if (mapGenerator == null) {
+		mapGenerator = new MapGenerator(scene, physicsWorld);
+	}
 	// Ground
 	rigidBodies = mapGenerator.initMap(levelSelected, seed, $('#levelSelect').val());
 	player = mapGenerator.createPlayer();
@@ -750,6 +766,26 @@ function updatePhysics(deltaTime) {
 
 
 
+}
+function lose() {
+	console.log("lose");
+	won = false;
+	dead = true;
+	$('.menu--loading-screen').removeClass('hide');
+	$('#container').addClass('hide');
+	if (bgm && bgm.isPlaying) {
+		bgm.stop();
+	}
+
+	if (mapGenerator != null) {
+		mapGenerator.clear();
+	}
+	if (scene != null) {
+		scene.clear();
+	}
+	$('.menu--start-screen').removeClass('hide');
+	$('.hud').addClass('hide');
+	$('.menu--loading-screen').addClass('hide');
 }
 function win() {
 	console.log("win");
