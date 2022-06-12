@@ -12,18 +12,20 @@ const COLOUR_GOAL = new THREE.Color(0x00ff00);
 
 const COLOUR_BRAMBLE_MAIN = new THREE.Color(0x264e24);
 const COLOUR_BRAMBLE_SECONDARY = new THREE.Color(0x65783e);
-const TEXTURE_TILE_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/TileMain.png');
+
+const TEXTURE_TILE_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile1.png');
 TEXTURE_TILE_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_TILE_MAIN.wrapT = THREE.RepeatWrapping;
 TEXTURE_TILE_MAIN.repeat.set(2, 2);
-const TEXTURE_GHOST_TILE = new THREE.TextureLoader().load('../images/amiyaroad/GhostTile.png');
+const TEXTURE_GHOST_TILE = new THREE.TextureLoader().load('../images/amiyaroad/tiles/GhostTile.png');
 TEXTURE_GHOST_TILE.wrapS = THREE.RepeatWrapping;
 TEXTURE_GHOST_TILE.wrapT = THREE.RepeatWrapping;
 TEXTURE_GHOST_TILE.repeat.set(2, 2);
-const TEXTURE_TILE_SECONDARY = new THREE.TextureLoader().load('../images/amiyaroad/TileSecondary.png');
-const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('../images/amiyaroad/Amiyabars-logo.png');
-const TEXTURE_BRAMBLE = new THREE.TextureLoader().load('../images/amiyaroad/Bramble.png');
-const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/Boost.png');
+const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile2.png');
+const TEXTURE_GOAL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile3.png');
+const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile4.png');
+const TEXTURE_BRAMBLE = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile5.png');
+
 
 const material = new THREE.MeshLambertMaterial();
 const deathMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_BRAMBLE });
@@ -54,6 +56,7 @@ let levelString;
 
 let ghostTile;
 
+let lastTileSelection = 0;
 
 class MapGenerator {
     constructor(scene, physicsWorld) {
@@ -87,10 +90,10 @@ class MapGenerator {
                 this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
             } else if (tileType == "AmiyaBar") {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
             } else if (tileType == "Goal") {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex });
-                this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, material);
+                this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, material);
             }
         }
     }
@@ -98,6 +101,7 @@ class MapGenerator {
         this.levelString = levelString;
         this.seed = seed;
         this.levelSelected = levelSelected;
+        this.lastTileSelection = 0;
         console.log(seed);
         console.log(levelString);
         Math.seedrandom(seed);
@@ -144,7 +148,7 @@ class MapGenerator {
         object.receiveShadow = true;
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
-        
+
         return object;
 
     }
@@ -159,11 +163,11 @@ class MapGenerator {
         return object;
 
     }
-    createDeathWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+    createDeathWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
         shape.setMargin(margin);
-        object.name = "Death";
+        object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
@@ -171,22 +175,22 @@ class MapGenerator {
         return object;
 
     }
-    createAmiyaBarWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+    createAmiyaBarWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
         shape.setMargin(margin);
-        object.name = "AmiyaBar";
+        object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
         return object;
 
     }
-    createGoalWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+    createGoalWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
         shape.setMargin(margin);
-        object.name = "Goal";
+        object.name = name;
         object.receiveShadow = false;
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat);
@@ -322,7 +326,7 @@ class MapGenerator {
                 this.pos.set(x, y, z);
                 if (i > 0 && i % 30 == 0) {
                     let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                    this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                    this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
                     let material = new THREE.MeshPhongMaterial({ color: colour });
                     this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
@@ -360,7 +364,7 @@ class MapGenerator {
                 this.pos.set(x, y, z);
                 if (i > 0 && Math.random() <= 0.02) {
                     let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                    this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                    this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
                     let material = new THREE.MeshPhongMaterial({ color: colour });
                     this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
@@ -396,7 +400,7 @@ class MapGenerator {
                 this.pos.set(x, y, z);
                 if (i > 0 && Math.random() <= 0.02) {
                     let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                    this.createAmiyaBarWithPhysics(TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                    this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
                 } else {
                     let material = new THREE.MeshPhongMaterial({ color: colour });
                     this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
@@ -406,8 +410,8 @@ class MapGenerator {
 
 
 
-        let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-        this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
+        let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL });
+        this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
 
     }
 
@@ -438,6 +442,12 @@ class MapGenerator {
 
         this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
         this.quat.set(rotation.x, 0, rotation.z, 1);
+        
+        if (this.lastTileSelection != tileSelection) {
+            this.scene.remove(this.ghostTile);
+            this.ghostTile = null;
+        }
+        
         if (tileSelection > 0) {
             if (this.ghostTile != null) {
                 this.ghostTile.position.x = this.pos.x;
@@ -446,14 +456,52 @@ class MapGenerator {
                 this.ghostTile.quaternion.x = this.quat.x;
                 this.ghostTile.quaternion.y = this.quat.y;
                 this.ghostTile.quaternion.z = this.quat.z;
+
             } else {
+
                 let materialHex = this.createColour(this.allBodies.length);
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GHOST_TILE, transparent: true, opacity: 0.75 });
-                this.ghostTile = this.createTileWithPhysics("GhostTile", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+
+                this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
+                $('.hud--tile_selection img').attr("src", "./images/amiyaroad/tiles/Tile" + tileSelection + ".png");
             }
 
         }
+        this.lastTileSelection = tileSelection;
 
+
+    }
+    getTileFromSelection(tileSelection, tileName = "Tile", tileMaterial = null) {
+
+        if (tileSelection == 1) {
+            console.log("Add tile");
+
+            //+1 for ghost tile
+            let materialHex = this.createColour(this.allBodies.length);
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
+
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            return this.createTileWithPhysics(tileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+        } else if (tileSelection == 2) {
+            console.log("Add amiyabar");
+
+            let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            return this.createAmiyaBarWithPhysics(tileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+        } else if (tileSelection == 3) {
+            console.log("Add goal");
+
+            let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            return this.createGoalWithPhysics(tileName, GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, material);
+        }
+        return null;
     }
     addTile(player, direction, tileSelection) {
         let playerPos = player.position;
@@ -461,25 +509,7 @@ class MapGenerator {
 
         this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
         this.quat.set(rotation.x, 0, rotation.z, 1);
-        if (tileSelection == 1) {
-            console.log("Add tile");
-
-            //+1 for ghost tile
-            let materialHex = this.createColour(this.allBodies.length + 1);
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
-            this.createTileWithPhysics("Tile0", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-        } else if (tileSelection == 2) {
-            console.log("Add amiyabar");
-
-            let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-            this.createAmiyaBarWithPhysics(TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-        } else if (tileSelection == 3) {
-            console.log("Add goal");
-
-            let material = new THREE.MeshPhongMaterial({ color: COLOUR_GOAL });
-            this.createGoalWithPhysics(GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, material);
-        }
-
+        return this.getTileFromSelection(tileSelection);
     }
 
 

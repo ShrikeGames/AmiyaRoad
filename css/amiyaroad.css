@@ -62,7 +62,17 @@
 
 	background-color: #b84ff4;
 }
+.hud--tile_selection {
+	line-height: 1;
+	width: 130px;
+	height: 130px;
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	vertical-align: bottom;
 
+	background-color: #b84ff4;
+}
 .hud--stamina-value {
 	background-color: #0F0;
 	margin-bottom: 0;

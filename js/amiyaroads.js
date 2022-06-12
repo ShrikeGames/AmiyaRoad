@@ -101,6 +101,10 @@ function initFirstTime() {
 		init(lastSelectedLevel);
 		animate();
 		$('.menu--start-screen').addClass('hide');
+
+	if (lastSelectedLevel == "*-*") {
+		$('.hud--tile_selection').removeClass("hide");
+	}
 	});
 
 	$(".hud--volume-slider").slider({
@@ -147,6 +151,8 @@ function init(levelSelected) {
 	clock = new THREE.Clock();
 
 	rigidBodies = [];
+
+	$('.hud--tile_selection').addClass("hide");
 
 	initGraphics();
 
@@ -464,7 +470,7 @@ function createObjects(levelSelected) {
 	onGround = false;
 	stamina = maxStamina;
 	timeLastOnGround = 0;
-
+	tileSelection = 0;
 	mapGenerator = new MapGenerator(scene, physicsWorld);
 
 	// Ground
