@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.6 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.7 \"Arachnid\"";
 
 let stats;
 
@@ -70,7 +70,7 @@ let musicVolume = 0.05;
 let $debug = $('.hud.hud--debug');
 
 //level editor
-const BUILD_CAMERA_SPEED = 10;
+const BUILD_CAMERA_SPEED = 12;
 const BUILD_ROTATION_SPEED = 1;
 let tileSelection = 0;
 
@@ -468,7 +468,7 @@ function createObjects(levelSelected) {
 	mapGenerator = new MapGenerator(scene, physicsWorld);
 
 	// Ground
-	rigidBodies = mapGenerator.initMap(levelSelected, seed);
+	rigidBodies = mapGenerator.initMap(levelSelected, seed, $('#levelSelect').val());
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
 	spotLight.target = player;
