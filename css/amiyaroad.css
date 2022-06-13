@@ -1,3 +1,12 @@
+.level-select-image {
+	max-width: 150px;
+	height: auto;
+	display: inline;
+}
+
+.level-select-container {
+	display:inline;
+}
 .hud--top {
 	position: absolute;
 	top: 10px;

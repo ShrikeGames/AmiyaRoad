@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.10 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.2.0 \"Buckopia\"";
 
 let stats;
 
@@ -631,7 +631,7 @@ function updateWorld(deltaTime) {
 
 	}
 
-	camera.position.set(0, 10, player.position.z + 20);
+	camera.position.set(0, 3, player.position.z + 8);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(player.position.x, 20, player.position.z);
 

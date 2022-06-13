@@ -147,7 +147,7 @@ class MapGenerator {
 
     createPlayer() {
         this.pos.set(0, 3, 0);
-        this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+        this.quat.setFromEuler(new THREE.Euler(0, -1.3, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
 
         let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, playerMaterial);
