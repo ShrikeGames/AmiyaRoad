@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.1.9 \"Arachnid\"";
+const versionString = "PRE-ALPHA Build 0.1.10 \"Arachnid\"";
 
 let stats;
 
@@ -51,7 +51,7 @@ let physicsWorld;
 
 let onGround;
 let timeLastOnGround;
-let coyoteTimeLimit = 0.18;
+let coyoteTimeLimit = 0.13;
 let velocity;
 let updates;
 let lastUpdateVelocity;
@@ -438,7 +438,7 @@ function setupContactResultCallback() {
 		onGround = false;
 		const distance = contactPoint.getDistance();
 
-		if (distance > 0) return;
+		if (distance > 0.02) return;
 
 		if (lastUpdateVelocity.z <= -maxSpeed / 2.0 && velocity.z() >= -0.1) {
 			//last frame going very fast, now stopped completely, hit a wall too hard
@@ -486,13 +486,13 @@ function setupContactResultCallback() {
 			dead = false;
 		} else if (tag == "AmiyaBar") {
 			stamina = maxStamina;
-			if (localPos.y() >= 2) {
+			if (localPos.y() >= 0.99) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
 
 		} else if (tag.indexOf("Tile") >= 0) {
-			if (localPos.y() >= 2) {
+			if (localPos.y() >= 0.99) {
 				//console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
@@ -674,6 +674,11 @@ function updatePhysics(deltaTime) {
 		}
 		if (keyStates.KeyA) {
 			angularImpulse.setZ(BUILD_ROTATION_SPEED);
+		}
+		if (keyStates.KeyR) {
+			angularImpulse.setX(-player.quaternion.x);
+			angularImpulse.setY(-player.quaternion.y);
+			angularImpulse.setZ(-player.quaternion.z);
 		}
 		if (keyStates.Space) {
 			impulse.setY(BUILD_CAMERA_SPEED);
