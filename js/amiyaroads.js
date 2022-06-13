@@ -36,9 +36,12 @@ const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
 const acceleration = 5;
 const turnSpeed = 2.5;
 const turnSpeedOnGround = 5;
+const regularMaxSpeed = 40;
+const boostMaxSpeed = 60;
+const BOOST_DECAY_RATE = 5;
 const maxTurnSpeed = 10;
 const jumpSpeed = 17;
-const maxSpeed = 40;
+let maxSpeed = regularMaxSpeed;
 const maxStamina = 500;
 let seed;
 
@@ -474,13 +477,21 @@ function setupContactResultCallback() {
 			//debug block key
 			console.log(tag);
 		}
-		if (tag == "Death") {
+		if (tag.indexOf("Death") >= 0) {
 			dead = true;
 			won = false;
-		} else if (tag == "Goal") {
+		} else if (tag.indexOf("Goal") >= 0) {
 			won = true;
 			dead = false;
-		} else if (tag == "AmiyaBar") {
+		} else if (tag.indexOf("Boost") >= 0) {
+			maxSpeed = boostMaxSpeed;
+			//always accelerate when on a boost tile
+			player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, -acceleration));
+			if (localPos.y() >= 0.99) {
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
+			}
+		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
 			if (localPos.y() >= 0.99) {
 				timeLastOnGround = clock.elapsedTime;
@@ -504,6 +515,7 @@ function createObjects(levelSelected) {
 	onGround = false;
 	stamina = maxStamina;
 	timeLastOnGround = 0;
+	maxSpeed = regularMaxSpeed;
 	tileSelection = 0;
 	if (mapGenerator == null) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
@@ -539,6 +551,8 @@ function initInput() {
 				tileSelection = 3;
 			} else if (keyStates.Digit4 && event.code == "Digit4") {
 				tileSelection = 4;
+			} else if (keyStates.Digit5 && event.code == "Digit5") {
+				tileSelection = 5;
 			}
 
 			if (keyStates.Enter && event.code == "Enter") {
@@ -726,7 +740,10 @@ function updatePhysics(deltaTime) {
 		return;
 	}
 
-
+	if (maxSpeed >= regularMaxSpeed) {
+		maxSpeed -= BOOST_DECAY_RATE * deltaTime;
+		console.log(maxSpeed);
+	}
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
 			let relVelChange = (-acceleration);
