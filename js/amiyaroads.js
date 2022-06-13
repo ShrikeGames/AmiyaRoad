@@ -631,7 +631,7 @@ function updateWorld(deltaTime) {
 
 	}
 
-	camera.position.set(0, 3, player.position.z + 8);
+	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(player.position.x, 20, player.position.z);
 
