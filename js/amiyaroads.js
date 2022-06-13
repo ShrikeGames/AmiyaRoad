@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.1 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.2 \"Buckopia\"";
 
 let stats;
 
