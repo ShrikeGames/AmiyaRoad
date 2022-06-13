@@ -93,7 +93,7 @@ class MapGenerator {
             const tile = mapTiles[i].split(",");
             let tileType = tile[0];
             let materialHex = "#" + tile[1];
-            this.pos.set(tile[2], tile[3], tile[4]);
+            this.pos.set(Math.round(parseFloat(tile[2])*2.0)/2.0, Math.round(parseFloat(tile[3])*2.0)/2.0, Math.round(parseFloat(tile[4])*2.0)/2.0);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
             if (tileType.indexOf("GhostTile") >= 0) {
                 continue;
@@ -560,7 +560,7 @@ class MapGenerator {
         let playerPos = player.position;
         let rotation = player.quaternion;
 
-        this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
+        this.pos.set(Math.round(playerPos.x*2.0)/2.0, Math.round(((playerPos.y - playerRadius - TILE_HEIGHT / 2.0))*2.0)/2.0, Math.round(playerPos.z*2.0)/2.0);
         this.quat.set(rotation.x, 0, rotation.z, 1);
         let newTile = this.getTileFromSelection(tileSelection);
         this.generateLevelString();

@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.2 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.3 \"Buckopia\"";
 
 let stats;
 
@@ -37,7 +37,7 @@ const acceleration = 5;
 const turnSpeed = 2.5;
 const turnSpeedOnGround = 5;
 const regularMaxSpeed = 40;
-const boostMaxSpeed = 60;
+const boostMaxSpeed = 65;
 const BOOST_DECAY_RATE = 5;
 const maxTurnSpeed = 10;
 const jumpSpeed = 17;
