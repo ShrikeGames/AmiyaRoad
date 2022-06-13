@@ -434,9 +434,9 @@ function setupContactResultCallback() {
 		onGround = false;
 		const distance = contactPoint.getDistance();
 
-		if (distance > 0.02) return;
+		if (distance > 0) return;
 
-		if (lastUpdateVelocity.z <= -maxSpeed / 2.0 && velocity.z() >= -0.1) {
+		/*if (lastUpdateVelocity.z <= -maxSpeed / 2.0 && velocity.z() >= -0.1) {
 			//last frame going very fast, now stopped completely, hit a wall too hard
 			//die
 			won = false;
@@ -448,7 +448,7 @@ function setupContactResultCallback() {
 			reset();
 			return;
 		}
-
+		*/
 
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
