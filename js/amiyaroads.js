@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.0 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.1 \"Buckopia\"";
 
 let stats;
 
@@ -73,6 +73,18 @@ let $debug = $('.hud.hud--debug');
 const BUILD_CAMERA_SPEED = 12;
 const BUILD_ROTATION_SPEED = 1;
 let tileSelection = 0;
+
+
+let defaultEffectController = {
+	turbidity: 10,
+	rayleigh: 3,
+	mieCoefficient: 0.005,
+	mieDirectionalG: 0.7,
+	elevation: 3,
+	azimuth: 180,
+	exposure: 1
+};
+let effectController = defaultEffectController;
 
 Ammo().then(function (AmmoLib) {
 
@@ -213,15 +225,7 @@ function initSky(levelSelected) {
 	scene.fog = fog;
 
 	sun = new THREE.Vector3();
-	let effectController = {
-		turbidity: 10,
-		rayleigh: 3,
-		mieCoefficient: 0.005,
-		mieDirectionalG: 0.7,
-		elevation: 3,
-		azimuth: 180,
-		exposure: 1
-	};
+	effectController = defaultEffectController;
 	if (levelSelected == "?-?") {
 		effectController = {
 			turbidity: Math.random() * 20,
@@ -246,7 +250,6 @@ function initSky(levelSelected) {
 	sun.setFromSphericalCoords(1, phi, theta);
 
 	uniforms['sunPosition'].value.copy(sun);
-
 
 	const materials = [];
 
@@ -630,6 +633,14 @@ function updateWorld(deltaTime) {
 		}
 
 	}
+	//sun sets as your stamina goes down
+	effectController.elevation = (stamina / maxStamina) * 3;
+	const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
+	const theta = THREE.MathUtils.degToRad(effectController.azimuth);
+
+	sun.setFromSphericalCoords(1, phi, theta);
+
+	sky.material.uniforms['sunPosition'].value.copy(sun);
 
 	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
