@@ -96,10 +96,10 @@ function initFirstTime() {
 		init(lastSelectedLevel);
 
 		$('.menu--start-screen').addClass('hide');
-		$('.hud--tile_selection').removeClass("hide");
-		$('.playtest-button').addClass("hide");
-		$('.editor-button').removeClass("hide");
-	
+		$('.hud--basic').removeClass("hide");
+		$('.hud--playtest').removeClass("hide");
+		$('.hud--editor').addClass("hide");
+
 
 	});
 	$('.editor-button').on('click', function (e) {
@@ -110,35 +110,28 @@ function initFirstTime() {
 		init(lastSelectedLevel);
 
 		$('.menu--start-screen').addClass('hide');
-		$('.hud--tile_selection').addClass("hide");
-		$('.playtest-button').removeClass("hide");
-		$('.editor-button').addClass("hide");
-
+		$('.hud--basic').removeClass('hide');
+		$('.hud--playtest').addClass("hide");
+		$('.hud--editor').removeClass("hide");
 	});
 	$('.play-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Play");
 
 		$('.hud--tile_selection').addClass("hide");
-		$('.playtest-button').addClass("hide");
-		$('.editor-button').addClass("hide");
+		$('.hud--playtest').addClass("hide");
+		$('.hud--editor').addClass("hide");
 		let $this = $(this);
 		//random seed when you click play on a level
 		//retries within the level will regenerate the same way.
 		seed = "amiyaroads_" + Math.random() * 256000;
 		lastSelectedLevel = $this.attr("data-level");
-
+		if (lastSelectedLevel == "*-*") {
+			$('.hud--editor').removeClass("hide");
+		}
 		init(lastSelectedLevel);
 		animate();
 		$('.menu--start-screen').addClass('hide');
-
-		if (lastSelectedLevel == "*-*") {
-			$('.hud--tile_selection').removeClass("hide");
-			$('.playtest-button').removeClass("hide");
-		}
-		if (lastSelectedLevel == "T-T") {
-			$('.editor-button').removeClass("hide");
-		}
 	});
 	$('.button--menu').on('click', function (e) {
 		e.preventDefault();
@@ -148,7 +141,7 @@ function initFirstTime() {
 
 
 	$(".hud--volume-slider").slider({
-		orientation: "vertical",
+		orientation: "horizontal",
 		range: "min",
 		min: 0,
 		max: 100,
@@ -202,7 +195,7 @@ function init(levelSelected) {
 
 	initMusic();
 
-	$('.hud').removeClass('hide');
+	$('.hud--basic').removeClass('hide');
 	$('#container').removeClass('hide');
 	$('.menu--loading-screen').addClass('hide');
 	dead = false;
@@ -805,7 +798,7 @@ function lose() {
 	scene.clear();
 
 	$('.menu--start-screen').removeClass('hide');
-	$('.hud').addClass('hide');
+	$('.hud--basic').addClass('hide');
 	$('.menu--loading-screen').addClass('hide');
 }
 function win() {
@@ -821,7 +814,7 @@ function win() {
 	mapGenerator.clear();
 	scene.clear();
 	$('.menu--start-screen').removeClass('hide');
-	$('.hud').addClass('hide');
+	$('.hud--basic').addClass('hide');
 	$('.menu--loading-screen').addClass('hide');
 }
 

@@ -44,6 +44,13 @@
 	line-height: 0;
 }
 
+.hud--volume-container {
+	max-width: 120px;
+	max-height: 120px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .hud--speed {
 	margin-left: auto;
 	margin-right: auto;
@@ -62,6 +69,7 @@
 
 	background-color: #b84ff4;
 }
+
 .hud--tile_selection {
 	line-height: 1;
 	width: 130px;
@@ -73,6 +81,7 @@
 
 	background-color: #b84ff4;
 }
+
 .hud--stamina-value {
 	background-color: #0F0;
 	margin-bottom: 0;
