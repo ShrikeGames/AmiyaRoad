@@ -534,38 +534,39 @@ function initInput() {
 	console.log("initInput");
 
 	keyStates = {};
+	$(document).ready(function() {
+		document.addEventListener('keydown', (event) => {
+			keyStates[event.code] = true;
+		});
 
-	document.addEventListener('keydown', (event) => {
-		keyStates[event.code] = true;
-	});
+		document.addEventListener('keyup', (event) => {
+			if (lastSelectedLevel == "*-*") {
+				if (keyStates.Digit0 && event.code == "Digit0") {
+					tileSelection = 0;
+				} else if (keyStates.Digit1 && event.code == "Digit1") {
+					tileSelection = 1;
+				} else if (keyStates.Digit2 && event.code == "Digit2") {
+					tileSelection = 2;
+				} else if (keyStates.Digit3 && event.code == "Digit3") {
+					tileSelection = 3;
+				} else if (keyStates.Digit4 && event.code == "Digit4") {
+					tileSelection = 4;
+				} else if (keyStates.Digit5 && event.code == "Digit5") {
+					tileSelection = 5;
+				}
 
-	document.addEventListener('keyup', (event) => {
-		if (lastSelectedLevel == "*-*") {
-			if (keyStates.Digit0 && event.code == "Digit0") {
-				tileSelection = 0;
-			} else if (keyStates.Digit1 && event.code == "Digit1") {
-				tileSelection = 1;
-			} else if (keyStates.Digit2 && event.code == "Digit2") {
-				tileSelection = 2;
-			} else if (keyStates.Digit3 && event.code == "Digit3") {
-				tileSelection = 3;
-			} else if (keyStates.Digit4 && event.code == "Digit4") {
-				tileSelection = 4;
-			} else if (keyStates.Digit5 && event.code == "Digit5") {
-				tileSelection = 5;
+				if (keyStates.Enter && event.code == "Enter") {
+
+					let playerPos = player.position;
+					let rotation = player.quaternion;
+					mapGenerator.addTile(playerPos, rotation, tileSelection);
+				} else if (keyStates.Backspace && event.code == "Backspace") {
+					mapGenerator.undoLastTile();
+				}
+
 			}
-
-			if (keyStates.Enter && event.code == "Enter") {
-
-				let playerPos = player.position;
-				let rotation = player.quaternion;
-				mapGenerator.addTile(playerPos, rotation, tileSelection);
-			} else if (keyStates.Backspace && event.code == "Backspace") {
-				mapGenerator.undoLastTile();
-			}
-
-		}
-		keyStates[event.code] = false;
+			keyStates[event.code] = false;
+		});
 	});
 
 }
