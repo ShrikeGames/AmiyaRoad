@@ -88,15 +88,13 @@ let defaultEffectController = {
 	exposure: 1
 };
 let effectController = defaultEffectController;
-window.onload = (event) => {
 
-	Ammo().then(function (AmmoLib) {
+Ammo().then(function (AmmoLib) {
 
-		Ammo = AmmoLib;
-		initFirstTime();
+	Ammo = AmmoLib;
+	initFirstTime();
 
-	});
-};
+});
 
 function initFirstTime() {
 	console.log("initFirstTime");
