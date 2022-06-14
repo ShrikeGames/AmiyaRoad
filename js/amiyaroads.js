@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.4 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.5 \"Buckopia\"";
 
 let stats;
 
@@ -745,7 +745,6 @@ function updatePhysics(deltaTime) {
 
 	if (maxSpeed >= regularMaxSpeed) {
 		maxSpeed -= BOOST_DECAY_RATE * deltaTime;
-		console.log(maxSpeed);
 	}
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {

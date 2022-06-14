@@ -203,7 +203,7 @@ Sky.SkyShader = {
 			float sundisk = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta );
 			L0 += ( vSunE * 19000.0 * Fex ) * sundisk;
 
-			vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.3, 0.3, 0.9 );
+			vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.3, 0.3, 0.7 );
 
 			vec3 retColor = pow( texColor, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
 
