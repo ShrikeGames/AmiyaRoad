@@ -88,13 +88,15 @@ let defaultEffectController = {
 	exposure: 1
 };
 let effectController = defaultEffectController;
+window.onload = (event) => {
 
-Ammo().then(function (AmmoLib) {
+	Ammo().then(function (AmmoLib) {
 
-	Ammo = AmmoLib;
-	initFirstTime();
+		Ammo = AmmoLib;
+		initFirstTime();
 
-});
+	});
+};
 
 function initFirstTime() {
 	console.log("initFirstTime");
@@ -164,7 +166,7 @@ function initFirstTime() {
 		slide: function (event, ui) {
 			musicVolume = ui.value / 100.0;
 			bgm.setVolume(musicVolume);
-			$(".hud--volume-display").text((musicVolume * 100) + "%");
+			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
 	});
 	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
