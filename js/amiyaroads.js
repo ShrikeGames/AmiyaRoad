@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.3 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.4 \"Buckopia\"";
 
 let stats;
 
@@ -556,7 +556,10 @@ function initInput() {
 			}
 
 			if (keyStates.Enter && event.code == "Enter") {
-				mapGenerator.addTile(player, new THREE.Vector3(0, 0, -1), tileSelection);
+
+				let playerPos = player.position;
+				let rotation = player.quaternion;
+				mapGenerator.addTile(playerPos, rotation, tileSelection);
 			} else if (keyStates.Backspace && event.code == "Backspace") {
 				mapGenerator.undoLastTile();
 			}

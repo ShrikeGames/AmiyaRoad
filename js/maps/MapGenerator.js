@@ -39,6 +39,10 @@ TEXTURE_PLAYER.repeat.set(1, 1);
 const TILE_WIDTH = 6;
 const TILE_HEIGHT = 2;
 const TILE_DEPTH = 12;
+const AMIYABAR_WIDTH = 6;
+const AMIYABAR_HEIGHT = 2;
+const AMIYABAR_DEPTH = 6;
+
 const DEATH_WIDTH = 6;
 const DEATH_HEIGHT = 6;
 const DEATH_DEPTH = 2;
@@ -93,7 +97,7 @@ class MapGenerator {
             const tile = mapTiles[i].split(",");
             let tileType = tile[0];
             let materialHex = "#" + tile[1];
-            this.pos.set(Math.round(parseFloat(tile[2])*2.0)/2.0, Math.round(parseFloat(tile[3])*2.0)/2.0, Math.round(parseFloat(tile[4])*2.0)/2.0);
+            this.pos.set(Math.round(parseFloat(tile[2]) * 2.0) / 2.0, Math.round(parseFloat(tile[3]) * 2.0) / 2.0, Math.round(parseFloat(tile[4]) * 2.0) / 2.0);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
             if (tileType.indexOf("GhostTile") >= 0) {
                 continue;
@@ -103,7 +107,7 @@ class MapGenerator {
                 this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
             } else if (tileType.indexOf("AmiyaBar") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+                this.createAmiyaBarWithPhysics("AmiyaBar", AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, material);
             } else if (tileType.indexOf("Goal") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL });
                 this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, material);
@@ -323,122 +327,125 @@ class MapGenerator {
     }
 
     createMapRandomChaos() {
-        let lastPos = new THREE.Vector3(0, 0, 0);
-        let lastQuat = new THREE.Quaternion();
-        const length = 100;
+
+        const length = 80 + Math.round(Math.random() * 100);
+        let x = 0;
+        let y = 0;
+        let z = TILE_DEPTH;
+        let zTilt = 0;
+        let tileType = 1;
+        let xAlgo = Math.round(Math.random() * 5);
+        let yAlgo = Math.round(Math.random() * 5);
+        let tiltAlgo = Math.round(Math.random() * 5);
+        let randomSwitchupRate = 10 + Math.round(Math.random() * 20);
+        let verticalRangeRate = Math.random() * 0.5;
+        let randomSkipRate = 2 + Math.round(Math.random() * 20);
+        let randomBoostRate = 2 + Math.round(Math.random() * 20);
+        let randomAmiyaBarRate = 10 + Math.round(Math.random() * 20);
+
+        let randomTiltRate = 1 + Math.round(Math.random() * 10);
+        let tiltRangeRate = Math.random() * 0.1;
+
         for (let i = 0; i < length; i++) {
-            this.quat.set(0, 0, 0, 1);
-
-            let random_skip = Math.random();
-            if (random_skip <= 0.2 && i > 6 && (i % 30) != 0) {
-
-            } else {
-                let colour = this.createColour(i);
-
-                let x = 0;
-                let y = -0.2;
-                let z = -i * TILE_DEPTH;
-
-                if (i >= 60) {
-                    x = Math.cos(i) * 2.5;
-                } else if (i >= 30) {
-                    x = Math.cos(i) * 1.5;
-                } else if (i >= 10) {
-                    x = Math.random() - 0.5;
-                }
-                if (i >= 20 && i % 30 != 0) {
-                    y += Math.floor(Math.random() * 2) * 0.3;
-                    this.quat.set(0.10 * (i / 100.0), 0, 0, 1);
-                }
-                this.pos.set(x, y, z);
-                if (i > 0 && i % 30 == 0) {
-                    let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                    this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-                } else {
-                    let material = new THREE.MeshPhongMaterial({ color: colour });
-                    this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-                }
+            tileType = 1;
+            x = 0;
+            y = 0;
+            zTilt = 0;
+            if (i > 0 && i % randomSwitchupRate == 0) {
+                xAlgo = Math.round(Math.random() * 5);
+                yAlgo = Math.round(Math.random() * 5);
+                verticalRangeRate = Math.random() * 0.5;
+                randomSkipRate = 2 + Math.round(Math.random() * 20);
+                randomBoostRate = 2 + Math.round(Math.random() * 20);
+                randomAmiyaBarRate = 10 + Math.round(Math.random() * 20);
+                randomTiltRate = 1 + Math.round(Math.random() * 10);
+                tiltAlgo = Math.round(Math.random() * 5);
+                tiltRangeRate = Math.random() * 0.1;
             }
-            lastPos.x = this.pos.x;
-            lastPos.y = this.pos.y + 4;
-            lastPos.z = this.pos.z - 1;
+            if (i > 2) {
 
-            random_skip = Math.random();
-            if (random_skip <= 0.33 && i > 6) {
+                switch (xAlgo) {
+                    case 0:
+                        x = Math.sin(i);
+                    case 1:
+                        x = Math.cos(i);
+                    case 2:
+                        x = Math.sin(i) + Math.cos(i);
+                    case 3:
+                        x = Math.sin(i) * 2.0;
+                    case 4:
+                        x = Math.cos(i) * 2.0;
+                    case 5:
+                        x = (Math.sin(i) + Math.cos(i)) * 2.0;
 
-            } else {
-                let colour = this.createColour(i);
-
-                let x = -TILE_WIDTH;
-                let y = 2;
-                let z = -i * TILE_DEPTH;
-
-                if (i >= 60) {
-                    x = -TILE_WIDTH + Math.cos(i) * 2.5;
-                } else if (i >= 30) {
-                    x = -TILE_WIDTH + Math.cos(i) * 1.5;
-                } else if (i >= 10) {
-                    x = -TILE_WIDTH + Math.random() - 0.5;
                 }
-                if (i >= 20 && i % 30 != 0) {
-                    y += Math.floor(Math.random() * 2) * 0.3;
+                switch (yAlgo) {
+                    case 0:
+                        y = Math.sin(i) * verticalRangeRate;
+                    case 1:
+                        y = Math.cos(i) * verticalRangeRate;
+                    case 2:
+                        y = (Math.sin(i) + Math.cos(i)) * verticalRangeRate;
+                    case 3:
+                        y = Math.sin(i) * 2.0 * verticalRangeRate;
+                    case 4:
+                        y = Math.cos(i) * 2.0 * verticalRangeRate;
+                    case 5:
+                        y = (Math.sin(i) + Math.cos(i)) * 2.0 * verticalRangeRate;
+
                 }
-                if (i >= 50) {
-                    this.quat.set(0, 0, Math.random() * 0.2, 1);
-                } else {
-                    this.quat.set(0, 0, (0.5 - Math.random()) * 0.1, 1);
-                }
-                this.pos.set(x, y, z);
-                if (i > 0 && Math.random() <= 0.02) {
-                    let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                    this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-                } else {
-                    let material = new THREE.MeshPhongMaterial({ color: colour });
-                    this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                if (i % randomTiltRate == 0) {
+                    switch (tiltAlgo) {
+                        case 0:
+                            zTilt = Math.sin(i) * tiltRangeRate;
+                        case 1:
+                            zTilt = Math.cos(i) * tiltRangeRate;
+                        case 2:
+                            zTilt = (Math.sin(i) + Math.cos(i)) * tiltRangeRate;
+                        case 3:
+                            zTilt = Math.sin(i) * 2.0 * tiltRangeRate;
+                        case 4:
+                            zTilt = Math.cos(i) * 2.0 * tiltRangeRate;
+                        case 5:
+                            zTilt = (Math.sin(i) + Math.cos(i)) * 2.0 * tiltRangeRate;
+
+                    }
                 }
             }
 
-            random_skip = Math.random();
-            if (random_skip <= 0.33 && i > 6) {
 
-            } else {
-                let colour = this.createColour(i);
-
-                let x = TILE_WIDTH;
-                let y = 2;
-                let z = -i * TILE_DEPTH;
-
-                if (i >= 60) {
-                    x = TILE_WIDTH + Math.cos(i) * 2.5;
-                } else if (i >= 30) {
-                    x = TILE_WIDTH + Math.cos(i) * 1.5;
-                } else if (i >= 10) {
-                    x = TILE_WIDTH + Math.random() - 0.5;
-                }
-                if (i >= 20 && i % 30 != 0) {
-                    y += Math.floor(Math.random() * 2) * 0.3;
-                }
-                if (i >= 50) {
-                    this.quat.set(0, 0, Math.random() * -0.2, 1);
-                } else {
-                    this.quat.set(0, 0, (0.5 - Math.random()) * 0.1, 1);
-                }
-
-                this.pos.set(x, y, z);
-                if (i > 0 && Math.random() <= 0.02) {
-                    let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                    this.createAmiyaBarWithPhysics("AmiyaBar", TILE_WIDTH, 5, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
-                } else {
-                    let material = new THREE.MeshPhongMaterial({ color: colour });
-                    this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
-                }
+            if (i > 0 && i % randomAmiyaBarRate == 0) {
+                tileType = 2;
+                z += (AMIYABAR_DEPTH * 0.5);
             }
+            if (i > 0 && i % randomBoostRate == 0) {
+                tileType = 4;
+            }
+            if (i == length - 1) {
+                //goal
+                tileType = 3;
+            }
+
+            let tilePos = new THREE.Vector3(x, y, z);
+            let tileQuat = new THREE.Quaternion(0, 0, zTilt, 1);
+            if (i % randomSkipRate != 0) {
+                this.addTile(tilePos, tileQuat, tileType);
+            }
+
+            if (tileType == 1) {
+                z -= (TILE_DEPTH);
+            } else if (tileType == 2) {
+                z -= (AMIYABAR_DEPTH * 1.5);
+            } else if (tileType == 3) {
+                z -= (GOAL_DEPTH);
+            } else if (tileType == 4) {
+                z -= (TILE_DEPTH);
+            } else if (tileType == 5) {
+                z -= (DEATH_DEPTH);
+            }
+
         }
 
-
-
-        let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL });
-        this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, lastPos, lastQuat, material);
 
     }
 
@@ -525,7 +532,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "AmiyaBar" + this.allObjects.length);
-            return this.createAmiyaBarWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH / 2.0, 0, this.pos, this.quat, material);
+            return this.createAmiyaBarWithPhysics(actualTileName, AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, material);
         } else if (tileSelection == 3) {
             console.log("Add goal");
 
@@ -556,11 +563,9 @@ class MapGenerator {
         }
         return null;
     }
-    addTile(player, direction, tileSelection) {
-        let playerPos = player.position;
-        let rotation = player.quaternion;
+    addTile(playerPos, rotation, tileSelection) {
 
-        this.pos.set(Math.round(playerPos.x*2.0)/2.0, Math.round(((playerPos.y - playerRadius - TILE_HEIGHT / 2.0))*2.0)/2.0, Math.round(playerPos.z*2.0)/2.0);
+        this.pos.set(Math.round(playerPos.x * 2.0) / 2.0, Math.round(((playerPos.y - playerRadius - TILE_HEIGHT / 2.0)) * 2.0) / 2.0, Math.round(playerPos.z * 2.0) / 2.0);
         this.quat.set(rotation.x, 0, rotation.z, 1);
         let newTile = this.getTileFromSelection(tileSelection);
         this.generateLevelString();
