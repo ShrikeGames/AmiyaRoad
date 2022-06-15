@@ -484,10 +484,13 @@ function setupContactResultCallback() {
 			won = true;
 			dead = false;
 		} else if (tag.indexOf("Boost") >= 0) {
-			maxSpeed = boostMaxSpeed;
-			//always accelerate when on a boost tile
-			player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, -acceleration));
 			if (localPos.y() >= 0.99) {
+				maxSpeed = boostMaxSpeed;
+				//always accelerate when on a boost tile
+				let boostImpulse = new Ammo.btVector3(velocity.x(), velocity.y(), velocity.z());
+				boostImpulse.normalize();
+				boostImpulse.op_mul(acceleration*2);
+				player.body.applyCentralImpulse(boostImpulse);
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
@@ -534,7 +537,7 @@ function initInput() {
 	console.log("initInput");
 
 	keyStates = {};
-	$(document).ready(function() {
+	$(document).ready(function () {
 		document.addEventListener('keydown', (event) => {
 			keyStates[event.code] = true;
 		});
