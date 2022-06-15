@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.5 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.6 \"Buckopia\"";
 
 let stats;
 
@@ -383,12 +383,12 @@ function initGraphics() {
 	spotLight.shadow.mapSize.height = 1024;
 
 	spotLight.shadow.camera.near = 1;
-	spotLight.shadow.camera.far = 60;
+	spotLight.shadow.camera.far = 120;
 	spotLight.shadow.camera.fov = 90;
-	spotLight.shadow.camera.right = 10.5;
-	spotLight.shadow.camera.left = -10.5;
-	spotLight.shadow.camera.top = 10.5;
-	spotLight.shadow.camera.bottom = - 10.5;
+	spotLight.shadow.camera.right = 100.5;
+	spotLight.shadow.camera.left = -100.5;
+	spotLight.shadow.camera.top = 100.5;
+	spotLight.shadow.camera.bottom = - 100.5;
 
 	scene.add(spotLight);
 
@@ -553,6 +553,8 @@ function initInput() {
 					tileSelection = 4;
 				} else if (keyStates.Digit5 && event.code == "Digit5") {
 					tileSelection = 5;
+				} else if (keyStates.Digit6 && event.code == "Digit6") {
+					tileSelection = 6;
 				}
 
 				if (keyStates.Enter && event.code == "Enter") {

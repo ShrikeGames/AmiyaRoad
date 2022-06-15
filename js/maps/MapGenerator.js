@@ -25,6 +25,7 @@ const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('../images/amiyaroad/til
 const TEXTURE_GOAL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile3.png');
 const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile4.png');
 const TEXTURE_DEATH = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile5.png');
+const TEXTURE_BALL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile6.png');
 
 let pos;
 let quad;
@@ -34,6 +35,7 @@ let rigidBodies;
 let allObjects;
 const margin = 0.05;
 const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
+
 TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
 TEXTURE_PLAYER.wrapT = THREE.RepeatWrapping;
 TEXTURE_PLAYER.repeat.set(1, 1);
@@ -52,6 +54,8 @@ const GOAL_WIDTH = 12;
 const GOAL_HEIGHT = 12;
 const GOAL_DEPTH = 4;
 const playerRadius = 0.75;
+const BALL_RADIUS = 1.5;
+const BALL_MASS = 2;
 
 const DEATH_MARGIN = 0.5;
 let seed;
@@ -118,6 +122,9 @@ class MapGenerator {
             } else if (tileType.indexOf("Death") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: 30, specular: 0xd4aae7 });
                 this.createTileWithPhysics("Death" + i, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, material);
+            } else if (tileType.indexOf("Ball") >= 0) {
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: 30, specular: 0xd4aae7, transparent: true, opacity: 1 });
+                this.createBallWithPhysics("Ball" + i, BALL_RADIUS, BALL_MASS, this.pos, this.quat, material);
             }
         }
     }
@@ -181,6 +188,17 @@ class MapGenerator {
         object.castShadow = true;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
 
+        return object;
+
+    }
+    createBallWithPhysics(name, radius, mass, pos, quat, material) {
+        const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
+        const shape = new Ammo.btSphereShape(radius);
+        shape.setMargin(margin);
+        object.name = name;
+        object.receiveShadow = true;
+        object.castShadow = true;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat);
         return object;
 
     }
@@ -626,6 +644,15 @@ class MapGenerator {
             }
             let actualTileName = this.getOrDefault(tileName, "Death" + this.allObjects.length);
             return this.createDeathWithPhysics(actualTileName, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, material);
+        } else if (tileSelection == 6) {
+            //console.log("Add ball");
+
+            let material = new THREE.MeshPhongMaterial({ map: TEXTURE_BALL, shininess: 30, specular: 0xd4aae7, transparent: true, opacity: 1 });
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            let actualTileName = this.getOrDefault(tileName, "Ball" + this.allObjects.length);
+            return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, material);
         }
         return null;
     }
