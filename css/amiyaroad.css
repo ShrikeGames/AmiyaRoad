@@ -5,16 +5,19 @@
 }
 
 .level-select-container {
-	display:inline;
+	display: inline;
 }
+
 .hud--top {
 	position: absolute;
-	top: 10px;
+	top: 60px;
 	width: 100%;
 	text-align: center;
 	z-index: 100;
 	display: block;
 	color: #ffffff;
+	background-color: #333333;
+	max-width: 200px;
 }
 
 .version {
@@ -54,10 +57,25 @@
 }
 
 .hud--volume-container {
+	max-width: 220px;
+	max-height: 220px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.hud--volume-slider {
 	max-width: 120px;
 	max-height: 120px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+.hud--editor_info {
+	max-width: 300px;
+	position: relative;
+	float: left;
+	text-align: left;
+	padding-left:10px;
 }
 
 .hud--speed {
@@ -65,6 +83,7 @@
 	margin-right: auto;
 	background-color: #F00;
 	line-height: 1;
+	
 }
 
 .hud--stamina {
@@ -141,6 +160,11 @@ h1 {
 
 h2 {
 	font-size: 1.5em;
+}
+
+p,
+span {
+	line-height: 1;
 }
 
 /*! jQuery UI - v1.13.1 - 2022-01-20
