@@ -369,7 +369,9 @@ class MapGenerator {
         let randomAmiyaBarRate;
 
         let randomTiltRate;
-        let tiltRangeRate
+        let tiltRangeRate;
+
+        let buckoRate;
 
         for (let i = 0; i < length; i++) {
             tileType = 1;
@@ -388,7 +390,7 @@ class MapGenerator {
                 xTiltAlgo = Math.round(Math.random() * 6);
                 zTiltAlgo = Math.round(Math.random() * 6);
                 tiltRangeRate = Math.random() * 0.1;
-
+                buckoRate = Math.round(Math.random() * 20);
             }
             if (i > 2) {
 
@@ -518,6 +520,10 @@ class MapGenerator {
             let tileQuat = new THREE.Quaternion(xTilt, 0, zTilt, 1);
             if ((i % randomSkipRate != 0) || tileType == 2) {
                 this.addTile(tilePos, tileQuat, tileType);
+            }
+            if (i % buckoRate == 0) {
+                tilePos = new THREE.Vector3(x, y + BALL_RADIUS, z);
+                this.addTile(tilePos, tileQuat, 6);
             }
 
             if (tileType == 1) {
@@ -656,7 +662,10 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Ball" + this.allObjects.length);
-            return this.createBallWithPhysics(actualTileName, BALL_RADIUS, 0, this.pos, this.quat, material);
+            if (this.levelSelected == "*-*") {
+                return this.createBallWithPhysics(actualTileName, BALL_RADIUS, 0, this.pos, this.quat, material);
+            }
+            return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, material);
         }
         return null;
     }
