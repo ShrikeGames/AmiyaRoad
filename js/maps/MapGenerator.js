@@ -87,6 +87,7 @@ class MapGenerator {
             }
         }
         this.levelString = newLevelString.slice(0, -1);
+        $('#levelSelect').attr("value", this.levelString);
         return this.levelString;
     }
     loadMap(levelSelected) {
@@ -148,10 +149,7 @@ class MapGenerator {
             this.createMapRandomChaos();
         } else if (levelSelected == "*-*") {
             console.log("B");
-            if (levelString != "") {
-                this.levelString = levelString;
-            }
-
+            this.levelString = levelString;
             this.createMapBuilder();
         } else {
             console.log("C");

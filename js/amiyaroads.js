@@ -7,7 +7,7 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 
-const versionString = "PRE-ALPHA Build 0.2.8 \"Buckopia\"";
+const versionString = "PRE-ALPHA Build 0.2.9 \"Buckopia\"";
 
 let stats;
 
@@ -35,7 +35,7 @@ const GRAVITY = 60;
 const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
 const acceleration = 5;
 const turnSpeed = 2.5;
-const turnSpeedOnGround = 5;
+const turnSpeedOnGround = 2.5;
 const regularMaxSpeed = 40;
 const boostMaxSpeed = 65;
 const BOOST_DECAY_RATE = 5;
@@ -109,8 +109,8 @@ function initFirstTime() {
 		lose();
 		lastSelectedLevel = "T-T";
 		init(lastSelectedLevel);
-
 		$('.menu--start-screen').addClass('hide');
+		$('.button--menu').addClass('hide');
 		$('.hud--basic').removeClass("hide");
 		$('.hud--playtest').removeClass("hide");
 		$('.hud--editor').addClass("hide");
@@ -125,6 +125,7 @@ function initFirstTime() {
 		init(lastSelectedLevel);
 
 		$('.menu--start-screen').addClass('hide');
+		$('.button--menu').removeClass('hide');
 		$('.hud--basic').removeClass('hide');
 		$('.hud--playtest').addClass("hide");
 		$('.hud--editor').removeClass("hide");
@@ -132,7 +133,7 @@ function initFirstTime() {
 	$('.play-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Play");
-
+		$('.button--menu').removeClass('hide');
 		$('.hud--tile_selection').addClass("hide");
 		$('.hud--playtest').addClass("hide");
 		$('.hud--editor').addClass("hide");
@@ -151,6 +152,7 @@ function initFirstTime() {
 	$('.button--menu').on('click', function (e) {
 		e.preventDefault();
 		console.log("Go to main menu");
+		mapGenerator.generateLevelString();
 		lose();
 	});
 
@@ -489,7 +491,7 @@ function setupContactResultCallback() {
 				//always accelerate when on a boost tile
 				let boostImpulse = new Ammo.btVector3(velocity.x(), velocity.y(), velocity.z());
 				boostImpulse.normalize();
-				boostImpulse.op_mul(acceleration*2);
+				boostImpulse.op_mul(acceleration * 2);
 				player.body.applyCentralImpulse(boostImpulse);
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
@@ -777,8 +779,8 @@ function updatePhysics(deltaTime) {
 				let relVelChange = (-turnSpeed);
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
-				//better handling on the ground
-				let relVelChange = (-turnSpeedOnGround);
+				//better handling on the ground and at higher speeds
+				let relVelChange = -turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 
@@ -789,8 +791,14 @@ function updatePhysics(deltaTime) {
 				let relVelChange = (turnSpeed);
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
-				//better handling on the ground
-				let relVelChange = (turnSpeedOnGround);
+				//better handling on the ground and at higher speeds
+				let relVelChange = turnSpeedOnGround+ (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
+				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+			}
+		}
+		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD){
+			if (onGround) {
+				let relVelChange = -velocity.x()*0.25;
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
