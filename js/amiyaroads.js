@@ -3,9 +3,11 @@ import * as THREE from 'three';
 import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 import { Sky } from './jsm/objects/Sky.js';
+import { Water } from './jsm/objects/Water.js';
 import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
+import { Vector3 } from 'three';
 
 const versionString = "PRE-ALPHA Build 0.2.9 \"Buckopia\"";
 
@@ -25,6 +27,7 @@ let spotLight;
 let clock;
 let sky;
 let sun;
+let water;
 let player;
 let container;
 
@@ -210,6 +213,8 @@ function init(levelSelected) {
 
 	initSky(levelSelected);
 
+	initWater(levelSelected);
+
 	initMusic();
 
 	$('.hud--basic').removeClass('hide');
@@ -250,7 +255,7 @@ function initSky(levelSelected) {
 	uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
 
 	const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
-	const theta = THREE.MathUtils.degToRad(effectController.azimuth);
+	const theta = THREE.MathUtils.degToRad(90 + effectController.azimuth);
 
 	sun.setFromSphericalCoords(1, phi, theta);
 
@@ -314,6 +319,57 @@ function initSky(levelSelected) {
 
 
 }
+
+function initWater(levelSelected) {
+	if (levelSelected.indexOf("2-") >= 0) {
+		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+		water = new Water(
+			waterGeometry,
+			{
+				textureWidth: 1024,
+				textureHeight: 1024,
+				waterNormals: new THREE.TextureLoader().load('images/amiyaroad/Water.png', function (texture) {
+
+					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+				}),
+				sunDirection: new THREE.Vector3(),
+				sunColor: 0xfbddff,
+				waterColor: 0xccb8f5,
+				distortionScale: -12,
+				fog: scene.fog !== undefined
+			}
+		);
+		water.position.y = -4;
+		water.rotation.x = - Math.PI / 2;
+		scene.add(water);
+	}else if (levelSelected.indexOf("3-") >= 0) {
+		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+		water = new Water(
+			waterGeometry,
+			{
+				textureWidth: 1024,
+				textureHeight: 1024,
+				waterNormals: new THREE.TextureLoader().load('images/amiyaroad/Snow.png', function (texture) {
+
+					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+				}),
+				sunDirection: new THREE.Vector3(),
+				sunColor: 0xffffff,
+				waterColor: 0xffffff,
+				distortionScale: 0.1,
+				fog: scene.fog !== undefined
+			}
+		);
+		water.position.y = -1;
+		water.rotation.x = - Math.PI / 2;
+		scene.add(water);
+	}
+
+}
+
+
 function initMusic() {
 	console.log("initMusic");
 	if (bgm) {
@@ -666,6 +722,11 @@ function updateWorld(deltaTime) {
 	sun.setFromSphericalCoords(1, phi, theta);
 
 	sky.material.uniforms['sunPosition'].value.copy(sun);
+	if(water){
+		water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+		water.material.uniforms['time'].value += deltaTime;
+	}
+	
 
 	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
@@ -792,13 +853,13 @@ function updatePhysics(deltaTime) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			} else {
 				//better handling on the ground and at higher speeds
-				let relVelChange = turnSpeedOnGround+ (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
+				let relVelChange = turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
-		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD){
+		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD) {
 			if (onGround) {
-				let relVelChange = -velocity.x()*0.25;
+				let relVelChange = -velocity.x() * 0.25;
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
