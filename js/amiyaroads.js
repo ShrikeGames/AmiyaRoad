@@ -857,9 +857,12 @@ function updatePhysics(deltaTime) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
+		//if not actively moving left or right and on the ground
 		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD) {
 			if (onGround) {
-				let relVelChange = -velocity.x() * 0.25;
+				//apply some extra friction to the x-axis movement
+				console.log(mapGenerator.xFriction);
+				let relVelChange = -velocity.x() * mapGenerator.xFriction;
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
