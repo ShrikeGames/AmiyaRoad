@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.2 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.3 \"Cat-Crab\"";
 
 let stats;
 
@@ -36,6 +36,7 @@ let container;
 const GRAVITY = 60;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
+const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 6;
 const acceleration = 5;
 const turnSpeed = 2.5;
 const turnSpeedOnGround = 2.5;
@@ -44,6 +45,7 @@ const boostMaxSpeed = 65;
 const BOOST_DECAY_RATE = 5;
 const maxTurnSpeed = 10;
 const jumpSpeed = 17;
+const waterJumpSpeed = 15;
 let maxSpeed = regularMaxSpeed;
 const maxStamina = 500;
 let seed;
@@ -82,6 +84,8 @@ let tileSelection = 0;
 let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
+
+const WATER_LEVEL_Y_WORLD2 = 2;
 
 let defaultEffectController = {
 	turbidity: 10,
@@ -236,6 +240,7 @@ function initSky(levelSelected) {
 	const fog = new THREE.FogExp2(fogColour, 0.008);
 	scene.fog = fog;
 
+
 	sun = new THREE.Vector3();
 	effectController = defaultEffectController;
 	if (levelSelected == "?-?") {
@@ -247,6 +252,16 @@ function initSky(levelSelected) {
 			elevation: Math.random() * 4,
 			azimuth: Math.random() * 360,
 			exposure: Math.random()
+		}
+	} else if (levelSelected.indexOf("2-") >= 0) {
+		effectController = {
+			turbidity: 20,
+			rayleigh: 3,
+			mieCoefficient: 0.002,
+			mieDirectionalG: 0.5,
+			elevation: 2,
+			azimuth: 80,
+			exposure: 0.5
 		}
 	}
 
@@ -276,11 +291,22 @@ function initSky(levelSelected) {
 	const sprite4 = textureLoader.load('./images/amiyaroad/Bucko4.png');
 	const sprite5 = textureLoader.load('./images/amiyaroad/Bucko5.png');
 
-	for (let i = 0; i < 50; i++) {
+	let maxBuckos = 50;
+	if (levelSelected.indexOf("2-") >= 0) {
+		maxBuckos = 200;
+	}
+	for (let i = 0; i < maxBuckos; i++) {
 
-		const x = -50 + i * 2;
-		const y = -15;
-		const z = -1200 + Math.random() * 1200;
+		let x = -50 + i * 2;
+		let y = -15;
+		let z = -1200 + Math.random() * 1200;
+		if (levelSelected.indexOf("2-") >= 0) {
+			x = -600 + Math.random() * 1200;
+			y = -20 + Math.random() * 10;
+			z = -600 + Math.random() * 1200;
+		}
+
+
 
 		vertices.push(x, y, z);
 
@@ -307,9 +333,12 @@ function initSky(levelSelected) {
 
 		const particles = new THREE.Points(geometry, materials[i]);
 
-		//particles.rotation.x = Math.random() * 6;
-		//particles.rotation.y = Math.random() * 6;
-		particles.rotation.z = Math.random() * 12;
+
+		if (levelSelected.indexOf("2-") >= 0) {
+			particles.rotation.y = Math.random() * 6;
+		} else {
+			particles.rotation.z = Math.random() * 12;
+		}
 
 		scene.add(particles);
 
@@ -338,11 +367,12 @@ function initWater(levelSelected) {
 				sunDirection: new THREE.Vector3(),
 				sunColor: 0xfbddff,
 				waterColor: 0xccb8f5,
-				distortionScale: -12,
+				distortionScale: -3,
+				alpha: 0.7,
 				fog: scene.fog !== undefined
 			}
 		);
-		water.position.y = -4;
+		water.position.y = WATER_LEVEL_Y_WORLD2;
 		water.rotation.x = - Math.PI / 2;
 		scene.add(water);
 	} else if (levelSelected.indexOf("3-") >= 0) {
@@ -361,6 +391,7 @@ function initWater(levelSelected) {
 				sunColor: 0xffffff,
 				waterColor: 0xffffff,
 				distortionScale: 0.1,
+				alpha: 0.9,
 				fog: scene.fog !== undefined
 			}
 		);
@@ -868,7 +899,6 @@ function updatePhysics(deltaTime) {
 		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD) {
 			if (onGround) {
 				//apply some extra friction to the x-axis movement
-				console.log(mapGenerator.xFriction);
 				let relVelChange = -velocity.x() * mapGenerator.xFriction;
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
@@ -877,15 +907,26 @@ function updatePhysics(deltaTime) {
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
-			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
-			player.body.setLinearVelocity(jumpImpulse);
+			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+				let jumpImpulse = new Ammo.btVector3(velocity.x(), waterJumpSpeed, velocity.z());
+				player.body.setLinearVelocity(jumpImpulse);
+			} else {
+				let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
+				player.body.setLinearVelocity(jumpImpulse);
+			}
+
 			onGround = false;
 		}
 
 	} else if (!onGround) {
 		//not actively trying to jump and not on the ground
 		//fall faster
-		player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY, 0));
+		if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+			player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER, 0));
+		}else{
+			player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY, 0));
+		}
+		
 	}
 	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z(), -9), 0, -velocity.x());
 	player.body.setAngularVelocity(angularVelocity);
