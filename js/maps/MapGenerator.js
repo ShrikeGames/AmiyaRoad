@@ -106,7 +106,6 @@ class MapGenerator {
                 return i;
             }
         }
-        console.log("Not in map", hexCode);
         return 0;
     }
     generateLevelString() {
@@ -118,7 +117,6 @@ class MapGenerator {
             let pos = object.position;
             let rotation = new THREE.Euler().setFromQuaternion(object.quaternion, "XYZ");
             let scale = object.scale;
-            console.log(scale.x, scale.y, scale.z);
             if (object.name.indexOf("GhostTile") < 0) {
                 newLevelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "," + scale.x + "," + scale.y + "," + scale.z + "|";
             }
@@ -149,9 +147,7 @@ class MapGenerator {
             let materialHex = colourSelection[colourIndex];
             this.pos.set(Math.round(parseFloat(tile[2]) * 2.0) / 2.0, Math.round(parseFloat(tile[3]) * 2.0) / 2.0, Math.round(parseFloat(tile[4]) * 2.0) / 2.0);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
-            console.log("tile.length", tile.length);
             if (tile.length > 10) {
-                console.log(tileType, parseFloat(tile[8]), parseFloat(tile[9]), parseFloat(tile[10]));
                 this.scale = new THREE.Vector3(parseFloat(tile[8]), parseFloat(tile[9]), parseFloat(tile[10]));
             } else {
                 this.scale = new THREE.Vector3(1, 1, 1);
@@ -294,7 +290,6 @@ class MapGenerator {
     createTileWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
-        console.log(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z);
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
@@ -341,7 +336,7 @@ class MapGenerator {
     }
 
     createRigidBody(object, physicsShape, mass, pos, quat, scale) {
-        
+
         if (pos) {
 
             object.position.copy(pos);
@@ -411,7 +406,7 @@ class MapGenerator {
             this.allObjects.push(object);
             this.physicsWorld.addRigidBody(body);
         }
-        
+
         return body;
 
     }
@@ -461,7 +456,7 @@ class MapGenerator {
 
         let buckoRate;
 
-        let tileScale = new THREE.Vector3(1, 1, 1);
+        let tileScale = 1;
         for (let i = 0; i < length; i++) {
             tileType = 1;
             x = 0;
@@ -608,11 +603,11 @@ class MapGenerator {
             let tilePos = new THREE.Vector3(x, y, z);
             let tileQuat = new THREE.Quaternion(xTilt, 0, zTilt, 1);
             if ((i % randomSkipRate != 0) || tileType == 2) {
-                this.addTile(tilePos, tileQuat, tileScale, tileType);
+                this.addTile(tileScale, tileType, tilePos, tileQuat);
             }
             if (i % buckoRate == 0) {
                 tilePos = new THREE.Vector3(x, y + BALL_RADIUS, z);
-                this.addTile(tilePos, tileQuat, tileScale, 6);
+                this.addTile(tileScale, 6, tilePos, tileQuat);
             }
 
             if (tileType == 1) {
@@ -764,19 +759,30 @@ class MapGenerator {
         }
         return null;
     }
-    addTile(scale, tileSelection) {
+    addTile(scale, tileSelection, tilePos = null, tileQuat = null) {
         this.scale = new Vector3(scale, scale, scale);
+        if (tilePos != null) {
+            this.pos.x = tilePos.x;
+            this.pos.y = tilePos.y;
+            this.pos.z = tilePos.z;
+        }
+        if (tileQuat != null) {
+            this.quat.x = tileQuat.x;
+            this.quat.y = tileQuat.y;
+            this.quat.z = tileQuat.z;
+        }
+
+
         let newTile = this.getTileFromSelection(tileSelection);
 
-        newTile.scale.x = scale;
+        newTile.scale.x = this.scale.x;
         if (tileSelection == 6) {
-            newTile.scale.y = scale;
+            newTile.scale.y = this.scale.y;
         } else {
             newTile.scale.y = 1;
         }
-        newTile.scale.z = scale;
-
-        console.log(newTile);
+        newTile.scale.z = this.scale.z;
+        
         this.generateLevelString();
         return newTile;
     }

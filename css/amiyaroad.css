@@ -20,6 +20,10 @@
 	max-width: 200px;
 }
 
+.hud--worldSelect {
+	color: #000000;
+}
+
 .version {
 	position: absolute;
 	top: 10px;
@@ -75,7 +79,7 @@
 	position: relative;
 	float: left;
 	text-align: left;
-	padding-left:10px;
+	padding-left: 10px;
 }
 
 .hud--speed {
@@ -83,7 +87,7 @@
 	margin-right: auto;
 	background-color: #F00;
 	line-height: 1;
-	
+
 }
 
 .hud--stamina {
