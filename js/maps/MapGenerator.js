@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Vector3 } from 'three';
 import { ConvexGeometry } from '../jsm/geometries/ConvexGeometry.js';
 let mapData = {};
 mapData["1-1"] = "1~Tile0,0,0,0.25,0,0,0,0|Tile1,1,-7.549517245077422e-14,0.2500004768371582,-11.999993324279785,-9.301209840306343e-14,1.1817645273406578e-33,-2.5410985186454742e-20|Tile2,0,-3.3861802251067274e-14,0.2500009536743164,-24.000019073486328,-2.427072215080428e-13,-6.281645554053844e-34,5.176315327597851e-21|Tile3,1,6.522550105277428e-14,0.2500014305114746,-36.000064849853516,-1.875660217420805e-12,-1.9070465944374998e-31,2.033467017880087e-19|Tile4,0,4.000000476837158,0.2500019073486328,-48.0001106262207,-3.761189276696442e-12,-6.690286628020419e-31,3.5575378614801786e-19|Tile5,1,4.000000476837158,0.250002384185791,-60.00015640258789,-5.6467179022912095e-12,9.663637573362777e-27,-3.422744943373801e-15|Tile6,0,4.000000476837158,0.2500028610229492,-72.00004577636719,-7.532246527885977e-12,7.135962433915067e-25,-1.8947766532856347e-13|Tile7,1,4.000000476837158,0.2500033378601074,-83.99986267089844,-8.88764496026484e-12,1.754179236930123e-24,-3.947455697820429e-13|Tile8,0,-0.6000004410743713,0.2500038146972656,-95.99967956542969,-1.0243043392643703e-11,3.072982304020927e-24,-6.000135284456309e-13|Tile9,1,-0.6000004410743713,0.25000429153442383,-107.99949645996094,-1.1598441825022565e-11,3.513949706890555e-24,-6.059347901904433e-13|Tile10,0,-0.6000004410743713,0.25000476837158203,-119.99931335449219,-1.2953840257401428e-11,3.9629427786468064e-24,-6.118560519352556e-13|Tile11,1,-0.6000004410743713,-0.549994945526123,-131.59913635253906,-0.15041569556705242,4.6159394472277037e-14,-6.160393375975735e-13|Tile12,0,-0.6000003218650818,-1.473527193069458,-143.5514678955078,-0.000020194444006400938,9.19529896793969e-13,-9.106761211796777e-8|Tile13,1,-0.6000003218650818,-1.473527193069458,-155.55128479003906,-0.000020194444006400938,9.19529896793969e-13,-9.106761211796777e-8|Tile14,0,-0.6000003218650818,0.3264729976654053,-168.35108947753906,0.33764912185633267,-1.5095548775123893e-8,-9.099975528670269e-8|Tile15,1,-0.6000000834465027,2.1657118797302246,-179.32687377929688,-0.00003836862743842256,2.1520424084757622e-12,-1.1217719020351098e-7|Player,0,3.000007390975952,6.915328502655029,-364.739990234375,0.0015631532491201209,0.006090078249492892,-0.0000045733961576767535|Tile17,0,-0.5999994874000549,2.165323257446289,-191.3845672607422,-0.000043245228894029886,-8.958204388582269e-13,4.1429792929648115e-8|Tile18,1,-0.5999994874000549,2.165323257446289,-203.38438415527344,-0.000043245228894029886,-8.958204388582269e-13,4.1429792929648115e-8|AmiyaBar19,0,-0.5999994874000549,2.165323257446289,-212.38424682617188,-0.000043245228894029886,-8.958204388582269e-13,4.1429792929648115e-8|Tile20,1,-0.5999994874000549,2.1653294563293457,-221.3841094970703,-0.000043246731379278625,-8.601896574433868e-13,3.978056284381638e-8|Tile21,0,-0.5999994874000549,-1.2346704006195068,-238.58384704589844,-0.000043246731379278625,-8.601904256596572e-13,3.978059837095317e-8|Tile22,1,1.6000008583068848,-1.2346704006195068,-250.5836639404297,-0.000043246731379278625,-8.601904256596572e-13,3.978059837095317e-8|Tile23,0,4.200001239776611,-1.2346704006195068,-262.583984375,-0.000043246731379278625,-8.601895806217597e-13,3.9780559291102704e-8|Tile24,1,7.199998378753662,-1.2346704006195068,-274.584716796875,-0.000043246731379278625,-8.601891196919975e-13,3.978053797482063e-8|Tile25,0,3.800001382827759,-1.2346704006195068,-286.58544921875,-0.000043246731379278625,-8.601885051189811e-13,3.97805095531112e-8|Tile26,1,5.662441253662109e-7,-1.2346704006195068,-298.586181640625,-0.000043246731379278625,-8.601878905459648e-13,3.978048113140177e-8|Tile27,0,-4.399999618530273,-1.2346704006195068,-310.5869140625,-0.000043246731379278625,-8.601878905459648e-13,3.978048113140177e-8|Tile28,1,-0.7999989986419678,-1.2346704006195068,-322.587646484375,-0.000043246731379278625,-8.601874296162025e-13,3.97804598151197e-8|Tile29,0,3.600001811981201,-1.2346704006195068,-334.58837890625,-0.000043246731379278625,-8.601874296162025e-13,3.97804598151197e-8|Tile30,1,0.40000107884407043,-1.2346704006195068,-346.589111328125,-0.000043246731379278625,-8.601859700052887e-13,3.97803923135598e-8|Tile31,0,-3.5999996662139893,-1.2346704006195068,-358.58984375,-0.000043246731379278625,-8.601859700052887e-13,3.97803923135598e-8|Tile32,1,0.000001043081283569336,-1.2346704006195068,-370.590576171875,-0.000043246731379278625,-8.601855090755264e-13,3.978037099727773e-8|Tile33,0,0.000001043081283569336,-1.2346704006195068,-382.59130859375,-0.000043246731379278625,-8.601855090755264e-13,3.978037099727773e-8|Goal,00ff00,0.000001043081283569336,4.165327548980713,-391.59185791015625,0,0,0";
@@ -12,7 +13,7 @@ mapData["1-8"] = "1~Tile0,0,0,1.5,0,0,0,0|Boost1,0,0,1.5,-12,-1.353936340819932e
 
 mapData["2-1"] = "2~Tile0,0,0,1.5,0,9.922292836647134e-17,-2.4612973784044756e-33,-4.961146418323567e-17|Tile1,1,0,1.5,-12,-2.4275628165634777e-13,6.021058129434222e-30,-4.9605786415511105e-17|Tile2,0,0,1.5,-24,8.760345083353403e-16,-2.1734372974460837e-32,-4.961990142548371e-17|Goal,0,0,1.5,-36,0,0,0|Player,0,-1.3426800116178583e-8,3.249999523162842,-2.6853600232357167e-8,2.89973603270172e-16,-2.1021172648371776e-32,-1.44986801635086e-16";
 
-mapData["3-1"] = "3~Tile0,0,0,1.5,0,0,0,0|Tile1,1,0,1.5,-12,-6.381005446254306e-11,-9.163394452401729e-29,2.872084824118338e-18|Tile2,0,0,1.5,-24,-6.371610877797806e-11,-7.46020628365916e-29,2.3417017852281652e-18|Goal,0,0,1.5,-36,0,0,0|Player,0,-1.288760920203913e-8,3.249999523162842,-2.577521840407826e-8,1.3079694174321244e-17,-4.276959992344327e-35,-6.539847087160622e-18";
+mapData["3-1"] = "3~Tile0,0,0,1.5,0,0,0,0,1,1,1|Tile1,1,0,1.5,-12,-6.381005446254306e-11,-9.163394452401729e-29,2.872084824118338e-18,1,1,1|Tile2,0,0,1.5,-24,-6.371610877797806e-11,-7.46020628365916e-29,2.3417017852281652e-18,1,1,1|Goal,0,0,1.5,-36,0,0,0|Player,0,-1.288760920203913e-8,3.249999523162842,-2.577521840407826e-8,1.3079694174321244e-17,-4.276959992344327e-35,-6.539847087160622e-18,1,1,1";
 const COLOUR_BLANK = new THREE.Color(0xffffff);
 
 const COLOUR_MAIN = new THREE.Color(0xc0bdf2);
@@ -40,6 +41,8 @@ let mainColour = COLOUR_MAIN;
 let secondaryColour = COLOUR_SECONDARY;
 
 const colourMap = {
+    "*": [COLOUR_MAIN, COLOUR_SECONDARY, COLOUR_BLANK],
+    "?": [COLOUR_MAIN, COLOUR_SECONDARY, COLOUR_BLANK],
     "1": [COLOUR_MAIN, COLOUR_SECONDARY, COLOUR_BLANK],
     "2": [COLOUR_MAIN_WORLD2, COLOUR_SECONDARY_WORLD2, COLOUR_BLANK],
     "3": [COLOUR_MAIN_WORLD3, COLOUR_SECONDARY_WORLD3, COLOUR_BLANK],
@@ -47,6 +50,7 @@ const colourMap = {
 
 let pos;
 let quad;
+let scale;
 let scene;
 let physicsWorld;
 let rigidBodies;
@@ -113,8 +117,10 @@ class MapGenerator {
             let materialInfo = this.getColourIndex(colourSelection, object.material.color.getHexString());
             let pos = object.position;
             let rotation = new THREE.Euler().setFromQuaternion(object.quaternion, "XYZ");
+            let scale = object.scale;
+            console.log(scale.x, scale.y, scale.z);
             if (object.name.indexOf("GhostTile") < 0) {
-                newLevelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "|";
+                newLevelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "," + scale.x + "," + scale.y + "," + scale.z + "|";
             }
         }
         this.levelString = newLevelString.slice(0, -1);
@@ -128,6 +134,9 @@ class MapGenerator {
     loadMapFromLevelString(levelString = "") {
         this.rigidBodies = [];
         this.allObjects = [];
+        if (levelString.indexOf("~") < 0) {
+            return;
+        }
         let parts = levelString.split("~");
         this.worldSelect = parts[0];
         let mapTiles = parts[1].split("|");
@@ -140,28 +149,42 @@ class MapGenerator {
             let materialHex = colourSelection[colourIndex];
             this.pos.set(Math.round(parseFloat(tile[2]) * 2.0) / 2.0, Math.round(parseFloat(tile[3]) * 2.0) / 2.0, Math.round(parseFloat(tile[4]) * 2.0) / 2.0);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
+            console.log("tile.length", tile.length);
+            if (tile.length > 10) {
+                console.log(tileType, parseFloat(tile[8]), parseFloat(tile[9]), parseFloat(tile[10]));
+                this.scale = new THREE.Vector3(parseFloat(tile[8]), parseFloat(tile[9]), parseFloat(tile[10]));
+            } else {
+                this.scale = new THREE.Vector3(1, 1, 1);
+            }
             if (tileType.indexOf("GhostTile") >= 0) {
                 continue;
             }
+            let newTile;
             if (tileType.indexOf("Tile") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
-                this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                newTile = this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("AmiyaBar") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
-                this.createAmiyaBarWithPhysics("AmiyaBar", AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, material);
+                newTile = this.createAmiyaBarWithPhysics("AmiyaBar", AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Goal") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL });
-                this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, material);
+                newTile = this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Boost") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: 30, specular: 0xd4aae7 });
-                this.createTileWithPhysics("Boost" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+                newTile = this.createTileWithPhysics("Boost" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Death") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: 30, specular: 0xd4aae7 });
-                this.createTileWithPhysics("Death" + i, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, material);
+                newTile = this.createTileWithPhysics("Death" + i, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Ball") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: 30, specular: 0xd4aae7, transparent: true, opacity: 1 });
-                this.createBallWithPhysics("Ball" + i, BALL_RADIUS, BALL_MASS, this.pos, this.quat, material);
+                newTile = this.createBallWithPhysics("Ball" + i, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
             }
+            if (newTile) {
+                newTile.scale.x = this.scale.x;
+                newTile.scale.y = this.scale.y;
+                newTile.scale.z = this.scale.z;
+            }
+
         }
     }
     initMap(levelSelected, seed, levelString = "") {
@@ -204,6 +227,7 @@ class MapGenerator {
 
         this.pos = new THREE.Vector3();
         this.quat = new THREE.Quaternion();
+        this.scale = new THREE.Vector3(1, 1, 1);
         this.rigidBodies = [];
         this.allObjects = [];
         if (levelSelected == "T-T") {
@@ -237,82 +261,85 @@ class MapGenerator {
         this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
 
-        let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, playerMaterial);
+        let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, this.scale, playerMaterial);
 
         return body;
 
     }
-    createPlayerWithPhysics(radius, mass, pos, quat, material) {
+    createPlayerWithPhysics(radius, mass, pos, quat, scale, material) {
 
-        const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
-        const shape = new Ammo.btSphereShape(radius);
+        const object = new THREE.Mesh(new THREE.SphereGeometry(radius * scale.x, 32, 32), material);
+        const shape = new Ammo.btSphereShape(radius * scale.x);
         shape.setMargin(margin);
         object.name = "Player";
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat, scene);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
 
     }
-    createBallWithPhysics(name, radius, mass, pos, quat, material) {
-        const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
-        const shape = new Ammo.btSphereShape(radius);
+    createBallWithPhysics(name, radius, mass, pos, quat, scale, material) {
+        const object = new THREE.Mesh(new THREE.SphereGeometry(radius * scale.x, 32, 32), material);
+        const shape = new Ammo.btSphereShape(radius * scale.x);
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+
         return object;
 
     }
-    createTileWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
-        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+    createTileWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+
         return object;
 
     }
-    createDeathWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
-        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+    createDeathWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
 
     }
-    createAmiyaBarWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
-        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+    createAmiyaBarWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+
         return object;
 
     }
-    createGoalWithPhysics(name, sx, sy, sz, mass, pos, quat, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
-        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+    createGoalWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = false;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat);
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
     }
 
-    createRigidBody(object, physicsShape, mass, pos, quat, vel, angVel) {
+    createRigidBody(object, physicsShape, mass, pos, quat, scale, vel, angVel) {
 
         if (pos) {
 
@@ -383,8 +410,7 @@ class MapGenerator {
             this.allObjects.push(object);
             this.physicsWorld.addRigidBody(body);
         }
-
-
+        body.scale = new Vector3(scale.x, 1, scale.z);
         return body;
 
     }
@@ -434,6 +460,7 @@ class MapGenerator {
 
         let buckoRate;
 
+        let tileScale = new THREE.Vector3(1, 1, 1);
         for (let i = 0; i < length; i++) {
             tileType = 1;
             x = 0;
@@ -580,11 +607,11 @@ class MapGenerator {
             let tilePos = new THREE.Vector3(x, y, z);
             let tileQuat = new THREE.Quaternion(xTilt, 0, zTilt, 1);
             if ((i % randomSkipRate != 0) || tileType == 2) {
-                this.addTile(tilePos, tileQuat, tileType);
+                this.addTile(tilePos, tileQuat, tileScale, tileType);
             }
             if (i % buckoRate == 0) {
                 tilePos = new THREE.Vector3(x, y + BALL_RADIUS, z);
-                this.addTile(tilePos, tileQuat, 6);
+                this.addTile(tilePos, tileQuat, tileScale, 6);
             }
 
             if (tileType == 1) {
@@ -623,11 +650,11 @@ class MapGenerator {
         this.scene.add(gridHelper);
 
     }
-    moveGhostTile(player, direction, tileSelection) {
+    moveGhostTile(player, direction, tileScale, tileSelection) {
         let playerPos = player.position;
         let rotation = player.quaternion;
 
-        this.pos.set(playerPos.x, playerPos.y - playerRadius - TILE_HEIGHT / 2.0, playerPos.z);
+        this.pos.set(Math.round(playerPos.x * 2.0) / 2.0, Math.round(((playerPos.y - playerRadius - TILE_HEIGHT / 2.0)) * 2.0) / 2.0, Math.round(playerPos.z * 2.0) / 2.0);
         this.quat.set(rotation.x, 0, rotation.z, 1);
 
         if (this.lastTileSelection != tileSelection) {
@@ -643,6 +670,13 @@ class MapGenerator {
                 this.ghostTile.quaternion.x = this.quat.x;
                 this.ghostTile.quaternion.y = this.quat.y;
                 this.ghostTile.quaternion.z = this.quat.z;
+                this.ghostTile.scale.x = tileScale;
+                if (tileSelection == 6) {
+                    this.ghostTile.scale.y = tileScale;
+                } else {
+                    this.ghostTile.scale.y = 1;
+                }
+                this.ghostTile.scale.z = tileScale;
 
             } else {
 
@@ -650,6 +684,8 @@ class MapGenerator {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GHOST_TILE, transparent: true, opacity: 0.75 });
 
                 this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
+                this.ghostTile.scale.x = tileScale;
+                this.ghostTile.scale.z = tileScale;
                 $('.hud--tile_selection img').attr("src", "./images/amiyaroad/tiles/Tile" + tileSelection + ".png");
             }
 
@@ -667,7 +703,7 @@ class MapGenerator {
     getTileFromSelection(tileSelection, tileName, tileMaterial = null) {
         //+1 for ghost tile
         let materialHex = this.createColour(this.allObjects.length + 1);
-        
+
         if (tileSelection == 1) {
             //console.log("Add tile");
             let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
@@ -676,7 +712,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Tile" + this.allObjects.length);
-            return this.createTileWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            return this.createTileWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 2) {
             //console.log("Add amiyabar");
 
@@ -685,7 +721,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "AmiyaBar" + this.allObjects.length);
-            return this.createAmiyaBarWithPhysics(actualTileName, AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, material);
+            return this.createAmiyaBarWithPhysics(actualTileName, AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 3) {
             //console.log("Add goal");
 
@@ -694,7 +730,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Goal");
-            return this.createGoalWithPhysics(actualTileName, GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, material);
+            return this.createGoalWithPhysics(actualTileName, GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quart, this.scale, material);
         } else if (tileSelection == 4) {
             //console.log("Add boost");
 
@@ -703,7 +739,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Boost" + this.allObjects.length);
-            return this.createTileWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, material);
+            return this.createTileWithPhysics(actualTileName, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 5) {
             //console.log("Add death");
 
@@ -712,7 +748,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Death" + this.allObjects.length);
-            return this.createDeathWithPhysics(actualTileName, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, material);
+            return this.createDeathWithPhysics(actualTileName, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 6) {
             //console.log("Add ball");
 
@@ -722,17 +758,25 @@ class MapGenerator {
             }
             let actualTileName = this.getOrDefault(tileName, "Ball" + this.allObjects.length);
             if (this.levelSelected == "*-*") {
-                return this.createBallWithPhysics(actualTileName, BALL_RADIUS, 0, this.pos, this.quat, material);
+                return this.createBallWithPhysics(actualTileName, BALL_RADIUS, 0, this.pos, this.quat, this.scale, material);
             }
-            return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, material);
+            return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
         }
         return null;
     }
-    addTile(playerPos, rotation, tileSelection) {
-
-        this.pos.set(Math.round(playerPos.x * 2.0) / 2.0, Math.round(((playerPos.y - playerRadius - TILE_HEIGHT / 2.0)) * 2.0) / 2.0, Math.round(playerPos.z * 2.0) / 2.0);
-        this.quat.set(rotation.x, 0, rotation.z, 1);
+    addTile(scale, tileSelection) {
+        this.scale = new Vector3(scale, scale, scale);
         let newTile = this.getTileFromSelection(tileSelection);
+
+        newTile.scale.x = scale;
+        if (tileSelection == 6) {
+            newTile.scale.y = scale;
+        } else {
+            newTile.scale.y = 1;
+        }
+        newTile.scale.z = scale;
+
+        console.log(newTile);
         this.generateLevelString();
         return newTile;
     }

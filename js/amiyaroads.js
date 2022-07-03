@@ -79,7 +79,9 @@ let $debug = $('.hud.hud--debug');
 const BUILD_CAMERA_SPEED = 12;
 const BUILD_ROTATION_SPEED = 1;
 let tileSelection = 0;
-
+let tileScale = 1;
+let minTileScale = 0.5;
+let maxTileScale = 2;
 
 let defaultEffectController = {
 	turbidity: 10,
@@ -343,7 +345,7 @@ function initWater(levelSelected) {
 		water.position.y = -4;
 		water.rotation.x = - Math.PI / 2;
 		scene.add(water);
-	}else if (levelSelected.indexOf("3-") >= 0) {
+	} else if (levelSelected.indexOf("3-") >= 0) {
 		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
 		water = new Water(
 			waterGeometry,
@@ -578,6 +580,7 @@ function createObjects(levelSelected) {
 	timeLastOnGround = 0;
 	maxSpeed = regularMaxSpeed;
 	tileSelection = 0;
+	tileScale = 1;
 	if (mapGenerator == null) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
@@ -601,6 +604,7 @@ function initInput() {
 		});
 
 		document.addEventListener('keyup', (event) => {
+			console.log(event.code);
 			if (lastSelectedLevel == "*-*") {
 				if (keyStates.Digit0 && event.code == "Digit0") {
 					tileSelection = 0;
@@ -618,11 +622,14 @@ function initInput() {
 					tileSelection = 6;
 				}
 
-				if (keyStates.Enter && event.code == "Enter") {
+				if (keyStates.Equal && event.code == "Equal") {
+					tileScale = Math.min(tileScale + 0.25, maxTileScale);
+				} else if (keyStates.Minus && event.code == "Minus") {
+					tileScale = Math.max(tileScale - 0.25, minTileScale);
+				}
 
-					let playerPos = player.position;
-					let rotation = player.quaternion;
-					mapGenerator.addTile(playerPos, rotation, tileSelection);
+				if (keyStates.Enter && event.code == "Enter") {
+					mapGenerator.addTile(tileScale, tileSelection);
 				} else if (keyStates.Backspace && event.code == "Backspace") {
 					mapGenerator.undoLastTile();
 				}
@@ -722,11 +729,11 @@ function updateWorld(deltaTime) {
 	sun.setFromSphericalCoords(1, phi, theta);
 
 	sky.material.uniforms['sunPosition'].value.copy(sun);
-	if(water){
+	if (water) {
 		water.material.uniforms['sunDirection'].value.copy(sun).normalize();
 		water.material.uniforms['time'].value += deltaTime;
 	}
-	
+
 
 	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
@@ -783,7 +790,7 @@ function updatePhysics(deltaTime) {
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
 		if (lastSelectedLevel == "*-*") {
-			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileSelection);
+			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection);
 		}
 		updateWorld(deltaTime);
 		return;
