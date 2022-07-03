@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.3 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.4 \"Cat-Crab\"";
 
 let stats;
 
@@ -31,12 +31,14 @@ let water;
 let player;
 let container;
 
+let waterRises = false;
+
 // Physics
 // Physics variables
 const GRAVITY = 60;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
-const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 6;
+const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 3;
 const acceleration = 5;
 const turnSpeed = 2.5;
 const turnSpeedOnGround = 2.5;
@@ -45,7 +47,7 @@ const boostMaxSpeed = 65;
 const BOOST_DECAY_RATE = 5;
 const maxTurnSpeed = 10;
 const jumpSpeed = 17;
-const waterJumpSpeed = 15;
+const waterJumpSpeed = 14;
 let maxSpeed = regularMaxSpeed;
 const maxStamina = 500;
 let seed;
@@ -71,7 +73,11 @@ let cbContactResult;
 
 //sounds
 let bgm;
-let lastSelectedLevel;
+let currentWorld;
+let currentLevel;
+let inEditor;
+let inPlayTest;
+
 let musicVolume = 0.05;
 
 //ui
@@ -85,8 +91,10 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const WATER_LEVEL_Y_WORLD2 = 2;
-
+const WATER_LEVEL_Y_WORLD2 = 6;
+const WATER_LEVEL_Y_WORLD3 = -4;
+let waterLevel = WATER_LEVEL_Y_WORLD2;
+let maxWaterLevel = waterLevel;
 let defaultEffectController = {
 	turbidity: 10,
 	rayleigh: 3,
@@ -112,12 +120,74 @@ function initFirstTime() {
 	}
 
 	$('.version').text(versionString);
+
+	$('.play-button').on('click', function (e) {
+		e.preventDefault();
+		console.log("Play");
+		let $this = $(this);
+		currentLevel = $this.attr("data-level");
+		currentWorld = $this.attr("data-world");
+		console.log(currentWorld, "-", currentLevel);
+		inEditor = "true" == $this.attr("data-editor");
+		inPlayTest = "true" == $this.attr("data-playtest");
+
+		$('.button--menu').removeClass('hide');
+		$('.hud--tile_selection').addClass("hide");
+		$('.hud--playtest').addClass("hide");
+		$('.hud--editor').addClass("hide");
+
+		//random seed when you click play on a level
+		//retries within the level will regenerate the same way.
+		seed = "amiyaroads_" + Math.random() * 25600;
+
+		if (inEditor) {
+			$('.hud--editor').removeClass("hide");
+		}
+
+		init(currentWorld, currentLevel, inEditor, inPlayTest);
+
+		animate();
+		$('.menu--start-screen').addClass('hide');
+	});
+
+	$('.button--menu').on('click', function (e) {
+		e.preventDefault();
+		console.log("Go to main menu");
+		inEditor = false;
+		inPlayTest = false;
+		mapGenerator.generateLevelString(currentWorld);
+		lose();
+	});
+
+
+	$('.hud--worldSelect').on('change', function (e) {
+		e.preventDefault();
+		console.log("Change world type");
+		lose();
+		currentWorld = $(this).val();
+		inEditor = true;
+		inPlayTest = false;
+		init(currentWorld, currentLevel, inEditor, inPlayTest);
+
+		$('.menu--start-screen').addClass('hide');
+		$('.button--menu').removeClass('hide');
+		$('.hud--basic').removeClass('hide');
+		$('.hud--playtest').addClass("hide");
+		$('.hud--editor').removeClass("hide");
+
+
+	});
+
+
 	$('.playtest-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Playtest");
 		lose();
-		lastSelectedLevel = "T-T";
-		init(lastSelectedLevel);
+
+		inEditor = false;
+		inPlayTest = true;
+
+		init(currentWorld, currentLevel, inEditor, inPlayTest);
 		$('.menu--start-screen').addClass('hide');
 		$('.button--menu').addClass('hide');
 		$('.hud--basic').removeClass("hide");
@@ -126,43 +196,23 @@ function initFirstTime() {
 
 
 	});
+
+
 	$('.editor-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Playtest");
 		lose();
-		lastSelectedLevel = "*-*";
-		init(lastSelectedLevel);
+
+		inEditor = true;
+		inPlayTest = false;
+
+		init(currentWorld, currentLevel, inEditor, inPlayTest);
 
 		$('.menu--start-screen').addClass('hide');
 		$('.button--menu').removeClass('hide');
 		$('.hud--basic').removeClass('hide');
 		$('.hud--playtest').addClass("hide");
 		$('.hud--editor').removeClass("hide");
-	});
-	$('.play-button').on('click', function (e) {
-		e.preventDefault();
-		console.log("Play");
-		$('.button--menu').removeClass('hide');
-		$('.hud--tile_selection').addClass("hide");
-		$('.hud--playtest').addClass("hide");
-		$('.hud--editor').addClass("hide");
-		let $this = $(this);
-		//random seed when you click play on a level
-		//retries within the level will regenerate the same way.
-		seed = "amiyaroads_" + Math.random() * 256000;
-		lastSelectedLevel = $this.attr("data-level");
-		if (lastSelectedLevel == "*-*") {
-			$('.hud--editor').removeClass("hide");
-		}
-		init(lastSelectedLevel);
-		animate();
-		$('.menu--start-screen').addClass('hide');
-	});
-	$('.button--menu').on('click', function (e) {
-		e.preventDefault();
-		console.log("Go to main menu");
-		mapGenerator.generateLevelString();
-		lose();
 	});
 
 
@@ -205,7 +255,7 @@ function initFirstTime() {
 	initialized = true;
 }
 
-function init(levelSelected) {
+function init(currentWorld, currentLevel, inEditor, inPlayTest) {
 	console.log("init");
 	clock = new THREE.Clock();
 
@@ -215,11 +265,11 @@ function init(levelSelected) {
 
 	initPhysics();
 
-	createObjects(levelSelected);
+	createObjects(currentWorld, currentLevel, inEditor, inPlayTest);
 
-	initSky(levelSelected);
+	initSky(currentWorld, currentLevel, inEditor, inPlayTest);
 
-	initWater(levelSelected);
+	initWater(currentWorld, currentLevel, inEditor, inPlayTest);
 
 	initMusic();
 
@@ -230,7 +280,7 @@ function init(levelSelected) {
 	won = false;
 }
 
-function initSky(levelSelected) {
+function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	console.log("initSky");
 	// Add Sky
 	sky = new Sky();
@@ -243,7 +293,7 @@ function initSky(levelSelected) {
 
 	sun = new THREE.Vector3();
 	effectController = defaultEffectController;
-	if (levelSelected == "?-?") {
+	if (currentWorld == "?") {
 		effectController = {
 			turbidity: Math.random() * 20,
 			rayleigh: Math.random() * 6,
@@ -253,7 +303,7 @@ function initSky(levelSelected) {
 			azimuth: Math.random() * 360,
 			exposure: Math.random()
 		}
-	} else if (levelSelected.indexOf("2-") >= 0) {
+	} else if (currentWorld == "2") {
 		effectController = {
 			turbidity: 20,
 			rayleigh: 3,
@@ -292,7 +342,7 @@ function initSky(levelSelected) {
 	const sprite5 = textureLoader.load('./images/amiyaroad/Bucko5.png');
 
 	let maxBuckos = 50;
-	if (levelSelected.indexOf("2-") >= 0) {
+	if (currentWorld == "2") {
 		maxBuckos = 200;
 	}
 	for (let i = 0; i < maxBuckos; i++) {
@@ -300,7 +350,7 @@ function initSky(levelSelected) {
 		let x = -50 + i * 2;
 		let y = -15;
 		let z = -1200 + Math.random() * 1200;
-		if (levelSelected.indexOf("2-") >= 0) {
+		if (currentWorld == "2") {
 			x = -600 + Math.random() * 1200;
 			y = -20 + Math.random() * 10;
 			z = -600 + Math.random() * 1200;
@@ -334,7 +384,7 @@ function initSky(levelSelected) {
 		const particles = new THREE.Points(geometry, materials[i]);
 
 
-		if (levelSelected.indexOf("2-") >= 0) {
+		if (currentWorld == "2") {
 			particles.rotation.y = Math.random() * 6;
 		} else {
 			particles.rotation.z = Math.random() * 12;
@@ -351,8 +401,11 @@ function initSky(levelSelected) {
 
 }
 
-function initWater(levelSelected) {
-	if (levelSelected.indexOf("2-") >= 0) {
+function initWater(currentWorld, currentLevel, inEditor, inPlayTest) {
+	waterRises = false;
+
+	if (currentWorld == "2") {
+		waterRises = true;
 		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
 		water = new Water(
 			waterGeometry,
@@ -372,10 +425,11 @@ function initWater(levelSelected) {
 				fog: scene.fog !== undefined
 			}
 		);
-		water.position.y = WATER_LEVEL_Y_WORLD2;
+		waterLevel = WATER_LEVEL_Y_WORLD2;
+		water.position.y = waterLevel;
 		water.rotation.x = - Math.PI / 2;
 		scene.add(water);
-	} else if (levelSelected.indexOf("3-") >= 0) {
+	} else if (currentWorld == "3") {
 		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
 		water = new Water(
 			waterGeometry,
@@ -395,7 +449,8 @@ function initWater(levelSelected) {
 				fog: scene.fog !== undefined
 			}
 		);
-		water.position.y = -1;
+		waterLevel = WATER_LEVEL_Y_WORLD3;
+		water.position.y = waterLevel;
 		water.rotation.x = - Math.PI / 2;
 		scene.add(water);
 	}
@@ -502,7 +557,7 @@ function initPhysics() {
 
 		transformAux1 = new Ammo.btTransform();
 	}
-	if (lastSelectedLevel == "*-*") {
+	if (inEditor) {
 		physicsWorld.setGravity(new Ammo.btVector3(0, 0, 0));
 	} else {
 		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
@@ -604,7 +659,7 @@ function setupContactResultCallback() {
 
 }
 
-function createObjects(levelSelected) {
+function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
 	console.log("createObjects");
 	onGround = false;
 	stamina = maxStamina;
@@ -616,7 +671,7 @@ function createObjects(levelSelected) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
 	// Ground
-	rigidBodies = mapGenerator.initMap(levelSelected, seed, $('#levelSelect').val());
+	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
 	spotLight.target = player;
@@ -636,7 +691,7 @@ function initInput() {
 
 		document.addEventListener('keyup', (event) => {
 			console.log(event.code);
-			if (lastSelectedLevel == "*-*") {
+			if (inEditor) {
 				if (keyStates.Digit0 && event.code == "Digit0") {
 					tileSelection = 0;
 				} else if (keyStates.Digit1 && event.code == "Digit1") {
@@ -697,7 +752,7 @@ function animate() {
 	render();
 	stats.update();
 
-	if (lastSelectedLevel == "*-*") {
+	if (inEditor) {
 		return;
 	}
 
@@ -754,6 +809,14 @@ function updateWorld(deltaTime) {
 	}
 	//sun sets as your stamina goes down
 	effectController.elevation = (stamina / maxStamina) * 3;
+
+	//in world 2 the water level rises as you run out of stamina
+	if (waterRises) {
+		waterLevel = maxWaterLevel * (1 - (stamina / maxStamina));
+		water.position.y = waterLevel;
+	}
+
+
 	const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
 	const theta = THREE.MathUtils.degToRad(effectController.azimuth);
 
@@ -765,7 +828,6 @@ function updateWorld(deltaTime) {
 		water.material.uniforms['time'].value += deltaTime;
 	}
 
-
 	camera.position.set(0, 10, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(player.position.x, 20, player.position.z);
@@ -775,7 +837,7 @@ function updatePhysics(deltaTime) {
 	if (won || dead) {
 		return;
 	}
-	if (lastSelectedLevel == "*-*") {
+	if (inEditor) {
 		let impulse = new Ammo.btVector3(0, 0, 0);
 		let angularImpulse = new Ammo.btVector3(0, 0, 0);
 
@@ -820,7 +882,7 @@ function updatePhysics(deltaTime) {
 		}
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
-		if (lastSelectedLevel == "*-*") {
+		if (inEditor) {
 			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection);
 		}
 		updateWorld(deltaTime);
@@ -923,10 +985,10 @@ function updatePhysics(deltaTime) {
 		//fall faster
 		if (player.position.y < WATER_LEVEL_Y_WORLD2) {
 			player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER, 0));
-		}else{
+		} else {
 			player.body.applyCentralImpulse(new Ammo.btVector3(0, -RESPONSIVE_ARTIFICAL_GRAVITY, 0));
 		}
-		
+
 	}
 	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z(), -9), 0, -velocity.x());
 	player.body.setAngularVelocity(angularVelocity);
@@ -984,7 +1046,7 @@ function reset() {
 
 	mapGenerator.clear();
 	scene.clear();
-	init(lastSelectedLevel);
+	init(currentWorld, currentLevel, inEditor, inPlayTest);
 
 	camera.position.set(0, 12, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
