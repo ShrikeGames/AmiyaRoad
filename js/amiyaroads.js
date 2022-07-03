@@ -80,7 +80,7 @@ const BUILD_CAMERA_SPEED = 12;
 const BUILD_ROTATION_SPEED = 1;
 let tileSelection = 0;
 let tileScale = 1;
-let minTileScale = 0.5;
+let minTileScale = 1;
 let maxTileScale = 2;
 
 let defaultEffectController = {

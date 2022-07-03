@@ -294,6 +294,7 @@ class MapGenerator {
     createTileWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
+        console.log(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z);
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
@@ -339,8 +340,8 @@ class MapGenerator {
         return object;
     }
 
-    createRigidBody(object, physicsShape, mass, pos, quat, scale, vel, angVel) {
-
+    createRigidBody(object, physicsShape, mass, pos, quat, scale) {
+        
         if (pos) {
 
             object.position.copy(pos);
@@ -377,17 +378,17 @@ class MapGenerator {
         body.setRollingFriction(this.rollingFriction);
 
         //body.setDamping(50);
-        if (vel) {
+        // if (vel) {
 
-            body.setLinearVelocity(new Ammo.btVector3(vel.x, vel.y, vel.z));
+        //     body.setLinearVelocity(new Ammo.btVector3(vel.x, vel.y, vel.z));
 
-        }
+        // }
 
-        if (angVel) {
+        // if (angVel) {
 
-            body.setAngularVelocity(new Ammo.btVector3(angVel.x, angVel.y, angVel.z));
+        //     body.setAngularVelocity(new Ammo.btVector3(angVel.x, angVel.y, angVel.z));
 
-        }
+        // }
 
         object.userData.physicsBody = body;
         object.userData.collided = false;
@@ -405,12 +406,12 @@ class MapGenerator {
 
         }
         body.name = object.name;
-
+        body.scale = new Vector3(scale.x, scale.y, scale.z);
         if (object.name.indexOf("GhostTile") < 0) {
             this.allObjects.push(object);
             this.physicsWorld.addRigidBody(body);
         }
-        body.scale = new Vector3(scale.x, 1, scale.z);
+        
         return body;
 
     }
@@ -653,7 +654,6 @@ class MapGenerator {
     moveGhostTile(player, direction, tileScale, tileSelection) {
         let playerPos = player.position;
         let rotation = player.quaternion;
-
         this.pos.set(Math.round(playerPos.x * 2.0) / 2.0, Math.round(((playerPos.y - playerRadius - TILE_HEIGHT / 2.0)) * 2.0) / 2.0, Math.round(playerPos.z * 2.0) / 2.0);
         this.quat.set(rotation.x, 0, rotation.z, 1);
 
