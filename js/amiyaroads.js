@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.4 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.5 \"Cat-Crab\"";
 
 let stats;
 
@@ -95,6 +95,8 @@ const WATER_LEVEL_Y_WORLD2 = 6;
 const WATER_LEVEL_Y_WORLD3 = -4;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
 let maxWaterLevel = waterLevel;
+let WATER_ACCELERATION_DEBUFF = 0.95;
+
 let defaultEffectController = {
 	turbidity: 10,
 	rayleigh: 3,
@@ -918,6 +920,9 @@ function updatePhysics(deltaTime) {
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
 			let relVelChange = (-acceleration);
+			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+				relVelChange *= WATER_ACCELERATION_DEBUFF;
+			}
 			if (velocity.z() + relVelChange >= -maxSpeed) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
 			} else {
@@ -927,6 +932,9 @@ function updatePhysics(deltaTime) {
 		}
 		if (keyStates.ArrowDown || keyStates.KeyS) {
 			let relVelChange = (acceleration);
+			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+				relVelChange *= WATER_ACCELERATION_DEBUFF;
+			}
 			if (velocity.z() + relVelChange <= 0) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
 			} else {
@@ -935,33 +943,35 @@ function updatePhysics(deltaTime) {
 			}
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
-			if (!onGround) {
-				//apply forces if not on the ground
-				let relVelChange = (-turnSpeed);
-				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
-			} else {
+			let relVelChange = (-turnSpeed);
+			if (onGround) {
 				//better handling on the ground and at higher speeds
-				let relVelChange = -turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
-				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+				relVelChange = -turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 			}
-
+			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+				relVelChange *= WATER_ACCELERATION_DEBUFF;
+			}
+			player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
-			if (!onGround) {
-				//apply forces if not on the ground
-				let relVelChange = (turnSpeed);
-				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
-			} else {
+			let relVelChange = (turnSpeed);
+			if (onGround) {
 				//better handling on the ground and at higher speeds
-				let relVelChange = turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
-				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+				relVelChange = turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 			}
+			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+				relVelChange *= WATER_ACCELERATION_DEBUFF;
+			}
+			player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 		}
 		//if not actively moving left or right and on the ground
 		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD) {
 			if (onGround) {
 				//apply some extra friction to the x-axis movement
 				let relVelChange = -velocity.x() * mapGenerator.xFriction;
+				if (player.position.y < WATER_LEVEL_Y_WORLD2) {
+					relVelChange *= WATER_ACCELERATION_DEBUFF;
+				}
 				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 			}
 		}
@@ -969,14 +979,11 @@ function updatePhysics(deltaTime) {
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
+			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
 			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
-				let jumpImpulse = new Ammo.btVector3(velocity.x(), waterJumpSpeed, velocity.z());
-				player.body.setLinearVelocity(jumpImpulse);
-			} else {
-				let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
-				player.body.setLinearVelocity(jumpImpulse);
+				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, jumpSpeed * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
 			}
-
+			player.body.setLinearVelocity(jumpImpulse);
 			onGround = false;
 		}
 
