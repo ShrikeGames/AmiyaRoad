@@ -97,6 +97,8 @@ let waterLevel = WATER_LEVEL_Y_WORLD2;
 let maxWaterLevel = waterLevel;
 let WATER_ACCELERATION_DEBUFF = 0.95;
 
+let tileSnapDistance = 1.5;
+
 let defaultEffectController = {
 	turbidity: 10,
 	rayleigh: 3,
@@ -422,7 +424,7 @@ function initWater(currentWorld, currentLevel, inEditor, inPlayTest) {
 				sunDirection: new THREE.Vector3(),
 				sunColor: 0xfbddff,
 				waterColor: 0xccb8f5,
-				distortionScale: -3,
+				distortionScale: -1,
 				alpha: 0.7,
 				fog: scene.fog !== undefined
 			}
@@ -880,12 +882,12 @@ function updatePhysics(deltaTime) {
 		}
 		if (keyStates.KeyI) {
 			//debug info key
-			console.log(mapGenerator.generateLevelString());
+			console.log(mapGenerator.generateLevelString(currentWorld));
 		}
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
 		if (inEditor) {
-			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection);
+			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection, tileSnapDistance);
 		}
 		updateWorld(deltaTime);
 		return;
@@ -981,7 +983,7 @@ function updatePhysics(deltaTime) {
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
 			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
 			if (player.position.y < WATER_LEVEL_Y_WORLD2) {
-				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, jumpSpeed * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
+				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, waterJumpSpeed * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
 			}
 			player.body.setLinearVelocity(jumpImpulse);
 			onGround = false;
