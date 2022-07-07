@@ -16,6 +16,7 @@ mapData["1"]["7"] = "1~Tile0,0,0,1.5,0,0,0,0|Tile1,1,0,1.5,-12,-1.25982137590997
 mapData["1"]["8"] = "1~Tile0,0,0,1.5,0,0,0,0|Boost1,0,0,1.5,-12,-1.353936340819932e-7,-1.120240630749123e-24,1.6547906972800476e-17|Tile2,0,0,1.5,-24,-2.405500083568791e-7,1.6489774712657466e-19,-1.3710059563326604e-12|Tile3,1,2,1.5,-37,-2.3784875224919458e-7,-3.5543672253602067e-8,0.30320296772928174|Boost4,0,4.5,3.5,-49.5,-0.0002486544279393762,-0.00010440947469567038,0.9140731034325231|Boost5,0,5.5,4,-62,-0.0011510174003372892,-0.0006259621289923881,1.21153075890787|Tile6,0,0,1.5,-103.5,-0.0014700818048369402,1.771370217553741e-20,-2.4098942654137812e-17|AmiyaBar,0,0,1.5,-112.5,-0.004240922769262616,1.2807989297060022e-15,-6.04020793885246e-13|Tile8,0,0,1.5,-121.5,-0.004240922769262616,1.2807989297060022e-15,-6.04020793885246e-13|Boost9,0,-4,2,-134.5,-0.004040911149347675,0.0012262935435505787,-0.6396317651739531|Boost10,0,-4.5,2.5,-146.5,-0.0038490930619965104,0.0016162206805610422,-0.914071741009715|Boost11,0,-5.5,3.5,-158.5,-0.003577783420407143,0.0019206274507709577,-1.1949647357705266|Tile12,0,0,1.5,-191.5,-0.004805183834427359,-0.000007964649612534277,0.003315042722475239|Tile13,1,0,1.5,-203.5,-0.004805183834427359,-0.000007964649612534277,0.003315042722475239|Tile14,0,0,1.5,-215.5,-0.004805183834427359,-0.000007964649612534277,0.003315042722475239|AmiyaBar,0,0,1.5,-224.5,-0.0017560354611395664,-0.0000010636915872270613,0.0012114702893327146|Boost16,0,10,3.5,-244.5,0.1164098944773129,0.05473657139458295,1.0373945004559755|Boost17,0,9.5,3.5,-257,0.12270370721067561,0.0525455980030839,0.936227848150127|Tile18,0,-0.5,2,-275.5,0.07778359743313903,-0.0002680174243307627,-0.006898338202641456|Boost19,0,-7,5.5,-290,0.10341336929414888,-0.04520706485648329,-0.9571447308488146|Boost20,0,-8,6,-303.5,0.03963772102244471,-0.01740267868444698,-0.9604307063499891|Goal,0,1.5,7,-329.5,0,0,0|Player,0,-2.5788118307445984e-8,7.749213218688965,-276.0594482421875,-0.002187702547412279,-1.9879210269982452e-11,-2.120906759261733e-14|Ball23,0,0,4.5,-112,-0.0014797605852212411,-6.000517905879109e-19,8.1101228883716e-16|Ball24,0,0,5,-207.5,-0.0014804843400698245,-1.7971659306504517e-19,2.4278089791610264e-16";
 
 mapData["2"]["1"] = "2~Tile0,0,0,-0.5,0,0,0,0,1,1,1|Tile1,1,0,-0.5,-12,0,0,0,1,1,1|Tile2,0,0,-0.5,-24,0,0,0,1,1,1|Tile3,1,0,-0.5,-56.5,0,0,0,1,1,1|Tile4,0,0,-0.5,-68.5,0,0,0,1,1,1|Tile5,1,0,-0.5,-80.5,0,0,0,1,1,1|Tile6,0,0,-0.5,-112,0,0,0,1,1,1|Tile7,1,0,-0.5,-124,0,0,0,1,1,1|Tile8,0,0,-0.5,-136,0,0,0,1,1,1|Tile9,1,0,-0.5,-172,0,0,0,1,1,1|Tile10,0,0,-0.5,-184,0,0,0,1,1,1|Tile11,1,0,-0.5,-196,0,0,0,1,1,1|Tile12,0,0,-0.5,-232,0,0,0,1,1,1|Tile13,1,0,-0.5,-244,0,0,0,1,1,1|Tile14,0,0,-0.5,-280,0,0,0,1,1,1|Tile15,1,0,-0.5,-292,0,0,0,1,1,1|Tile16,0,0,-0.5,-328,0,0,0,1,1,1|Tile17,1,0,-0.5,-340,0,0,0,1,1,1|Tile18,0,0,-0.5,-375.5,0,0,0,1,1,1|Tile19,1,0,-0.5,-387.5,0,0,0,1,1,1|Player,2,0,9.799994468688965,-516.0130615234375,0,0,0,1,1,1|Tile21,0,0,-0.6666666666666666,-417.3333333333333,0,0,0,1,1,1|Tile22,1,0,-0.6666666666666666,-429.3333333333333,0,0,0,1,1,1|Tile23,0,0,-0.6666666666666666,-459.3333333333333,0,0,0,1,1,1|Tile24,1,0,-0.6666666666666666,-471.3333333333333,0,0,0,1,1,1|Tile25,0,0,-0.6666666666666666,-495.3333333333333,0,0,0,1,1,1|Tile26,1,0,-0.6666666666666666,-507.3333333333333,0,0,0,1,1,1|Goal,0,0,6,-516,0,0,0,1,1,1";
+mapData["2"]["2"] = "2~Tile0,0,0,-0.6666666666666666,0,0,0,0,1,1,1|Tile1,1,0,-0.6666666666666666,-12,0,0,0,1,1,1|Tile2,0,0,-0.6666666666666666,-24,0,0,0,1,1,1|Tile3,1,6.666666666666667,2,-37.333333333333336,0,0,0.2518843866170029,1,1,1|Tile4,0,6.666666666666667,2,-49.333333333333336,0,0,0.2518843866170029,1,1,1|Tile5,1,6.666666666666667,2,-61.333333333333336,0,0,0.2518843866170029,1,1,1|Tile6,0,6.666666666666667,2,-73.33333333333333,0,0,0.2518843866170029,1,1,1|Tile7,1,-6.666666666666667,2,-56,0,0,-0.8775988383552435,2,1,2|Tile8,0,-3.3333333333333335,6,-82.66666666666667,0,0,0.25188383403256265,1,1,1|Tile9,1,-3.3333333333333335,6,-94.66666666666667,0,0,0.25188383403256265,1,1,1|Tile10,0,-3.3333333333333335,6,-106.66666666666667,0,0,0.25188383403256265,1,1,1|Tile11,1,3.3333333333333335,2,-92,0,0,-0.18408911019563584,1,1,1|Tile12,0,12,2,-120,0,0,0.477795121409672,1,1,1|Tile13,1,3.3333333333333335,2,-134,0,0,-0.2860473646922834,1,1,1|Tile14,0,10.666666666666666,2,-155.33333333333334,0,0,0.40727243861724816,1,1,1|Tile15,1,-8.666666666666666,5.333333333333333,-128.66666666666666,0,0,0.016667187584638896,1.5,1,1.5|Tile16,0,-8.666666666666666,5.333333333333333,-146.66666666666666,0,0,0.016667187584638896,1.5,1,1.5|Tile18,1,1.3333333333333333,2,-185.33333333333334,7.925549105891603e-9,9.660037074502466e-16,2.4376953433602715e-7,1.5,1,1.5|Tile19,0,1.3333333333333333,2,-210,7.925549105891603e-9,9.660037074502466e-16,2.4376953433602715e-7,1.25,1,1.25|Tile20,1,1.3333333333333333,3.3333333333333335,-230,7.925549105891603e-9,9.660037074502466e-16,2.4376953433602715e-7,1,1,1|Tile21,0,1.3333333333333333,4.666666666666667,-250,7.925549105891603e-9,9.660037074502466e-16,2.4376953433602715e-7,1,1,1|Tile22,1,-4.666666666666667,2,-278,0.14208129527031987,-0.04622046165704817,-0.6922140949549567,2,1,2|Tile23,0,8.666666666666666,2,-302.6666666666667,0.2524697954406028,0.04209942761822361,0.3429491408129501,2,1,2|Tile24,1,-1.3333333333333333,2.6666666666666665,-327.3333333333333,0.3888540356348934,-0.046491780476499066,-0.24692290575751583,1.5,1,1.5|Player,2,1.4000003337860107,9.399994850158691,-559.4157104492188,0,0,-1.3970148415865017e-7,1,1,1|Tile25,0,8.666666666666666,3.3333333333333335,-355.3333333333333,0,0,0,1,1,1|Tile26,1,8.666666666666666,3.3333333333333335,-367.3333333333333,0,0,0,1,1,1|Tile27,0,5.333333333333333,3.3333333333333335,-379.3333333333333,0,0,0,1,1,1|AmiyaBar28,1,5.333333333333333,3.3333333333333335,-389.3333333333333,0,0,0,1.25,1,1.25|Tile29,0,1.3333333333333333,-0.6666666666666666,-406.6666666666667,0,0,0,1,1,1|Tile30,1,1.3333333333333333,-0.6666666666666666,-418.6666666666667,0,0,0,1,1,1|Tile31,0,1.3333333333333333,-0.6666666666666666,-430.6666666666667,0,0,0,1,1,1|Tile32,1,6.666666666666667,-0.6666666666666666,-442.6666666666667,0,0,0,1,1,1|Tile33,0,10.666666666666666,-0.6666666666666666,-454.6666666666667,0,0,0,1,1,1|Tile34,1,10.666666666666666,-0.6666666666666666,-466.6666666666667,0,0,0,1,1,1|Tile35,0,10.666666666666666,-0.6666666666666666,-478.6666666666667,0,0,0,1,1,1|Tile36,1,-3.3333333333333335,0,-500.6666666666667,0,0,-0.2518843866170029,1,1,1|Tile37,0,-3.3333333333333335,0,-512.6666666666666,0,0,-0.2518843866170029,1,1,1|Tile38,1,-3.3333333333333335,0,-524.6666666666666,0,0,-0.2518843866170029,1,1,1|Tile39,0,4,0,-538,0,0,-1.3970148415865017e-7,1,1,1|Tile40,1,4,0,-550,0,0,-1.3970148415865017e-7,1,1,1|Goal,0,1.3333333333333333,5.333333333333333,-559.3333333333334,0,0,0,1,1,1";
 
 mapData["3"]["1"] = "3~Tile0,0,0,0.25,0,0,0,0|Tile1,1,-7.549517245077422e-14,0.2500004768371582,-11.999993324279785,-9.301209840306343e-14,1.1817645273406578e-33,-2.5410985186454742e-20|Tile2,0,-3.3861802251067274e-14,0.2500009536743164,-24.000019073486328,-2.427072215080428e-13,-6.281645554053844e-34,5.176315327597851e-21|Tile3,1,6.522550105277428e-14,0.2500014305114746,-36.000064849853516,-1.875660217420805e-12,-1.9070465944374998e-31,2.033467017880087e-19|Tile4,0,4.000000476837158,0.2500019073486328,-48.0001106262207,-3.761189276696442e-12,-6.690286628020419e-31,3.5575378614801786e-19|Tile5,1,4.000000476837158,0.250002384185791,-60.00015640258789,-5.6467179022912095e-12,9.663637573362777e-27,-3.422744943373801e-15|Tile6,0,4.000000476837158,0.2500028610229492,-72.00004577636719,-7.532246527885977e-12,7.135962433915067e-25,-1.8947766532856347e-13|Tile7,1,4.000000476837158,0.2500033378601074,-83.99986267089844,-8.88764496026484e-12,1.754179236930123e-24,-3.947455697820429e-13|Tile8,0,-0.6000004410743713,0.2500038146972656,-95.99967956542969,-1.0243043392643703e-11,3.072982304020927e-24,-6.000135284456309e-13|Tile9,1,-0.6000004410743713,0.25000429153442383,-107.99949645996094,-1.1598441825022565e-11,3.513949706890555e-24,-6.059347901904433e-13|Tile10,0,-0.6000004410743713,0.25000476837158203,-119.99931335449219,-1.2953840257401428e-11,3.9629427786468064e-24,-6.118560519352556e-13|Tile11,1,-0.6000004410743713,-0.549994945526123,-131.59913635253906,-0.15041569556705242,4.6159394472277037e-14,-6.160393375975735e-13|Tile12,0,-0.6000003218650818,-1.473527193069458,-143.5514678955078,-0.000020194444006400938,9.19529896793969e-13,-9.106761211796777e-8|Tile13,1,-0.6000003218650818,-1.473527193069458,-155.55128479003906,-0.000020194444006400938,9.19529896793969e-13,-9.106761211796777e-8|Tile14,0,-0.6000003218650818,0.3264729976654053,-168.35108947753906,0.33764912185633267,-1.5095548775123893e-8,-9.099975528670269e-8|Tile15,1,-0.6000000834465027,2.1657118797302246,-179.32687377929688,-0.00003836862743842256,2.1520424084757622e-12,-1.1217719020351098e-7|Player,0,3.000007390975952,6.915328502655029,-364.739990234375,0.0015631532491201209,0.006090078249492892,-0.0000045733961576767535|Tile17,0,-0.5999994874000549,2.165323257446289,-191.3845672607422,-0.000043245228894029886,-8.958204388582269e-13,4.1429792929648115e-8|Tile18,1,-0.5999994874000549,2.165323257446289,-203.38438415527344,-0.000043245228894029886,-8.958204388582269e-13,4.1429792929648115e-8|AmiyaBar19,0,-0.5999994874000549,2.165323257446289,-212.38424682617188,-0.000043245228894029886,-8.958204388582269e-13,4.1429792929648115e-8|Tile20,1,-0.5999994874000549,2.1653294563293457,-221.3841094970703,-0.000043246731379278625,-8.601896574433868e-13,3.978056284381638e-8|Tile21,0,-0.5999994874000549,-1.2346704006195068,-238.58384704589844,-0.000043246731379278625,-8.601904256596572e-13,3.978059837095317e-8|Tile22,1,1.6000008583068848,-1.2346704006195068,-250.5836639404297,-0.000043246731379278625,-8.601904256596572e-13,3.978059837095317e-8|Tile23,0,4.200001239776611,-1.2346704006195068,-262.583984375,-0.000043246731379278625,-8.601895806217597e-13,3.9780559291102704e-8|Tile24,1,7.199998378753662,-1.2346704006195068,-274.584716796875,-0.000043246731379278625,-8.601891196919975e-13,3.978053797482063e-8|Tile25,0,3.800001382827759,-1.2346704006195068,-286.58544921875,-0.000043246731379278625,-8.601885051189811e-13,3.97805095531112e-8|Tile26,1,5.662441253662109e-7,-1.2346704006195068,-298.586181640625,-0.000043246731379278625,-8.601878905459648e-13,3.978048113140177e-8|Tile27,0,-4.399999618530273,-1.2346704006195068,-310.5869140625,-0.000043246731379278625,-8.601878905459648e-13,3.978048113140177e-8|Tile28,1,-0.7999989986419678,-1.2346704006195068,-322.587646484375,-0.000043246731379278625,-8.601874296162025e-13,3.97804598151197e-8|Tile29,0,3.600001811981201,-1.2346704006195068,-334.58837890625,-0.000043246731379278625,-8.601874296162025e-13,3.97804598151197e-8|Tile30,1,0.40000107884407043,-1.2346704006195068,-346.589111328125,-0.000043246731379278625,-8.601859700052887e-13,3.97803923135598e-8|Tile31,0,-3.5999996662139893,-1.2346704006195068,-358.58984375,-0.000043246731379278625,-8.601859700052887e-13,3.97803923135598e-8|Tile32,1,0.000001043081283569336,-1.2346704006195068,-370.590576171875,-0.000043246731379278625,-8.601855090755264e-13,3.978037099727773e-8|Tile33,0,0.000001043081283569336,-1.2346704006195068,-382.59130859375,-0.000043246731379278625,-8.601855090755264e-13,3.978037099727773e-8|Goal,00ff00,0.000001043081283569336,4.165327548980713,-391.59185791015625,0,0,0";
 const COLOUR_BLANK = new THREE.Color(0xffffff);
@@ -107,10 +108,18 @@ class MapGenerator {
         this.seed = seed;
         this.lastTileSelection = 0;
         console.log(seed);
-        console.log(levelString);
+        console.log("levelString", levelString);
         Math.seedrandom(seed);
         if (inEditor) {
-            this.currentWorld = $('.hud--worldSelect').val();
+            console.log("In editor");
+            if (levelString.indexOf("~") >= 0) {
+
+                let parts = levelString.split("~");
+                this.currentWorld = parts[0];
+            } else {
+                this.currentWorld = $('.hud--worldSelect').val();
+            }
+
         } else {
             this.currentWorld = currentWorld;
         }
@@ -168,6 +177,7 @@ class MapGenerator {
             this.loadMapFromLevelString(this.levelString);
         }
 
+
         return this.rigidBodies;
 
     }
@@ -194,7 +204,9 @@ class MapGenerator {
             }
         }
         this.levelString = newLevelString.slice(0, -1);
-        $('#levelSelect').attr("value", this.levelString);
+        console.log(this.levelString);
+        $('#levelSelect').val(this.levelString);
+
         return this.levelString;
     }
     loadMapFromLevelString(levelString = "") {
@@ -204,7 +216,11 @@ class MapGenerator {
             return;
         }
         let parts = levelString.split("~");
+
         let mapTiles = parts[1].split("|");
+        if (!this.inEditor) {
+            this.currentWorld = parts[0];
+        }
         let colourSelection = colourMap[this.currentWorld];
 
         for (let i = 0; i < mapTiles.length; i++) {
@@ -212,7 +228,7 @@ class MapGenerator {
             let tileType = tile[0];
             let colourIndex = parseInt(tile[1]);
             let materialHex = colourSelection[colourIndex];
-            this.pos.set(Math.round(parseFloat(tile[2]) * 2.0) / 2.0, Math.round(parseFloat(tile[3]) * 2.0) / 2.0, Math.round(parseFloat(tile[4]) * 2.0) / 2.0);
+            this.pos.set(tile[2], tile[3], tile[4]);
             this.quat.setFromEuler(new THREE.Euler(tile[5], tile[6], tile[7], 'XYZ'));
             if (tile.length > 10) {
                 this.scale = new THREE.Vector3(parseFloat(tile[8]), parseFloat(tile[9]), parseFloat(tile[10]));
@@ -258,6 +274,7 @@ class MapGenerator {
 
     createPlayer() {
         this.pos.set(0, 3, 0);
+        this.scale.set(1, 1, 1);
         this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
 
@@ -267,9 +284,10 @@ class MapGenerator {
 
     }
     createPlayerWithPhysics(radius, mass, pos, quat, scale, material) {
-
-        const object = new THREE.Mesh(new THREE.SphereGeometry(radius * scale.x, 32, 32), material);
-        const shape = new Ammo.btSphereShape(radius * scale.x);
+        const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
+        //use x scaling for all directions for ball, never be squished
+        object.scale.set(scale.x, scale.x, scale.x);
+        const shape = new Ammo.btSphereShape(radius);
         shape.setMargin(margin);
         object.name = "Player";
         object.receiveShadow = true;
@@ -280,19 +298,22 @@ class MapGenerator {
 
     }
     createBallWithPhysics(name, radius, mass, pos, quat, scale, material) {
-        const object = new THREE.Mesh(new THREE.SphereGeometry(radius * scale.x, 32, 32), material);
+        const object = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 32), material);
+        //use x scaling for all directions for ball, never be squished
+        object.scale.set(scale.x, scale.x, scale.x);
         const shape = new Ammo.btSphereShape(radius * scale.x);
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
-        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+        object.body = this.createRigidBody(object, shape, mass * scale.x, pos, quat, scale);
 
         return object;
 
     }
     createTileWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+        object.scale.set(scale.x, scale.y, scale.z);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
@@ -304,7 +325,8 @@ class MapGenerator {
 
     }
     createDeathWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+        object.scale.set(scale.x, scale.y, scale.z);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
@@ -316,7 +338,8 @@ class MapGenerator {
 
     }
     createAmiyaBarWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+        object.scale.set(scale.x, scale.y, scale.z);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
@@ -328,7 +351,8 @@ class MapGenerator {
 
     }
     createGoalWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
-        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, scale.x, scale.y, scale.z), material);
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+        object.scale.set(scale.x, scale.y, scale.z);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
@@ -677,6 +701,7 @@ class MapGenerator {
                     this.ghostTile.scale.y = 1;
                 }
                 this.ghostTile.scale.z = tileScale;
+                this.scale.set(this.ghostTile.scale.x, this.ghostTile.scale.y, this.ghostTile.scale.z);
 
             } else {
 
@@ -685,11 +710,18 @@ class MapGenerator {
 
                 this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
                 this.ghostTile.scale.x = tileScale;
+                if (tileSelection == 6) {
+                    this.ghostTile.scale.y = tileScale;
+                } else {
+                    this.ghostTile.scale.y = 1;
+                }
                 this.ghostTile.scale.z = tileScale;
+                this.scale.set(this.ghostTile.scale.x, this.ghostTile.scale.y, this.ghostTile.scale.z);
                 $('.hud--tile_selection img').attr("src", "./images/amiyaroad/tiles/Tile" + tileSelection + ".png");
             }
 
         }
+
         this.lastTileSelection = tileSelection;
 
 
@@ -757,7 +789,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Ball" + this.allObjects.length);
-            if (this.levelSelected == "*-*") {
+            if (this.inEditor) {
                 return this.createBallWithPhysics(actualTileName, BALL_RADIUS, 0, this.pos, this.quat, this.scale, material);
             }
             return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
@@ -765,7 +797,7 @@ class MapGenerator {
         return null;
     }
     addTile(scale, tileSelection, tilePos = null, tileQuat = null) {
-        this.scale = new Vector3(scale, scale, scale);
+        this.scale = new Vector3(scale, 1, scale);
         if (tilePos != null) {
             this.pos.x = tilePos.x;
             this.pos.y = tilePos.y;
@@ -779,14 +811,6 @@ class MapGenerator {
 
 
         let newTile = this.getTileFromSelection(tileSelection);
-
-        newTile.scale.x = this.scale.x;
-        if (tileSelection == 6) {
-            newTile.scale.y = this.scale.y;
-        } else {
-            newTile.scale.y = 1;
-        }
-        newTile.scale.z = this.scale.z;
 
         this.generateLevelString(this.currentWorld);
         return newTile;

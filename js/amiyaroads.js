@@ -110,6 +110,31 @@ let defaultEffectController = {
 };
 let effectController = defaultEffectController;
 
+const mainGameLoop = function(deltaTime) {
+	
+	if (won || dead) {
+		return;
+	}
+	render();
+	stats.update();
+
+	if (inEditor) {
+		return;
+	}
+
+	updates++;
+	if (updates >= 5) {
+		lastUpdateVelocity.z = velocity.z();
+		updates = 0;
+	}
+};
+
+// how to create a game loop with a targeted 60 FPS :
+const gameLoop = createGameLoop(mainGameLoop, 60);
+
+// how to get the targeted FPS :
+const targetFps = gameLoop.fps;
+
 Ammo().then(function (AmmoLib) {
 
 	Ammo = AmmoLib;
@@ -142,15 +167,21 @@ function initFirstTime() {
 
 		//random seed when you click play on a level
 		//retries within the level will regenerate the same way.
-		seed = "amiyaroads_" + Math.random() * 25600;
+		seed = "amiyaroads_" + Math.round(Math.random() * 25600);
 
 		if (inEditor) {
 			$('.hud--editor').removeClass("hide");
+
+			if ($('#levelSelect').val().indexOf("~") > 0) {
+				currentWorld = $('#levelSelect').val().split("~")[0];
+			} else {
+				currentWorld = mapGenerator.currentWorld;
+			}
 		}
 
 		init(currentWorld, currentLevel, inEditor, inPlayTest);
-
 		animate();
+
 		$('.menu--start-screen').addClass('hide');
 	});
 
@@ -209,6 +240,7 @@ function initFirstTime() {
 
 		inEditor = true;
 		inPlayTest = false;
+		console.log($('.hud--worldSelect').val());
 
 		init(currentWorld, currentLevel, inEditor, inPlayTest);
 
@@ -549,10 +581,11 @@ function initGraphics() {
 }
 
 function initPhysics() {
-	console.log("ininitPhysicsitGraphics");
+	console.log("initPhysics");
 	// Physics configuration
 
 	if (!collisionConfiguration) {
+		console.log("collisionConfiguration");
 		collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
 		dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
 		broadphase = new Ammo.btDbvtBroadphase();
@@ -560,6 +593,7 @@ function initPhysics() {
 		physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 		transformAux1 = new Ammo.btTransform();
+		setupContactResultCallback();
 	}
 	if (inEditor) {
 		physicsWorld.setGravity(new Ammo.btVector3(0, 0, 0));
@@ -567,7 +601,7 @@ function initPhysics() {
 		physicsWorld.setGravity(new Ammo.btVector3(0, - GRAVITY, 0));
 	}
 
-	setupContactResultCallback();
+
 
 }
 function setupContactResultCallback() {
@@ -674,7 +708,7 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
 	if (mapGenerator == null) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
-	// Ground
+
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
@@ -748,25 +782,9 @@ function onWindowResize() {
 }
 
 function animate() {
-	if (won || dead) {
-		return;
-	}
-	requestAnimationFrame(animate);
-
-	render();
-	stats.update();
-
-	if (inEditor) {
-		return;
-	}
-
-	updates++;
-	if (updates >= 5) {
-		lastUpdateVelocity.z = velocity.z();
-		updates = 0;
-	}
-
-
+	const deltaTime = clock.getDelta();
+	//requestAnimationFrame(animate);
+	renderer.setAnimationLoop( gameLoop.loop );
 }
 
 function render() {
@@ -782,6 +800,7 @@ function render() {
 
 }
 
+  
 function checkContact() {
 	if (won || dead) {
 		return;
@@ -837,7 +856,7 @@ function updateWorld(deltaTime) {
 	spotLight.position.set(player.position.x, 20, player.position.z);
 
 }
-function isUnderWater(){
+function isUnderWater() {
 	return waterRises && player.position.y < waterLevel;
 }
 function updatePhysics(deltaTime) {
@@ -1063,4 +1082,45 @@ function reset() {
 	camera.position.set(0, 12, player.position.z + 20);
 	camera.lookAt(0, 0.5, player.position.z);
 	spotLight.position.set(0, 20, player.position.z);
+}
+
+export function createGameLoop(func, fps = 60) {
+	let targetFps = 0, fpsInterval = 0;
+	let lastTime = 0, lastOverTime = 0, prevOverTime = 0, deltaTime = 0;
+
+	function updateFps(value) {
+		targetFps = value;
+		fpsInterval = 1000 / targetFps;
+	}
+
+	updateFps(fps);
+
+	return {
+		// getter/setter for targeted frame rate
+		get fps() {
+			return targetFps;
+		},
+		set fps(value) {
+			updateFps(value);
+		},
+
+		// the frame-capped loop function
+		loop(time) {
+			deltaTime = time - lastTime;
+
+			if (deltaTime >= fpsInterval) {
+				prevOverTime = lastOverTime;
+				lastOverTime = deltaTime % fpsInterval;
+				lastTime = time - lastOverTime;
+
+				// keep time elapsed in sync with real life
+				deltaTime -= prevOverTime;
+
+				// "normalize" the delta time (so 1 equals to 1 second)
+				deltaTime *= 0.001;
+
+				func(deltaTime);
+			}
+		},
+	}
 }
