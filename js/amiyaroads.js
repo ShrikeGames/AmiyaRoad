@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.6 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.7 \"Cat-Crab\"";
 
 let stats;
 
@@ -128,12 +128,9 @@ const mainGameLoop = function(deltaTime) {
 		updates = 0;
 	}
 };
-
-// how to create a game loop with a targeted 60 FPS :
+// game loop limited to 60fps because bullet physics engine only does 60
 const gameLoop = createGameLoop(mainGameLoop, 60);
 
-// how to get the targeted FPS :
-const targetFps = gameLoop.fps;
 
 Ammo().then(function (AmmoLib) {
 
