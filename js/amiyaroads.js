@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.7 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.8 \"Cat-Crab\"";
 
 let stats;
 
@@ -110,8 +110,8 @@ let defaultEffectController = {
 };
 let effectController = defaultEffectController;
 
-const mainGameLoop = function(deltaTime) {
-	
+const mainGameLoop = function (deltaTime) {
+
 	if (won || dead) {
 		return;
 	}
@@ -171,8 +171,10 @@ function initFirstTime() {
 
 			if ($('#levelSelect').val().indexOf("~") > 0) {
 				currentWorld = $('#levelSelect').val().split("~")[0];
-			} else {
+			} else if (mapGenerator) {
 				currentWorld = mapGenerator.currentWorld;
+			} else {
+				currentWorld = $('.hud--worldSelect').val();
 			}
 		}
 
@@ -781,7 +783,7 @@ function onWindowResize() {
 function animate() {
 	const deltaTime = clock.getDelta();
 	//requestAnimationFrame(animate);
-	renderer.setAnimationLoop( gameLoop.loop );
+	renderer.setAnimationLoop(gameLoop.loop);
 }
 
 function render() {
@@ -797,7 +799,7 @@ function render() {
 
 }
 
-  
+
 function checkContact() {
 	if (won || dead) {
 		return;
