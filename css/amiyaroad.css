@@ -113,6 +113,17 @@
 
 	background-color: #dda7fc;
 }
+.hud--level_export {
+	line-height: 1;
+	width: 130px;
+	height: 130px;
+	position: absolute;
+	right: 140px;
+	bottom: 10px;
+	vertical-align: bottom;
+
+	background-color: #dda7fc;
+}
 
 .hud--stamina-value {
 	background-color: #0F0;

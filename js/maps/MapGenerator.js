@@ -53,6 +53,7 @@ const colourMap = {
     "2": [COLOUR_MAIN_WORLD2, COLOUR_SECONDARY_WORLD2, COLOUR_BLANK],
     "3": [COLOUR_MAIN_WORLD3, COLOUR_SECONDARY_WORLD3, COLOUR_BLANK]
 };
+const tileTypes = ["Tile", "AmiyaBar", "Goal", "Boost", "Death", "Ball"];
 
 let pos;
 let quad;
@@ -93,6 +94,13 @@ let rollingFriciton = 0;
 let ghostTile;
 
 let lastTileSelection = 0;
+const reader = new FileReader();
+
+reader.addEventListener("load", function () {
+    // convert image file to base64 string
+    var $levelImage = $('.hud--level_export');
+    $levelImage.html('<img src="' + reader.result + '" width="130" height="auto">');
+}, false);
 
 class MapGenerator {
     constructor(scene, physicsWorld) {
@@ -104,6 +112,7 @@ class MapGenerator {
         this.allObjects = [];
         this.levelString = "";
     }
+
     initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString = "") {
         this.seed = seed;
         this.lastTileSelection = 0;
@@ -193,6 +202,8 @@ class MapGenerator {
     generateLevelString(world) {
         let newLevelString = world + "~";
         let colourSelection = colourMap[world];
+
+
         for (let i = 0; i < this.allObjects.length; i++) {
             let object = this.allObjects[i];
             let materialInfo = this.getColourIndex(colourSelection, object.material.color.getHexString());
@@ -202,13 +213,106 @@ class MapGenerator {
             if (object.name.indexOf("GhostTile") < 0) {
                 newLevelString += object.name + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "," + scale.x + "," + scale.y + "," + scale.z + "|";
             }
+
+
         }
+
         this.levelString = newLevelString.slice(0, -1);
         console.log(this.levelString);
         $('#levelSelect').val(this.levelString);
 
+        this.updateMapImage(colourSelection);
+
         return this.levelString;
     }
+
+    updateMapImage(colourSelection) {
+        var currentWorld = this.currentWorld;
+        let base_image = new Image();
+        base_image.src = './images/amiyaroad/AmiyaRoadsCustomLevelTemplate.png';
+        base_image.width = 130;
+        base_image.height = 130;
+
+        var worldObjects = this.allObjects;
+        var getColourIndex = this.getColourIndex;
+        var getTileIndexFromName = this.getTileIndexFromName;
+
+        // create an offscreen canvas
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+
+        // size the canvas to your desired image
+        canvas.width = 600;
+        canvas.height = 600;
+
+        base_image.onload = function () {
+            ctx.drawImage(base_image, 0, 0);
+
+            $('.hud--level_export').html("");
+            $('.hud--level_export').append(base_image);
+
+            exportLevelImage();
+        }
+        var r2 = [0, 255];
+        var toRBGRange = function (value, r1) {
+            return (value - r1[0]) * (r2[1] - r2[0]) / (r1[1] - r1[0]) + r2[0];
+        }
+        var drawTileData = function (data, object, imagePos) {
+            var tileTypeIndex = getTileIndexFromName(object.name);
+            let materialInfo = getColourIndex(colourSelection, object.material.color.getHexString());
+            let pos = object.position;
+            let rotation = new THREE.Euler().setFromQuaternion(object.quaternion, "XYZ");
+            let scale = object.scale;
+
+            //rbga values, 3 pixels in a row for our data1
+            data[imagePos] = toRBGRange(pos.x, [-40, 40]);
+            data[imagePos + 1] = toRBGRange(pos.y, [-40, 40]);
+            data[imagePos + 2] = toRBGRange(pos.z, [-40, 40]);
+            //first pixels alpha value will be our material index
+            data[imagePos + 3] = materialInfo;
+
+            data[imagePos + 4] = toRBGRange(rotation.x, [-3, 3]);
+            data[imagePos + 5] = toRBGRange(rotation.y, [-3, 3]);
+            data[imagePos + 6] = toRBGRange(rotation.z, [-3, 3]);
+            //second pixel alpha will be our current world
+            data[imagePos + 7] = currentWorld;
+
+            data[imagePos + 8] = toRBGRange(scale.x, [0, 10]);
+            data[imagePos + 9] = toRBGRange(scale.y, [0, 10]);
+            data[imagePos + 10] = toRBGRange(scale.z, [0, 10]);
+            //tile type index
+            data[imagePos + 11] = tileTypeIndex;
+
+            return 12;
+        }
+
+        function exportLevelImage() {
+            console.log("exportLevelImage");
+            // get the imageData and pixel array from the canvas
+            let imgData = ctx.getImageData(0, 0, 600, 600);
+            let data = imgData.data;
+            let imagePos = 0;
+            for (let i = 0; i < worldObjects.length; i++) {
+
+                imagePos += drawTileData(data, worldObjects[i], imagePos);
+
+            }
+            console.log(data);
+            // put the modified pixels back on the canvas
+            ctx.putImageData(imgData, 0, 0);
+
+            // create a new img object
+            var image = new Image();
+            image.width = 130;
+            image.height = 130;
+            // set the img.src to the canvas data url
+            image.src = canvas.toDataURL();
+            // append the new img object to the page
+            $('.hud--level_export').html("");
+            $('.hud--level_export').append(image);
+        }
+    }
+
     loadMapFromLevelString(levelString = "") {
         this.rigidBodies = [];
         this.allObjects = [];
@@ -265,6 +369,7 @@ class MapGenerator {
             }
 
         }
+        this.updateMapImage(colourSelection);
     }
 
 
@@ -731,6 +836,19 @@ class MapGenerator {
             return value;
         }
         return defaultValue;
+    }
+
+    getTileNameFromIndex(tileIndex, i) {
+        return tileTypes[tileIndex] + i;
+    }
+    getTileIndexFromName(tileName) {
+        for (var i = 0; i < tileTypes.length; i++) {
+            if (tileTypes[i].indexOf(tileName) >= 0) {
+                return i;
+            }
+        }
+        //default to regular tile
+        return 0;
     }
     getTileFromSelection(tileSelection, tileName, tileMaterial = null) {
         //+1 for ghost tile
