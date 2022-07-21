@@ -6,7 +6,7 @@ mapData["1"] = {};
 mapData["2"] = {};
 mapData["3"] = {};
 
-mapData["1"]["1"] = "1~Player,2,0,3,700,0,0,0,1,1,1|Tile1,0,0,-20,0,0,0,0,1,1,1|Tile2,1,0,-20,100,0,0,0,1,1,1|Tile3,0,0,-20,200,0,0,0,1,1,1|Tile4,1,0,-20,300,0,0,0,1,1,1|Tile5,0,0,-20,400,0,0,0,1,1,1|Tile6,1,0,-20,500,0,0,0,1,1,1|Tile7,0,0,-20,600,0,0,0,1,1,1|Goal,1,0,-20,700,0,0,0,1,1,1"
+mapData["1"]["1"] = "1~Tile1,0,0,10,0,0,0,0,1,1,1|Tile2,1,0,10,100,0,0,0,1,1,1|Tile3,0,0,10,200,0,0,0,1,1,1|Tile4,1,-20,10,300,0,0,0,1,1,1|Tile5,0,-40,10,400,0,0,0,1,1,1|Tile6,1,-60,10,500,0,0,0,1,1,1|Tile7,0,-60,10,600,0,0,0,1,1,1|Tile8,1,-40,10,700,0,0,0,1,1,1|Tile9,0,-20,10,800,0,0,0,1,1,1|Tile10,1,0,10,900,0,0,0,1,1,1|Tile11,0,40,10,1000,0,0,0,1,1,1|Tile12,1,80,10,1100,0,0,0,1,1,1|Tile13,0,60,10,1200,0,0,0,1,1,1|Tile14,1,20,10,1300,0,0,0,1,1,1|Tile15,0,20,10,1500,0,0,0,1,1,1|Tile16,1,20,10,1600,0,0,0,1,1,1|Tile17,0,-20,10,1800,0,0,0,1,1,1|Tile18,1,-20,10,1900,0,0,0,1,1,1|Tile19,0,40,10,2100,0,0,0,1,1,1|Tile20,1,40,10,2200,0,0,0,1,1,1|Tile21,0,40,10,2500,0,0,0,1,1,1|Tile22,1,40,10,2600,0,0,0,1,1,1|Tile23,0,40,10,2700,0,0,0,1,1,1|Tile24,1,40,30,2800,0,0,0,1,1,1|Tile25,0,40,30,2900,0,0,0,1,1,1|Tile26,1,-20,30,3050,0,0,0,1,1,1|Tile27,0,-20,30,3250,0,0,0,1,1,1|Tile28,1,40,30,3450,0,0,0,1,1,1|Tile29,0,40,20,3550,0,0,0,1,1,1|Tile30,1,40,10,3650,0,0,0,1,1,1|Tile31,0,40,0,3750,0,0,0,1,1,1|Tile32,1,40,0,3850,0,0,0,1,1,1|Goal,2,40,20,3950,0,0,0,1,1,1|Player,2,0,30,0,0,0,0,1,1,1"
 mapData["1"]["2"] = "1~Tile0,0,0,15,0,0,0,0,1,1,1|Tile1,1,0,15,-120,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile2,0,0,15,-240,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile3,1,0,15,-445,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile4,0,0,15,-565,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile5,1,0,15,-805,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile6,0,0,15,-925,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile7,1,0,15,-1225,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile8,0,0,15,-1345,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile9,1,60,15,-1520,-0.0000011446302323750194,-2.6994361412081293e-13,4.7166955141621584e-7,1,1,1|Tile10,0,-60,15,-1520,-0.000001144605903391747,-2.6993842953865834e-13,4.716705177543365e-7,1,1,1|Tile11,1,60,15,-1640,-0.000001144605903391747,-2.6993842953865834e-13,4.716705177543365e-7,1,1,1|Tile12,0,-60,15,-1640,-0.000001144605903391747,-2.6993842953865834e-13,4.716705177543365e-7,1,1,1|Tile13,1,60,30,-1760,-0.000001144605903391747,-2.6993842953865834e-13,4.716705177543365e-7,1,1,1|Tile14,0,-75,15,-1820,0.000009038056305267002,-0.000001499382492788512,-0.3376721937412079,1,1,1|Tile15,1,30,45,-1880,9.78767360493293e-8,-6.160301771980097e-16,-1.2587877407099793e-8,1,1,1|Tile16,0,-10,45,-2000,1.2777569224908877e-7,-6.779980345697631e-16,-1.061231635901552e-8,1,1,1|AmiyaBar,2,-10,45,-2090,0.000004870919383412172,1.6480958484060844e-13,6.76708324931497e-8,1,1,1|Tile18,0,-10,45,-2200,0.000004870649718233093,1.6480215640136749e-13,6.767152882503088e-8,1,1,1|Tile19,1,45,45,-2380,0.000004781184998155393,9.107934002178788e-7,0.38978676508310084,1,1,1|Tile20,0,45,45,-2500,0.000004426766736301849,8.432783774912281e-7,0.38978676508310073,1,1,1|Tile21,1,45,45,-2620,0.000004426344276012871,8.431979007802859e-7,0.38978676508310084,1,1,1|Tile22,0,45,45,-2740,0.000004426344276012871,8.431979007802859e-7,0.38978676508310084,1,1,1|Tile23,1,-15,30,-2865,1.7351625558603772e-7,7.20985175861636e-15,8.310289700830264e-8,1,1,1|Tile24,0,-15,30,-2985,-0.0000032763591661991523,-1.5662139990867795e-13,9.560697833421742e-8,1,1,1|Tile25,1,-80,35,-3160,1.2028701590338653e-8,-3.745742290774902e-9,-0.6578393005921698,1,1,1|Tile26,0,-15,35,-3155,0.01324274255735157,0.0033494834622648786,0.5256580907152424,1,1,1|Tile27,1,-55,10,-3295,0.09587603581718875,-0.0023363095155257557,-0.04882960352811204,1,1,1|Tile28,0,30,15,-3475,0.01813360565298653,0.000001166433484509763,0.00012865586940301449,1,1,1|Goal,2,30,65,-3555,0,0,0,1,1,1|Player,2,0,40,0,0,0,0,1,1,1";
 mapData["1"]["3"] = "1~Tile0,0,0,0,0,0,0,0,1,1,1|Tile1,1,-17,0,-120,0,0,0,1,1,1|Tile2,0,-18,0,-240,0,0,0,1,1,1|Tile3,1,-3,0,-360,0,0,0,1,1,1|Tile4,0,6,0,-720,0,0,0,1,1,1|Tile5,1,-13,0,-840,0,0,0,1,1,1|Tile6,0,-20,0,-960,0,0,0,1,1,1|Tile7,1,-17,0,-2520,0,0,0.04,1,1,1|Tile8,0,0,0,-2640,0,0,0.04,1,1,1|Tile9,1,17,0,-2760,0,0,0.04,1,1,1|Tile10,0,-15,0,-2980,0,0,0.04,1,1,1|Tile11,1,-19,0,-3240,0,0,0.04,1,1,1|Tile12,1,3,0,-4920,0,0,0,1,1,1|Tile13,0,18,0,-5040,0,0,0,1,1,1|Tile14,1,17,0,-5160,0,0,0,1,1,1|Tile15,0,-18,0,-5520,0,0,0,1,1,1|Tile16,1,-2,0,-5640,0,0,0,1,1,1|AmiyaBar,2,15,0,-5760,0,0,0,1,1,1|Tile18,1,80,15,-1320,0,0,0,1,1,1|Tile19,0,71,15,-1440,0,0,0,1,1,1|Tile20,1,52,15,-1560,0,0,0,1,1,1|Tile21,0,40,15,-1680,0,0,0,1,1,1|Tile22,0,66,15,-1920,0,0,0,1,1,1|Tile23,1,79,15,-2040,0,0,0,1,1,1|AmiyaBar,2,75,15,-2160,0,0,0,1,1,1|Tile25,1,57,15,-2280,0,0,0,1,1,1|Tile26,1,68,15,-3720,0,0,0.04,1,1,1|Tile27,0,49,15,-3840,0,0,0.04,1,1,1|Tile28,1,40,15,-3960,0,0,0.04,1,1,1|Tile29,0,49,15,-4080,0,0,0.04,1,1,1|Tile30,0,80,15,-4320,0,0,0.04,1,1,1|Tile31,1,73,15,-4440,0,0,0.04,1,1,1|Tile32,0,54,15,-4560,0,0,0.04,1,1,1|Tile33,1,41,15,-4680,0,0,0.04,1,1,1|Tile34,1,47,15,-6120,0,0,0,1,1,1|Tile35,0,40,15,-6240,0,0,0,1,1,1|Tile36,1,52,15,-6360,0,0,0,1,1,1|Tile37,0,71,15,-6480,0,0,0,1,1,1|Tile38,0,70,15,-6720,0,0,0,1,1,1|Tile39,1,51,15,-6840,0,0,0,1,1,1|Tile40,0,40,15,-6960,0,0,0,1,1,1|Tile41,1,47,15,-7080,0,0,0,1,1,1|Tile42,0,-80,-10,-1200,0,0,0,1,1,1|Tile43,1,-50,-10,-1320,0,0,0,1,1,1|Tile44,1,-37,-10,-1560,0,0,0,1,1,1|Tile45,0,-66,-10,-1680,0,0,0,1,1,1|AmiyaBar,2,-86,-10,-1920,0,0,0,1,1,1|Tile47,1,-59,-10,-2040,0,0,0,1,1,1|Tile48,1,-32,-10,-2280,0,0,0,1,1,1|Tile49,1,-29,-10,-3620,0,0,-0.04,1,1,1|Tile50,0,-40,-10,-3840,0,0,-0.04,1,1,1|Tile51,0,-91,-10,-4080,0,0,-0.04,1,1,1|Tile52,1,-83,-10,-4200,0,0,-0.04,1,1,1|Tile53,1,-31,-10,-4440,0,0,-0.04,1,1,1|Tile54,0,-34,-10,-4560,0,0,-0.04,1,1,1|Tile55,0,-28,-10,-6000,0,0,0,1,1,1|Tile56,0,-75,-10,-6240,0,0,0,1,1,1|Tile57,1,-92,-10,-6360,0,0,0,1,1,1|Tile58,1,-49,-10,-6600,0,0,0,1,1,1|Tile59,0,-29,-10,-6720,0,0,0,1,1,1|Tile60,0,-66,-10,-6960,0,0,0,1,1,1|Tile61,1,-89,-10,-7080,0,0,0,1,1,1|Goal,2,-89,30,-7090,0,0,0,1,1,1|Player,2,0,30,0,0.0006830667509232767,2.6871999920718737e-7,0.0009958181872055548,1,1,1";
 mapData["1"]["4"] = "1~Tile0,0,0,13,0,0,0,0,1,1,1|Tile1,1,0,13,-120,-8.339016326422422e-14,3.924122948179535e-34,-9.411476832695085e-21,1,1,1|Tile2,0,0,13,-238,1.3698912067639651e-13,-6.446349677885885e-34,-9.411476832695085e-21,1,1,1|Tile3,1,0,13,-358,-7.364441088203444e-13,5.848053974832778e-33,-1.588186776101813e-20,1,1,1|Tile4,0,-60,13,-358,-2.015051320247707e-12,4.622626288441468e-33,-4.588097823606017e-21,1,1,1|Tile5,1,-60,13,-478,-3.056810880808225e-12,2.128158865039973e-25,-1.3924046648756266e-13,1,1,1|Tile6,0,-60,13,-598,-4.335417875395153e-12,5.394885111814471e-25,-2.488749766167697e-13,1,1,1|Tile7,1,-60,13,-718,-5.377177002274802e-12,1.0434826810069866e-24,-3.881154295518052e-13,1,1,1|Tile8,0,0,13,-718,-5.836069041226244e-12,9.890887757552623e-25,-3.389571880552805e-13,1,1,1|Tile9,1,0,13,-838,-6.103447608429846e-12,1.0344037193980538e-24,-3.389571880552805e-13,1,1,1|Tile10,0,0,13,-958,-6.370826175633448e-12,1.0797186630408452e-24,-3.389571880552805e-13,1,1,1|Tile11,1,60,13,-958,-6.7862343348934484e-12,3.127245796164427e-20,-9.216439167403223e-9,1,1,1|Tile12,0,60,13,-1078,-7.053612902097051e-12,3.2504706746462297e-20,-9.216470253647913e-9,1,1,1|Tile13,1,60,13,-1198,-7.320991902981522e-12,3.3736965841586043e-20,-9.216501339892602e-9,1,1,1|Tile14,0,60,13,-1318,-7.588370903865993e-12,3.4969233248518836e-20,-9.216532426137292e-9,1,1,1|Tile15,1,0,13,-1318,-7.855749904750464e-12,3.6201508967260676e-20,-9.216563512381981e-9,1,1,1|Tile16,0,-1,48,-538,-0.000011268510206957408,-7.857537080878836e-12,0.000001394600872118175,1,1,1|Tile17,1,-1,48,-1164,-0.000011268510206957408,-7.857537080878836e-12,0.000001394600872118175,1,1,1|Tile18,0,0,13,-1438,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile19,1,0,13,-1558,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile20,0,0,13,-1886,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile21,1,0,13,-2126,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile22,0,0,13,-2306,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile23,1,60,13,-2306,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile24,0,60,13,-2548,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile25,1,0,13,-2726,-0.000002774695076372077,1.6653025519322304e-14,-1.2003499527679785e-8,1,1,1|Tile26,0,-74,13,-2880,-0.000002688432005019022,6.65128415575507e-7,-0.5133994294317872,1,1,1|Tile27,1,-73,12,-3000,-0.0000025159154120073407,6.22447184595364e-7,-0.5133994623885403,1,1,1|Tile28,0,-72,12,-3120,-0.0000023628940653019815,5.845891127440586e-7,-0.5133994623885403,1,1,1|Tile29,1,-71,12,-3238,-0.000002207932539024088,5.462510329772333e-7,-0.5133994623885402,1,1,1|Tile30,0,2,-14,-3354,-1.6161345683940525e-7,1.0311584309547235e-10,-0.0012760802608562656,1,1,1|Tile31,1,2,-14,-3474,-1.704746921404903e-8,1.147330578202497e-12,-0.00013460421218670907,1,1,1|Tile32,0,62,24,-3624,-1.639210900350469e-8,-4.7124767203631436e-9,0.6031889723440547,1,1,1|Tile33,1,60,24,-3814,-3.42913395456892e-8,-9.858227473022467e-9,0.6031889723440546,1,1,1|Tile34,0,59,24,-4014,-6.465060664595511e-8,-1.8586045194750847e-8,0.6031889723440538,1,1,1|Tile35,1,-62,27,-4150,-9.035024817194406e-8,2.5985909021824624e-8,-0.6034806522342421,1,1,1|Tile36,0,-61,29,-4386,-7.287087555596379e-8,2.0958613626984794e-8,-0.6034806522342424,1,1,1|Tile37,1,32,31,-4526,-6.671483276932135e-8,-8.864556147139583e-9,0.26880462114666204,1,1,1|Tile38,0,-40,32,-4720,-7.790927014639288e-8,9.71849848916317e-9,-0.2520211226295307,1,1,1|Tile39,1,12,32,-4942,-7.951898339797489e-8,-3.306960314602719e-9,0.08326980875434409,1,1,1|Tile40,0,-4,32,-5202,-8.19647496541621e-8,5.546240928464378e-12,-0.00013533234637562179,1,1,1|Tile41,1,-4,32,-5322,-2.9091095754552182e-8,6.986479125175368e-13,-0.0000480317358054039,1,1,1|Goal,2,-4,52,-5396,0,0,0,1,1,1|AmiyaBar,2,60,13,-1408,-0.0000010296178061254918,7.454042819705844e-16,-1.4479242249620938e-9,1,1,1|AmiyaBar,2,62,23,-3713,0.000001824798573580766,5.101355766663709e-7,0.5852492442861101,1,1,1|Player,2,0,30,0,0,0,1,1,1";
@@ -53,7 +53,7 @@ const colourMap = {
     "2": [COLOUR_MAIN_WORLD2, COLOUR_SECONDARY_WORLD2, COLOUR_BLANK],
     "3": [COLOUR_MAIN_WORLD3, COLOUR_SECONDARY_WORLD3, COLOUR_BLANK]
 };
-const tileTypes = ["Tile", "AmiyaBar", "Goal", "Boost", "Death", "Ball"];
+const tileTypes = ["Tile", "AmiyaBar", "Goal", "Boost", "Death", "Ball", "Player"];
 
 let pos;
 let quad;
@@ -209,7 +209,7 @@ class MapGenerator {
             let materialInfo = this.getColourIndex(colourSelection, object.material.color.getHexString());
             let pos = object.position;
             let rotation = object.quaternion;
-            console.log(rotation);
+
             let scale = object.scale;
             if (object.name.indexOf("Player") >= 0) {
                 rotation.set(0, 0, 0, 1);
@@ -225,9 +225,85 @@ class MapGenerator {
         console.log(this.levelString);
         $('#levelSelect').val(this.levelString);
 
-        //this.updateMapImage(colourSelection);
+        this.updateMapImage(colourSelection);
 
         return this.levelString;
+    }
+    generateLevelStringFromImage(uploadedImage) {
+        $('#level-image-preview').html('<img src="' + uploadedImage + '" width="130" height="130"/>');
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+
+        canvas.width = 600;
+        canvas.height = 600;
+
+        let base_image = new Image();
+        base_image.src = uploadedImage;
+        base_image.width = 130;
+        base_image.height = 130;
+        var getTileNameFromIndex = this.getTileNameFromIndex;
+        let newLevelString = "";
+
+        base_image.onload = function () {
+            ctx.drawImage(base_image, 0, 0);
+            let imgData = ctx.getImageData(0, 0, 600, 600);
+            console.log(imgData);
+            var fromRBGRange = function (rbgValue, r1, r2) {
+                return (rbgValue - r1[0]) * (r2[1] - r2[0]) / (r1[1] - r1[0]) + r2[0];
+            }
+            var currentWorld = 0;
+            let data = imgData.data;
+            console.log(data[0]);
+            let numberOfTiles = data[0] + data[1] + data[2];
+            console.log("numberOfTiles", numberOfTiles);
+            let imagePos = 4;
+
+            //0 num tiles
+            //1 num tiles
+            //2 num tiles
+            //3 num tiles
+
+            //0 1 2 3 x,y,z,255
+            //4 5 6 7 x,y,z,255
+            //8 9 10 11 z,y,z,255
+            //12 13 14 15 material world tileType 255
+            for (let i = 0; i < numberOfTiles; i++) {
+
+                //0-3
+                let pos = new THREE.Vector3(fromRBGRange(data[imagePos], [0, 255], [-128, 127]), fromRBGRange(data[imagePos + 1], [0, 255], [-128, 127]), fromRBGRange(data[imagePos + 2], [0, 255], [0, 255 * 25]));
+
+                //4-7
+                let rotation = new THREE.Quaternion();
+                rotation.set(fromRBGRange(data[imagePos + 4], [0, 255], [-1, 1]), fromRBGRange(data[imagePos + 5], [0, 255], [-1, 1]), fromRBGRange(data[imagePos + 6], [0, 255], [-1, 1]), 1);
+
+                //8-11
+                let scale = new THREE.Vector3(fromRBGRange(data[imagePos + 8], [0, 255], [1, 2]), fromRBGRange(data[imagePos + 9], [0, 255], [1, 2]), fromRBGRange(data[imagePos + 10], [0, 255], [1, 2]));
+
+                //12
+                let materialInfo = data[imagePos + 12];
+                //13
+                if (currentWorld == 0) {
+                    currentWorld = data[imagePos + 13];
+                }
+                //14
+                let tileTypeName = getTileNameFromIndex(data[imagePos + 14], i);
+                if (tileTypeName.indexOf("Player") >= 0) {
+                    rotation.set(0, 0, 0, 1);
+                }
+                let tileString = tileTypeName + "," + materialInfo + "," + pos.x + "," + pos.y + "," + pos.z + "," + rotation.x + "," + rotation.y + "," + rotation.z + "," + scale.x + "," + scale.y + "," + scale.z + "|";
+                console.log(tileString);
+                newLevelString += tileString;
+
+                imagePos += 16;
+            }
+
+            newLevelString = currentWorld + "~" + newLevelString;
+            console.log(newLevelString);
+            this.levelString = newLevelString.slice(0, -1);
+            console.log(this.levelString);
+            $('#levelSelect').val(this.levelString);
+
+        }
     }
 
     updateMapImage(colourSelection) {
@@ -256,46 +332,51 @@ class MapGenerator {
             exportLevelImage();
         }
 
-        var toRBGRange = function (value) {
-            return (value / 255) * 255;
+        var toRBGRange = function (value, r1, r2 = [0, 255]) {
+            return (value - r1[0]) * (r2[1] - r2[0]) / (r1[1] - r1[0]) + r2[0];
         }
-        var fromRBGRange = function (rbgValue) {
-            return rbgValue / 255;
-        }
+
         var drawTileData = function (data, object, imagePos) {
+
+            //0 1 2 3 x,y,z,255
+            //4 5 6 7 x,y,z,255
+            //8 9 10 11 z,y,z,255
+            //12 13 14 15 material world tileType 255
             var tileTypeIndex = getTileIndexFromName(object.name);
             let materialInfo = getColourIndex(colourSelection, object.material.color.getHexString());
             let pos = object.position;
             let rotation = new THREE.Euler().setFromQuaternion(object.quaternion, "XYZ");
             let scale = object.scale;
-            console.log(pos.x, pos.y, pos.z);
+
             //rbga values, 3 pixels in a row for our position
+            data[imagePos] = toRBGRange(pos.x, [-128, 127]);
+            data[imagePos + 1] = toRBGRange(pos.y, [-128, 127]);
+            data[imagePos + 2] = toRBGRange(pos.z, [0, 255 * 25]);
+            data[imagePos + 3] = 255;
+            // console.log("x", pos.x, data[imagePos]);
+            // console.log("y", pos.y, data[imagePos + 1]);
+            // console.log("z", pos.z, data[imagePos + 2]);
 
-            let stringValue = pos.x;
-            data[imagePos] = 0;
-            /*
-            data[imagePos + 1] = toRBGRange(128 + pos.y);
-            data[imagePos + 2] = toRBGRange(128 + pos.z);
-            //first pixels alpha value will be our material index
-            data[imagePos + 3] = materialInfo;
-            console.log(data[imagePos], data[imagePos + 1], data[imagePos + 2]);
-            console.log(fromRBGRange(data[imagePos]), fromRBGRange(data[imagePos + 1]), fromRBGRange(data[imagePos + 2]));
+            data[imagePos + 4] = toRBGRange(rotation.x, [-1, 1]);
+            data[imagePos + 5] = toRBGRange(rotation.y, [-1, 1]);
+            data[imagePos + 6] = toRBGRange(rotation.z, [-1, 1]);
+            // console.log("rx", rotation.x, data[imagePos + 4]);
+            // console.log("ry", rotation.y, data[imagePos + 5]);
+            // console.log("rz", rotation.z, data[imagePos + 6]);
 
-            //rotation
-            data[imagePos + 4] = toRBGRange(128 + rotation.x);
-            data[imagePos + 5] = toRBGRange(128 + rotation.y);
-            data[imagePos + 6] = toRBGRange(128 + rotation.z);
-            //second pixel alpha will be our current world
-            data[imagePos + 7] = currentWorld;
+            data[imagePos + 7] = 255;
 
-            //scale
-            data[imagePos + 8] = toRBGRange(scale.x);
-            data[imagePos + 9] = toRBGRange(scale.y);
-            data[imagePos + 10] = toRBGRange(scale.z);
-            //tile type index
-            data[imagePos + 11] = tileTypeIndex;
-            */
-            return 12;
+            data[imagePos + 8] = toRBGRange(scale.x, [1, 2]);
+            data[imagePos + 9] = toRBGRange(scale.y, [1, 2]);
+            data[imagePos + 10] = toRBGRange(scale.z, [1, 2]);
+            data[imagePos + 11] = 255;
+
+            data[imagePos + 12] = materialInfo;
+            data[imagePos + 13] = currentWorld;
+            data[imagePos + 14] = tileTypeIndex;
+            data[imagePos + 15] = 255;
+
+            return 16;
         }
 
         function exportLevelImage() {
@@ -303,7 +384,20 @@ class MapGenerator {
             // get the imageData and pixel array from the canvas
             let imgData = ctx.getImageData(0, 0, 600, 600);
             let data = imgData.data;
-            let imagePos = 0;
+            data[0] = 0;
+            data[1] = Math.min(worldObjects.length, 255);
+            if (worldObjects.length > 255) {
+                data[2] = Math.min(worldObjects.length % 255, 255);
+            } else {
+                data[2] = 0;
+            }
+            data[3] = 255;
+            //0 num tiles
+            //1 num tiles
+            //2 num tiles
+            //3 num tiles
+
+            let imagePos = 4;
             for (let i = 0; i < worldObjects.length; i++) {
 
                 imagePos += drawTileData(data, worldObjects[i], imagePos);
@@ -338,7 +432,7 @@ class MapGenerator {
             this.currentWorld = parts[0];
         }
         let colourSelection = colourMap[this.currentWorld];
-
+        console.log("mapTiles.length", mapTiles.length);
         for (let i = 0; i < mapTiles.length; i++) {
             const tile = mapTiles[i].split(",");
             let tileType = tile[0];
@@ -346,7 +440,7 @@ class MapGenerator {
             let materialHex = colourSelection[colourIndex];
             this.pos.set(parseFloat(tile[2]), parseFloat(tile[3]), parseFloat(tile[4]));
             this.quat.set(parseFloat(tile[5]), parseFloat(tile[6]), parseFloat(tile[7]), 1);
-            
+
             if (tile.length > 10) {
                 this.scale = new THREE.Vector3(parseFloat(tile[8]), parseFloat(tile[9]), parseFloat(tile[10]));
             } else {
@@ -382,7 +476,6 @@ class MapGenerator {
             }
 
         }
-        this.updateMapImage(colourSelection);
     }
 
 
@@ -391,7 +484,7 @@ class MapGenerator {
     }
 
     createPlayer() {
-        this.pos.set(0, 3, 0);
+        this.pos.set(0, 30, 0);
         this.scale.set(1, 1, 1);
         this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
@@ -742,7 +835,7 @@ class MapGenerator {
                 tileType = 3;
             } else if (i > 0 && i % randomAmiyaBarRate == 0) {
                 tileType = 2;
-                z += (AMIYABAR_DEPTH * 0.5);
+                z -= (AMIYABAR_DEPTH * 0.5);
             } else if (i > 0 && i % randomBoostRate == 0) {
                 tileType = 4;
             }
@@ -758,15 +851,15 @@ class MapGenerator {
             }
 
             if (tileType == 1) {
-                z -= (TILE_DEPTH);
+                z += (TILE_DEPTH);
             } else if (tileType == 2) {
-                z -= (AMIYABAR_DEPTH * 1.5);
+                z += (AMIYABAR_DEPTH * 1.5);
             } else if (tileType == 3) {
-                z -= (GOAL_DEPTH);
+                z += (GOAL_DEPTH);
             } else if (tileType == 4) {
-                z -= (TILE_DEPTH);
+                z += (TILE_DEPTH);
             } else if (tileType == 5) {
-                z -= (DEATH_DEPTH);
+                z += (DEATH_DEPTH);
             }
 
         }
@@ -855,6 +948,7 @@ class MapGenerator {
     }
 
     getTileNameFromIndex(tileIndex, i) {
+        console.log(tileIndex);
         return tileTypes[tileIndex] + i;
     }
     getTileIndexFromName(tileName) {

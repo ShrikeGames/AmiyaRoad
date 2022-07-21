@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.9 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.10 \"Cat-Crab\"";
 
 let stats;
 
@@ -193,6 +193,7 @@ function initFirstTime() {
 		console.log("Go to main menu");
 		inEditor = false;
 		inPlayTest = false;
+		console.log(mapGenerator);
 		mapGenerator.generateLevelString(currentWorld);
 		lose();
 	});
@@ -244,7 +245,6 @@ function initFirstTime() {
 		inEditor = true;
 		inPlayTest = false;
 		console.log($('.hud--worldSelect').val());
-
 		init(currentWorld, currentLevel, inEditor, inPlayTest);
 
 		$('.menu--start-screen').addClass('hide');
@@ -254,6 +254,7 @@ function initFirstTime() {
 		$('.hud--editor').removeClass("hide");
 	});
 
+	
 	$(".hud--volume-slider").slider({
 		orientation: "horizontal",
 		range: "min",
@@ -266,32 +267,17 @@ function initFirstTime() {
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
 	});
-
+	
 	let $levelImageInput = $('#level-image-input');
-	$levelImageInput.on("change", function(e) {
-	  const reader = new FileReader();
-	  reader.addEventListener("load", () => {
-		const uploadedImage = reader.result;
-		$('#level-image-preview').html('<img src="'+uploadedImage+'" width="130" height="130"/>');
-		var canvas = document.createElement("canvas");
-        var ctx = canvas.getContext("2d");
-
-        canvas.width = 600;
-        canvas.height = 600;
-
-		let base_image = new Image();
-        base_image.src = uploadedImage;
-        base_image.width = 130;
-        base_image.height = 130;
-
-        base_image.onload = function () {
-            ctx.drawImage(base_image, 0, 0);
-			let imgData = ctx.getImageData(0, 0, 600, 600);
-			console.log(imgData);
-
-        }
-	  });
-	  reader.readAsDataURL(this.files[0]);
+	$levelImageInput.on("change", function (e) {
+		const reader = new FileReader();
+		console.log(mapGenerator);
+		reader.onload = function() {
+			console.log(reader.result);
+			mapGenerator.generateLevelStringFromImage(reader.result);
+			
+		};
+		reader.readAsDataURL(this.files[0]);
 	});
 
 	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
@@ -312,6 +298,11 @@ function initFirstTime() {
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.top = '0px';
 	container.appendChild(stats.domElement);
+
+	if (mapGenerator == null) {
+		initPhysics();
+		mapGenerator = new MapGenerator(scene, physicsWorld);
+	}
 
 	initInput();
 
@@ -904,10 +895,10 @@ function updatePhysics(deltaTime) {
 			impulse.setZ(-BUILD_CAMERA_SPEED_Z);
 		}
 		if (keyStates.ArrowRight) {
-			impulse.setX(BUILD_CAMERA_SPEED_X);
+			impulse.setX(-BUILD_CAMERA_SPEED_X);
 		}
 		if (keyStates.ArrowLeft) {
-			impulse.setX(-BUILD_CAMERA_SPEED_X);
+			impulse.setX(BUILD_CAMERA_SPEED_X);
 		}
 		if (keyStates.KeyW) {
 			angularImpulse.setX(-BUILD_ROTATION_SPEED);
@@ -1000,7 +991,7 @@ function updatePhysics(deltaTime) {
 			let relVelChange = (turnSpeed);
 			if (onGround) {
 				//better handling on the ground and at higher speeds
-				relVelChange = turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
+				relVelChange = turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 			}
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
@@ -1011,7 +1002,7 @@ function updatePhysics(deltaTime) {
 			let relVelChange = (-turnSpeed);
 			if (onGround) {
 				//better handling on the ground and at higher speeds
-				relVelChange = -turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
+				relVelChange = -turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 			}
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
@@ -1051,7 +1042,7 @@ function updatePhysics(deltaTime) {
 		}
 
 	}
-	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z()*0.05, -9), 0, -velocity.x()*0.1);
+	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z() * 0.05, -9), 0, -velocity.x() * 0.1);
 	player.body.setAngularVelocity(angularVelocity);
 
 	//limit some speeds
