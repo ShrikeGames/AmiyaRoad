@@ -35,21 +35,21 @@ let waterRises = false;
 
 // Physics
 // Physics variables
-const GRAVITY = 60;
+const GRAVITY = 600;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
-const RESPONSIVE_ARTIFICAL_GRAVITY = 8;
-const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 3;
-const acceleration = 5;
-const turnSpeed = 2.5;
-const turnSpeedOnGround = 2.5;
-const regularMaxSpeed = 40;
-const boostMaxSpeed = 65;
-const BOOST_DECAY_RATE = 5;
-const maxTurnSpeed = 10;
-const jumpSpeed = 17;
-const waterJumpSpeed = 14;
+const RESPONSIVE_ARTIFICAL_GRAVITY = 80;
+const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 30;
+const acceleration = 50;
+const turnSpeed = 25;
+const turnSpeedOnGround = 25;
+const regularMaxSpeed = 400;
+const boostMaxSpeed = 650;
+const BOOST_DECAY_RATE = 50;
+const maxTurnSpeed = 100;
+const jumpSpeed = 170;
+const waterJumpSpeed = 140;
 let maxSpeed = regularMaxSpeed;
-const maxStamina = 500;
+const maxStamina = 5000;
 let seed;
 
 let stamina;
@@ -84,20 +84,24 @@ let musicVolume = 0.05;
 let $debug = $('.hud.hud--debug');
 
 //level editor
-const BUILD_CAMERA_SPEED = 12;
+const BUILD_CAMERA_SPEED_X = 50;
+const BUILD_CAMERA_SPEED_Y = 20;
+const BUILD_CAMERA_SPEED_Z = 100;
 const BUILD_ROTATION_SPEED = 1;
 let tileSelection = 0;
 let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const WATER_LEVEL_Y_WORLD2 = 6;
-const WATER_LEVEL_Y_WORLD3 = -4;
+const WATER_LEVEL_Y_WORLD2 = 60;
+const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
 let maxWaterLevel = waterLevel;
 let WATER_ACCELERATION_DEBUFF = 0.95;
 
-let tileSnapDistance = 1.5;
+let tileSnapDistanceX = 20;
+let tileSnapDistanceY = 10;
+let tileSnapDistanceZ = 50;
 
 let defaultEffectController = {
 	turbidity: 10,
@@ -250,7 +254,6 @@ function initFirstTime() {
 		$('.hud--editor').removeClass("hide");
 	});
 
-
 	$(".hud--volume-slider").slider({
 		orientation: "horizontal",
 		range: "min",
@@ -263,6 +266,34 @@ function initFirstTime() {
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
 	});
+
+	let $levelImageInput = $('#level-image-input');
+	$levelImageInput.on("change", function(e) {
+	  const reader = new FileReader();
+	  reader.addEventListener("load", () => {
+		const uploadedImage = reader.result;
+		$('#level-image-preview').html('<img src="'+uploadedImage+'" width="130" height="130"/>');
+		var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+
+        canvas.width = 600;
+        canvas.height = 600;
+
+		let base_image = new Image();
+        base_image.src = uploadedImage;
+        base_image.width = 130;
+        base_image.height = 130;
+
+        base_image.onload = function () {
+            ctx.drawImage(base_image, 0, 0);
+			let imgData = ctx.getImageData(0, 0, 600, 600);
+			console.log(imgData);
+
+        }
+	  });
+	  reader.readAsDataURL(this.files[0]);
+	});
+
 	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
 	$(".hud--volume-display").text((musicVolume * 100) + "%");
 
@@ -322,7 +353,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	sky.scale.setScalar(150000);
 	scene.add(sky);
 	const fogColour = new THREE.Color(0xfbddff);
-	const fog = new THREE.FogExp2(fogColour, 0.008);
+	const fog = new THREE.FogExp2(fogColour, 0.0008);
 	scene.fog = fog;
 
 
@@ -382,13 +413,13 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	}
 	for (let i = 0; i < maxBuckos; i++) {
 
-		let x = -50 + i * 2;
-		let y = -15;
-		let z = -1200 + Math.random() * 1200;
+		let x = -500 + i * 2;
+		let y = -150;
+		let z = -12000 + Math.random() * 12000;
 		if (currentWorld == "2") {
-			x = -600 + Math.random() * 1200;
-			y = -20 + Math.random() * 10;
-			z = -600 + Math.random() * 1200;
+			x = -6000 + Math.random() * 12000;
+			y = -200 + Math.random() * 100;
+			z = -6000 + Math.random() * 12000;
 		}
 
 
@@ -420,9 +451,9 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 
 
 		if (currentWorld == "2") {
-			particles.rotation.y = Math.random() * 6;
+			particles.rotation.y = Math.random() * 60;
 		} else {
-			particles.rotation.z = Math.random() * 12;
+			particles.rotation.z = Math.random() * 120;
 		}
 
 		scene.add(particles);
@@ -441,7 +472,7 @@ function initWater(currentWorld, currentLevel, inEditor, inPlayTest) {
 
 	if (currentWorld == "2") {
 		waterRises = true;
-		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+		const waterGeometry = new THREE.PlaneGeometry(100000, 100000);
 		water = new Water(
 			waterGeometry,
 			{
@@ -547,29 +578,29 @@ function initMusic() {
 
 function initGraphics() {
 	console.log("initGraphics");
-	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 600);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 6000);
 
-	camera.position.set(0, 12, 21);
-	camera.lookAt(0, 0.5, 0);
+	camera.position.set(0, 120, -210);
+	camera.lookAt(0, 5, 0);
 
 	const hemisphereLight = new THREE.HemisphereLight(0xc0bdf2, 0xffbef4, 0.9);
 	scene.add(hemisphereLight);
 
 	spotLight = new THREE.DirectionalLight(0xffd0fe, 0.4);
-	spotLight.position.set(0, 60, 0);
+	spotLight.position.set(0, 600, 0);
 
 	spotLight.castShadow = true;
 
-	spotLight.shadow.mapSize.width = 1024;
-	spotLight.shadow.mapSize.height = 1024;
+	spotLight.shadow.mapSize.width = 10240;
+	spotLight.shadow.mapSize.height = 10240;
 
 	spotLight.shadow.camera.near = 1;
-	spotLight.shadow.camera.far = 120;
-	spotLight.shadow.camera.fov = 90;
-	spotLight.shadow.camera.right = 100.5;
-	spotLight.shadow.camera.left = -100.5;
-	spotLight.shadow.camera.top = 100.5;
-	spotLight.shadow.camera.bottom = - 100.5;
+	spotLight.shadow.camera.far = 1200;
+	spotLight.shadow.camera.fov = 900;
+	spotLight.shadow.camera.right = 1000;
+	spotLight.shadow.camera.left = -1000;
+	spotLight.shadow.camera.top = 1000;
+	spotLight.shadow.camera.bottom = - 1000;
 
 	scene.add(spotLight);
 
@@ -850,9 +881,9 @@ function updateWorld(deltaTime) {
 		water.material.uniforms['time'].value += deltaTime;
 	}
 
-	camera.position.set(0, 10, player.position.z + 20);
-	camera.lookAt(0, 0.5, player.position.z);
-	spotLight.position.set(player.position.x, 20, player.position.z);
+	camera.position.set(0, 100, player.position.z - 200);
+	camera.lookAt(0, 5, player.position.z);
+	spotLight.position.set(player.position.x, 200, player.position.z);
 
 }
 function isUnderWater() {
@@ -867,16 +898,16 @@ function updatePhysics(deltaTime) {
 		let angularImpulse = new Ammo.btVector3(0, 0, 0);
 
 		if (keyStates.ArrowUp) {
-			impulse.setZ(-BUILD_CAMERA_SPEED);
+			impulse.setZ(BUILD_CAMERA_SPEED_Z);
 		}
 		if (keyStates.ArrowDown) {
-			impulse.setZ(BUILD_CAMERA_SPEED);
+			impulse.setZ(-BUILD_CAMERA_SPEED_Z);
 		}
 		if (keyStates.ArrowRight) {
-			impulse.setX(BUILD_CAMERA_SPEED);
+			impulse.setX(BUILD_CAMERA_SPEED_X);
 		}
 		if (keyStates.ArrowLeft) {
-			impulse.setX(-BUILD_CAMERA_SPEED);
+			impulse.setX(-BUILD_CAMERA_SPEED_X);
 		}
 		if (keyStates.KeyW) {
 			angularImpulse.setX(-BUILD_ROTATION_SPEED);
@@ -885,10 +916,10 @@ function updatePhysics(deltaTime) {
 			angularImpulse.setX(BUILD_ROTATION_SPEED);
 		}
 		if (keyStates.KeyD) {
-			angularImpulse.setZ(-BUILD_ROTATION_SPEED);
+			angularImpulse.setZ(BUILD_ROTATION_SPEED);
 		}
 		if (keyStates.KeyA) {
-			angularImpulse.setZ(BUILD_ROTATION_SPEED);
+			angularImpulse.setZ(-BUILD_ROTATION_SPEED);
 		}
 		if (keyStates.KeyR) {
 			angularImpulse.setX(-player.quaternion.x);
@@ -896,10 +927,10 @@ function updatePhysics(deltaTime) {
 			angularImpulse.setZ(-player.quaternion.z);
 		}
 		if (keyStates.Space) {
-			impulse.setY(BUILD_CAMERA_SPEED);
+			impulse.setY(BUILD_CAMERA_SPEED_Y);
 		}
 		if (keyStates.ControlLeft) {
-			impulse.setY(-BUILD_CAMERA_SPEED);
+			impulse.setY(-BUILD_CAMERA_SPEED_Y);
 		}
 		if (keyStates.KeyI) {
 			//debug info key
@@ -908,7 +939,7 @@ function updatePhysics(deltaTime) {
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
 		if (inEditor) {
-			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection, tileSnapDistance);
+			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
 		}
 		updateWorld(deltaTime);
 		return;
@@ -932,7 +963,7 @@ function updatePhysics(deltaTime) {
 		win();
 		return;
 	}
-	if (player.position.y <= -5 || dead) {
+	if (player.position.y <= -50 || dead) {
 		reset();
 		return;
 	}
@@ -942,23 +973,23 @@ function updatePhysics(deltaTime) {
 	}
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
-			let relVelChange = (-acceleration);
-			if (isUnderWater()) {
-				relVelChange *= WATER_ACCELERATION_DEBUFF;
-			}
-			if (velocity.z() + relVelChange >= -maxSpeed) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
-			} else {
-				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), -maxSpeed);
-				player.body.setLinearVelocity(impulse);
-			}
-		}
-		if (keyStates.ArrowDown || keyStates.KeyS) {
 			let relVelChange = (acceleration);
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
 			}
-			if (velocity.z() + relVelChange <= 0) {
+			if (velocity.z() + relVelChange < maxSpeed) {
+				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
+			} else {
+				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), maxSpeed);
+				player.body.setLinearVelocity(impulse);
+			}
+		}
+		if (keyStates.ArrowDown || keyStates.KeyS) {
+			let relVelChange = (-acceleration);
+			if (isUnderWater()) {
+				relVelChange *= WATER_ACCELERATION_DEBUFF;
+			}
+			if (velocity.z() + relVelChange > 0) {
 				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
 			} else {
 				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), 0);
@@ -966,10 +997,10 @@ function updatePhysics(deltaTime) {
 			}
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
-			let relVelChange = (-turnSpeed);
+			let relVelChange = (turnSpeed);
 			if (onGround) {
 				//better handling on the ground and at higher speeds
-				relVelChange = -turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
+				relVelChange = turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 			}
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
@@ -977,10 +1008,10 @@ function updatePhysics(deltaTime) {
 			player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
-			let relVelChange = (turnSpeed);
+			let relVelChange = (-turnSpeed);
 			if (onGround) {
 				//better handling on the ground and at higher speeds
-				relVelChange = turnSpeedOnGround + (-turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
+				relVelChange = -turnSpeedOnGround + (turnSpeedOnGround * (velocity.z() / regularMaxSpeed));
 			}
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
@@ -1020,7 +1051,7 @@ function updatePhysics(deltaTime) {
 		}
 
 	}
-	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z(), -9), 0, -velocity.x());
+	let angularVelocity = new Ammo.btVector3(Math.max(velocity.z()*0.05, -9), 0, -velocity.x()*0.1);
 	player.body.setAngularVelocity(angularVelocity);
 
 	//limit some speeds
@@ -1078,9 +1109,9 @@ function reset() {
 	scene.clear();
 	init(currentWorld, currentLevel, inEditor, inPlayTest);
 
-	camera.position.set(0, 12, player.position.z + 20);
-	camera.lookAt(0, 0.5, player.position.z);
-	spotLight.position.set(0, 20, player.position.z);
+	camera.position.set(0, 120, player.position.z - 200);
+	camera.lookAt(0, 5, player.position.z);
+	spotLight.position.set(0, 200, player.position.z);
 }
 
 export function createGameLoop(func, fps = 60) {

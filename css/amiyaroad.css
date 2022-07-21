@@ -124,7 +124,9 @@
 
 	background-color: #dda7fc;
 }
-
+#level-image-input{
+	display: block;
+}
 .hud--stamina-value {
 	background-color: #0F0;
 	margin-bottom: 0;
@@ -2195,4 +2197,8 @@ a.ui-button:active,
 .ui-widget-shadow {
 	-webkit-box-shadow: 0px 0px 5px #666666;
 	box-shadow: 0px 0px 5px #666666;
+}
+
+li {
+    margin-bottom: 0.2rem;
 }
