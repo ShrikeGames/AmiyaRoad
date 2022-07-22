@@ -404,17 +404,15 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	}
 	for (let i = 0; i < maxBuckos; i++) {
 
-		let x = -500 + i * 2;
-		let y = -150;
-		let z = -12000 + Math.random() * 12000;
+		let x = -20 + i * 10;
+		let y = -5;
+		let z = Math.random() * 5000;
 		if (currentWorld == "2") {
-			x = -6000 + Math.random() * 12000;
-			y = -200 + Math.random() * 100;
-			z = -6000 + Math.random() * 12000;
+			x = -20 + i * 10;
+			y = -25 + Math.random() * 10;
+			z = Math.random() * 5000;
 		}
-
-
-
+		
 		vertices.push(x, y, z);
 
 	}
@@ -422,11 +420,11 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
 	let parameters = [
-		[[1.0, 0.2, 0.5], sprite1, 5],
-		[[0.95, 0.1, 0.5], sprite2, 3],
-		[[0.90, 0.05, 0.5], sprite3, 2],
-		[[0.85, 0, 0.5], sprite4, 1],
-		[[0.80, 0, 0.5], sprite5, 0.5]
+		[[110, 20, 35], sprite1, 50],
+		[[195, 10, 35], sprite2, 30],
+		[[190, 5, 35], sprite3, 20],
+		[[185, 10, 35], sprite4, 10],
+		[[180, 10, 35], sprite5, 5]
 	];
 
 	for (let i = 0; i < parameters.length; i++) {
