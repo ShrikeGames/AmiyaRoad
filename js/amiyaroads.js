@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.10 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.11 \"Cat-Crab\"";
 
 let stats;
 
@@ -49,7 +49,7 @@ const maxTurnSpeed = 100;
 const jumpSpeed = 170;
 const waterJumpSpeed = 140;
 let maxSpeed = regularMaxSpeed;
-const maxStamina = 5000;
+const maxStamina = 2500;
 let seed;
 
 let stamina;
@@ -99,17 +99,17 @@ let waterLevel = WATER_LEVEL_Y_WORLD2;
 let maxWaterLevel = waterLevel;
 let WATER_ACCELERATION_DEBUFF = 0.95;
 
-let tileSnapDistanceX = 20;
-let tileSnapDistanceY = 10;
-let tileSnapDistanceZ = 50;
+let tileSnapDistanceX = 10;
+let tileSnapDistanceY = 5;
+let tileSnapDistanceZ = 25;
 
 let defaultEffectController = {
 	turbidity: 10,
 	rayleigh: 3,
 	mieCoefficient: 0.005,
 	mieDirectionalG: 0.7,
-	elevation: 3,
-	azimuth: 180,
+	elevation: 30,
+	azimuth: 360,
 	exposure: 1
 };
 let effectController = defaultEffectController;
@@ -254,7 +254,7 @@ function initFirstTime() {
 		$('.hud--editor').removeClass("hide");
 	});
 
-	
+
 	$(".hud--volume-slider").slider({
 		orientation: "horizontal",
 		range: "min",
@@ -267,15 +267,15 @@ function initFirstTime() {
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
 	});
-	
+
 	let $levelImageInput = $('#level-image-input');
 	$levelImageInput.on("change", function (e) {
 		const reader = new FileReader();
 		console.log(mapGenerator);
-		reader.onload = function() {
+		reader.onload = function () {
 			console.log(reader.result);
 			mapGenerator.generateLevelStringFromImage(reader.result);
-			
+
 		};
 		reader.readAsDataURL(this.files[0]);
 	});
@@ -691,11 +691,15 @@ function setupContactResultCallback() {
 		} else if (tag.indexOf("Boost") >= 0) {
 			if (localPos.y() >= 0.99) {
 				maxSpeed = boostMaxSpeed;
+				if (Math.abs(velocity.x()) <= 0.01) {
+					velocity.setX(0);
+				}
 				//always accelerate when on a boost tile
 				let boostImpulse = new Ammo.btVector3(velocity.x(), velocity.y(), velocity.z());
 				boostImpulse.normalize();
 				boostImpulse.op_mul(acceleration * 2);
 				player.body.applyCentralImpulse(boostImpulse);
+
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
@@ -774,7 +778,7 @@ function initInput() {
 				}
 
 				if (keyStates.Enter && event.code == "Enter") {
-					mapGenerator.addTile(tileScale, tileSelection);
+					mapGenerator.addTile(tileScale, tileSelection, null, null, true);
 				} else if (keyStates.Backspace && event.code == "Backspace") {
 					mapGenerator.undoLastTile();
 				}
@@ -852,7 +856,7 @@ function updateWorld(deltaTime) {
 
 	}
 	//sun sets as your stamina goes down
-	effectController.elevation = (stamina / maxStamina) * 3;
+	effectController.elevation = (stamina / maxStamina) * 2;
 
 	//in world 2 the water level rises as you run out of stamina
 	if (waterRises) {
