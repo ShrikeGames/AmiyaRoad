@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.11 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.12 \"Cat-Crab\"";
 
 let stats;
 
@@ -266,18 +266,6 @@ function initFirstTime() {
 			bgm.setVolume(musicVolume);
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
-	});
-
-	let $levelImageInput = $('#level-image-input');
-	$levelImageInput.on("change", function (e) {
-		const reader = new FileReader();
-		console.log(mapGenerator);
-		reader.onload = function () {
-			console.log(reader.result);
-			mapGenerator.generateLevelStringFromImage(reader.result);
-
-		};
-		reader.readAsDataURL(this.files[0]);
 	});
 
 	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
