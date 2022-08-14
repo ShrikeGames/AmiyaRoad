@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.12 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.13 \"Cat-Crab\"";
 
 let stats;
 
@@ -252,6 +252,34 @@ function initFirstTime() {
 		$('.hud--basic').removeClass('hide');
 		$('.hud--playtest').addClass("hide");
 		$('.hud--editor').removeClass("hide");
+	});
+
+	$('#image-input').on("change", function(e) {
+		const reader = new FileReader();
+		reader.addEventListener("load", () => {
+			const uploaded_image = reader.result;
+			var imageObj = new Image();
+			imageObj.src = uploaded_image;
+			imageObj.onload = function()
+			{
+				console.log("imageObj onload");
+				var shadowCanvas = document.createElement('canvas');
+				shadowCanvas.style.display = 'none';
+				shadowCanvas.width = 600;
+				shadowCanvas.height = 600;
+
+				var shadowCtx = shadowCanvas.getContext('2d');
+				shadowCtx.drawImage(imageObj, 0, 0,600,600);
+				
+				var imageData = shadowCtx.getImageData(0,0,600,600);
+				var decodeMessage = steg.decode(imageData, {t:3, width: 600, height:600});
+				$('#levelSelect').attr('value', (atob(decodeMessage)));
+				return imageObj;
+			};
+			console.log(uploaded_image);
+			document.querySelector("#display-image").style.backgroundImage = `url(${uploaded_image})`;
+		});
+		reader.readAsDataURL(this.files[0]);
 	});
 
 

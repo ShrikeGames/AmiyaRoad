@@ -191,13 +191,22 @@ class MapGenerator {
             this.loadMapFromLevelString(this.levelString);
         }
 
+        if (this.inEditor) {
+            var cover = $("#cover");
+            var base64LevelString = btoa(this.levelString);
+            console.log(base64LevelString);
 
+            var encodedImageURL = steg.encode(base64LevelString, "img", {t:3, width: 600, height:600});
+            cover.attr("src", encodedImageURL);
+            console.log(cover.attr("src"));
+
+        }
         return this.rigidBodies;
 
     }
 
     getColourIndex(colourSelection, hexCode) {
-        if(colourSelection && colourSelection.length>0){
+        if (colourSelection && colourSelection.length > 0) {
             for (let i = 0; i < colourSelection.length; i++) {
                 if (colourSelection[i].getHexString() == hexCode) {
                     return i;
@@ -207,7 +216,7 @@ class MapGenerator {
         return 0;
     }
     generateLevelString(world) {
-        if(world){
+        if (world) {
             let newLevelString = world + "~";
             let colourSelection = colourMap[world];
 
@@ -230,8 +239,21 @@ class MapGenerator {
             }
 
             this.levelString = newLevelString.slice(0, -1);
-            console.log(this.levelString);
             $('#levelSelect').val(this.levelString);
+            console.log(this.levelString);
+            console.log(this.inEditor);
+            if (this.inEditor) {
+                var cover = $("#cover");
+                var base64LevelString = btoa(this.levelString);
+                console.log(base64LevelString);
+
+                var encodedImageURL = steg.encode(base64LevelString, "img", {t:3, width: 600, height:600});
+                cover.attr("src", encodedImageURL);
+                console.log(cover.attr("src"));
+
+            }
+
+
         }
         return this.levelString;
     }
@@ -657,7 +679,7 @@ class MapGenerator {
                 tileType = 4;
             }
 
-            let tilePos = new THREE.Vector3(x, y*10, z);
+            let tilePos = new THREE.Vector3(x, y * 10, z);
             let tileQuat = new THREE.Quaternion(xTilt, 0, zTilt, 1);
             if ((i % randomSkipRate != 0) || tileType == 2) {
                 this.addTile(tileScale, tileType, tilePos, tileQuat, false);
@@ -856,10 +878,10 @@ class MapGenerator {
 
 
         let newTile = this.getTileFromSelection(tileSelection);
-        if(genLevelString){
+        if (genLevelString) {
             this.generateLevelString(this.currentWorld);
         }
-        
+
         return newTile;
     }
     undoLastTile() {

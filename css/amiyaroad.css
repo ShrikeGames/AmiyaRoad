@@ -121,9 +121,9 @@
 	right: 140px;
 	bottom: 10px;
 	vertical-align: bottom;
-
 	background-color: #dda7fc;
 }
+
 #level-image-input{
 	display: block;
 }
@@ -131,6 +131,14 @@
 	background-color: #0F0;
 	margin-bottom: 0;
 
+}
+
+#display-image{
+	width: 600px;
+	height: 600px;
+	border: 1px solid black;
+	background-position: center;
+	background-size: cover;
 }
 
 .hud--stamina-label {
