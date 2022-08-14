@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.13 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.14 \"Cat-Crab\"";
 
 let stats;
 
@@ -182,7 +182,7 @@ function initFirstTime() {
 			}
 		}
 
-		init(currentWorld, currentLevel, inEditor, inPlayTest);
+		init(currentWorld, currentLevel, inEditor, inPlayTest, seed);
 		animate();
 
 		$('.menu--start-screen').addClass('hide');
@@ -254,14 +254,13 @@ function initFirstTime() {
 		$('.hud--editor').removeClass("hide");
 	});
 
-	$('#image-input').on("change", function(e) {
+	$('#image-input').on("change", function (e) {
 		const reader = new FileReader();
 		reader.addEventListener("load", () => {
 			const uploaded_image = reader.result;
 			var imageObj = new Image();
 			imageObj.src = uploaded_image;
-			imageObj.onload = function()
-			{
+			imageObj.onload = function () {
 				console.log("imageObj onload");
 				var shadowCanvas = document.createElement('canvas');
 				shadowCanvas.style.display = 'none';
@@ -269,11 +268,31 @@ function initFirstTime() {
 				shadowCanvas.height = 600;
 
 				var shadowCtx = shadowCanvas.getContext('2d');
-				shadowCtx.drawImage(imageObj, 0, 0,600,600);
-				
-				var imageData = shadowCtx.getImageData(0,0,600,600);
-				var decodeMessage = steg.decode(imageData, {t:3, width: 600, height:600});
-				$('#levelSelect').attr('value', (atob(decodeMessage)));
+				shadowCtx.drawImage(imageObj, 0, 0, 600, 600);
+
+				var imageData = shadowCtx.getImageData(0, 0, 600, 600);
+				var decodeMessage = steg.decode(imageData, { t: 3, width: 600, height: 600 });
+				var levelString = atob(decodeMessage);
+				$('#levelSelect').attr('value', levelString);
+				inEditor = false;
+				inPlayTest = true;
+				if (levelString.indexOf("~") >= 0) {
+
+					let parts = levelString.split("~");
+					currentWorld = parts[0];
+				} else {
+					currentWorld = $('.hud--worldSelect').val();
+				}
+				console.log("currentWorld", currentWorld);
+				currentLevel = "T";
+				seed = "amiyaroads_" + Math.round(Math.random() * 25600);
+				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString, true);
+				$('.menu--start-screen').addClass('hide');
+				$('.button--menu').addClass('hide');
+				$('.hud--basic').removeClass("hide");
+				$('.hud--playtest').removeClass("hide");
+				$('.hud--editor').addClass("hide");
+				animate();
 				return imageObj;
 			};
 			console.log(uploaded_image);
@@ -428,7 +447,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 			y = -25 + Math.random() * 10;
 			z = Math.random() * 5000;
 		}
-		
+
 		vertices.push(x, y, z);
 
 	}

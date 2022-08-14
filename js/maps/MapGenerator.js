@@ -118,7 +118,7 @@ class MapGenerator {
         this.levelString = "";
     }
 
-    initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString = "") {
+    initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString = "", loadedFromImage = false) {
         this.seed = seed;
         this.lastTileSelection = 0;
         console.log(seed);
@@ -179,7 +179,12 @@ class MapGenerator {
             this.createMapBuilder();
         } else if (inPlayTest) {
             console.log("Playtest");
-            this.loadMapFromLevelString(this.levelString);
+            if (levelString != "") {
+                this.loadMapFromLevelString(levelString);
+            } else {
+                this.loadMapFromLevelString(this.levelString);
+            }
+
         } else if (this.currentLevel == "?") {
             console.log("Random Map");
             this.levelString = "";
@@ -187,7 +192,9 @@ class MapGenerator {
         } else {
             console.log("Level");
             this.levelString = mapData[this.currentWorld][this.currentLevel];
-
+            if (loadedFromImage) {
+                this.levelString = levelString;
+            }
             this.loadMapFromLevelString(this.levelString);
         }
 
@@ -196,7 +203,7 @@ class MapGenerator {
             var base64LevelString = btoa(this.levelString);
             console.log(base64LevelString);
 
-            var encodedImageURL = steg.encode(base64LevelString, "img", {t:3, width: 600, height:600});
+            var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, width: 600, height: 600 });
             cover.attr("src", encodedImageURL);
             console.log(cover.attr("src"));
 
@@ -247,7 +254,7 @@ class MapGenerator {
                 var base64LevelString = btoa(this.levelString);
                 console.log(base64LevelString);
 
-                var encodedImageURL = steg.encode(base64LevelString, "img", {t:3, width: 600, height:600});
+                var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, width: 600, height: 600 });
                 cover.attr("src", encodedImageURL);
                 console.log(cover.attr("src"));
 
@@ -261,6 +268,7 @@ class MapGenerator {
     loadMapFromLevelString(levelString = "") {
         this.rigidBodies = [];
         this.allObjects = [];
+        console.log("loadMapFromLevelString", levelString);
         if (levelString.indexOf("~") < 0) {
             return;
         }
