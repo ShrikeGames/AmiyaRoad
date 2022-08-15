@@ -52,7 +52,7 @@ let maxSpeed = regularMaxSpeed;
 const maxStamina = 2500;
 
 // if the player goes above this height the camera will pan with them
-const yCamerPan = 120;
+const yCamerPan = 60;
 
 let seed;
 
