@@ -59,6 +59,7 @@ let currentLevel;
 let inEditor;
 let inPlaytest;
 
+let editorLastPos = new THREE.Vector3();
 
 const colourMap = {
     "1": [COLOUR_MAIN, COLOUR_SECONDARY, COLOUR_BLANK],
@@ -144,6 +145,15 @@ class MapGenerator {
         console.log("World", this.currentWorld);
         console.log("Level", this.currentLevel);
 
+        this.pos = new THREE.Vector3();
+        this.quat = new THREE.Quaternion();
+        this.scale = new THREE.Vector3(1, 1, 1);
+        this.rigidBodies = [];
+        this.allObjects = [];
+        if (this.editorLastPos == undefined) {
+            this.editorLastPos = new THREE.Vector3();
+        }
+
         if (inEditor) {
             this.xFriction = 0;
             this.physicsFriction = 0;
@@ -166,12 +176,6 @@ class MapGenerator {
             this.rollingFriciton = 0;
 
         }
-
-        this.pos = new THREE.Vector3();
-        this.quat = new THREE.Quaternion();
-        this.scale = new THREE.Vector3(1, 1, 1);
-        this.rigidBodies = [];
-        this.allObjects = [];
 
         if (inEditor) {
             console.log("Editor");
@@ -311,7 +315,9 @@ class MapGenerator {
         this.scale.set(1, 1, 1);
         this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
-
+        if (this.inEditor) {
+            this.pos.set(this.editorLastPos.x, this.editorLastPos.y, this.editorLastPos.z);
+        }
         let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, this.scale, playerMaterial);
 
         return body;
@@ -849,6 +855,7 @@ class MapGenerator {
     }
     addTile(scale, tileSelection, tilePos = null, tileQuat = null, genLevelString) {
         this.scale = new Vector3(scale, 1, scale);
+        this.editorLastPos.set(this.pos.x, this.pos.y + 20, this.pos.z);
         if (tilePos != null) {
             this.pos.x = tilePos.x;
             this.pos.y = tilePos.y;

@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.15 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.16 \"Cat-Crab\"";
 
 let stats;
 
@@ -50,6 +50,10 @@ const jumpSpeed = 170;
 const waterJumpSpeed = 140;
 let maxSpeed = regularMaxSpeed;
 const maxStamina = 2500;
+
+// if the player goes above this height the camera will pan with them
+const yCamerPan = 120;
+
 let seed;
 
 let stamina;
@@ -184,7 +188,7 @@ function initFirstTime() {
 
 			$('.modal--share').removeClass('hide');
 		};
-		
+
 	});
 	$('.play-button').on('click', function (e) {
 		e.preventDefault();
@@ -359,7 +363,7 @@ function initFirstTime() {
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color(0xbfd1e5);
 
-	renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+	renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMap.enabled = true;
@@ -943,9 +947,9 @@ function updateWorld(deltaTime) {
 		water.material.uniforms['sunDirection'].value.copy(sun).normalize();
 		water.material.uniforms['time'].value += deltaTime;
 	}
-
-	camera.position.set(0, 100, player.position.z - 200);
-	camera.lookAt(0, 5, player.position.z);
+	
+	camera.position.set(0, 100 + Math.max(player.position.y - yCamerPan, 0), player.position.z - 200);
+	camera.lookAt(0, 5 + Math.max(player.position.y - yCamerPan, 0), player.position.z);
 	spotLight.position.set(player.position.x, 200, player.position.z);
 
 }
