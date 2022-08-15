@@ -1,5 +1,5 @@
 .level-select-image {
-	max-width: 130px;
+	max-width: 200px;
 	height: auto;
 	display: inline;
 }
@@ -197,6 +197,7 @@
 }
 .modal-content {
 	background-color: #dda7fc;
+	z-index: 2;
 	margin: auto;
 	padding: 20px;
 	margin-top:5%;
@@ -209,7 +210,7 @@
 	}
 }
 .modal--close {
-	color: #aaa;
+	color: rgb(118, 46, 235);
 	float: right;
 	font-size: 28px;
 	font-weight: bold;

@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.16 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.17 \"Cat-Crab\"";
 
 let stats;
 
@@ -154,7 +154,11 @@ function initFirstTime() {
 	}
 
 	$('.version').text(versionString);
-	$('.modal--close').on('click', function (e) {
+	$('.modal-content').on('click', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+	$('.modal, .modal--close').on('click', function (e) {
 		e.preventDefault();
 		$('.modal').addClass('hide');
 	});
@@ -189,6 +193,13 @@ function initFirstTime() {
 			$('.modal--share').removeClass('hide');
 		};
 
+	});
+	$('.open-level-select').on('click', function (e) {
+		e.preventDefault();
+		var $this = $(this);
+		var modalId = $this.attr('data-modal-id');
+		var $modal = $('#'+modalId);
+		$modal.removeClass('hide');
 	});
 	$('.play-button').on('click', function (e) {
 		e.preventDefault();
@@ -225,6 +236,7 @@ function initFirstTime() {
 		animate();
 
 		$('.menu--start-screen').addClass('hide');
+		$('.modal').addClass('hide');
 	});
 
 	$('.button--menu').on('click', function (e) {
