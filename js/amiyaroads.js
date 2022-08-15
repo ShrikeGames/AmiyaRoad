@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.18 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.19 \"Cat-Crab\"";
 
 let stats;
 
@@ -49,7 +49,7 @@ const maxTurnSpeed = 100;
 const jumpSpeed = 170;
 const waterJumpSpeed = 140;
 let maxSpeed = regularMaxSpeed;
-const maxStamina = 2500;
+const maxStamina = 2800;
 
 // if the player goes above this height the camera will pan with them
 const yCamerPan = 60;
@@ -193,7 +193,7 @@ function initFirstTime() {
 		};
 
 	});
-	$('.open-level-select').on('click', function (e) {
+	$('.open-modal').on('click', function (e) {
 		e.preventDefault();
 		var $this = $(this);
 		var modalId = $this.attr('data-modal-id');
@@ -361,7 +361,10 @@ function initFirstTime() {
 		value: 5,
 		slide: function (event, ui) {
 			musicVolume = ui.value / 100.0;
-			bgm.setVolume(musicVolume);
+			if(bgm){
+				bgm.setVolume(musicVolume);
+			}
+			
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
 	});
@@ -490,7 +493,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	}
 	for (let i = 0; i < maxBuckos; i++) {
 
-		let x = -20 + i * 10;
+		let x = -2000 + Math.random()*4000;
 		let y = -5;
 		let z = Math.random() * 5000;
 		if (currentWorld == "2") {
@@ -519,7 +522,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 		const sprite = parameters[i][1];
 		const size = parameters[i][2];
 
-		materials[i] = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: true, transparent: true });
+		materials[i] = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true });
 		materials[i].color.setHSL(color[0], color[1], color[2]);
 
 		const particles = new THREE.Points(geometry, materials[i]);
@@ -527,7 +530,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 
 		if (currentWorld == "2") {
 			particles.rotation.y = Math.random() * 60;
-		} else {
+		}else{
 			particles.rotation.z = Math.random() * 120;
 		}
 

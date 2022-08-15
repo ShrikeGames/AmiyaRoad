@@ -37,6 +37,15 @@
     <script src="js/libs/seedrandom.js"></script>
     <script src="js/libs/ammo.wasm.js"></script>
     <script src="js/libs/steganography.min.js"></script>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "./js/three.module.js"
+          }
+        }
+      </script>
+  
 </head>
 
 <body>
@@ -164,6 +173,7 @@
     <div class="modal hide" id="modal--world_X">
         <div class="modal-content">
             <span class="modal--close">&times;</span>
+            <h2 data-lang-en="X. Extra" data-lang-jp="X. 余分">X. Extra</h2>
             <div class="level-select-container">
                 <img class="level-select-image play-button" data-world="1" data-level="?"
                     src="./images/amiyaroad/levels/LevelRandomized.png" />
@@ -172,6 +182,15 @@
                 <img class="level-select-image play-button" data-editor="true" data-world="1" data-level="*"
                     src="./images/amiyaroad/levels/LevelT-T.png" />
             </div>
+        </div>
+    </div>
+    <div class="modal hide" id="modal--options">
+        <div class="modal-content">
+            <span class="modal--close">&times;</span>
+            <h2 data-lang-en="Options" data-lang-jp="Options">Options</h2>
+            <p>Music Volume <span class="hud--volume-display"></span></p>
+            <div class="hud hud--volume-slider" style="width:120px;"></div>
+            
         </div>
     </div>
     <div class="menu--start-screen">
@@ -196,14 +215,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    <a class="button button-primary open-level-select" data-modal-id="modal--world_1" target='_blank' rel='noopener' href='#'
+                    <a class="button button-primary open-modal" data-modal-id="modal--world_1" target='_blank' rel='noopener' href='#'
                     data-lang-en="1. Amiyaland" data-lang-jp="1. アミヤランド">1. Amiyaland</a>
-                    <a class="button button-primary open-level-select" data-modal-id="modal--world_2"  target='_blank' rel='noopener' href='#'
+                    <a class="button button-primary open-modal" data-modal-id="modal--world_2"  target='_blank' rel='noopener' href='#'
                     data-lang-en="2. Dehumidifier" data-lang-jp="2. 除湿器">2. Dehumidifier</a>
-                    <a class="button button-primary open-level-select" data-modal-id="modal--world_3"  target='_blank' rel='noopener' href='#'
+                    <a class="button button-primary open-modal" data-modal-id="modal--world_3"  target='_blank' rel='noopener' href='#'
                     data-lang-en="3. Freezer" data-lang-jp="3. 冷凍庫">3. Freezer</a>
-                    <a class="button button-primary open-level-select" data-modal-id="modal--world_X"  target='_blank' rel='noopener' href='#'
+                    <a class="button button-primary open-modal" data-modal-id="modal--world_X"  target='_blank' rel='noopener' href='#'
                     data-lang-en="X. Extra" data-lang-jp="X. 余分">X. Extra</a>
+                    <a class="button button-primary open-modal" data-modal-id="modal--options"  target='_blank' rel='noopener' href='#'
+                    data-lang-en="Options" data-lang-jp="Options">Options</a>
                 </div>
                 <div class="row">
                     <h2 data-lang-en="Play Custom Level" data-lang-jp="Play Custom Level">Play Custom Level</h2>
@@ -287,11 +308,8 @@
                 rel='noopener' href='#' data-lang-en="Test" data-level="T-T" data-lang-jp="Test">Test</a>
             <a class="button button-special hud--playtest editor-button hide" data-editor="true" target='_blank'
                 rel='noopener' href='#' data-lang-en="Edit" data-level="*-*" data-lang-jp="Edit">Edit</a>
-
-            <div class="hud hud--volume-container">
-                <p>Music Volume <span class="hud--volume-display"></span></p>
-                <div class="hud hud--volume-slider" style="width:120px;"></div>
-            </div>
+            <a class="button button-primary open-modal" data-modal-id="modal--options"  target='_blank' rel='noopener' href='#'
+                data-lang-en="Options" data-lang-jp="Options">Options</a>
         </div>
         <div class="hud--tile_selection hud--editor">
             <img src="./images/amiyaroad/tiles/Tile0.png" width="130" height="auto" />
@@ -309,14 +327,6 @@
     <div id="container">
 
     </div>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "./js/three.module.js"
-        }
-      }
-    </script>
-
     <script type="module" src="./js/amiyaroads.js?nocache=true"></script>
 </body>
 
