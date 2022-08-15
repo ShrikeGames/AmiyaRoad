@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.19 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.20 \"Cat-Crab\"";
 
 let stats;
 
@@ -53,6 +53,10 @@ const maxStamina = 2800;
 
 // if the player goes above this height the camera will pan with them
 const yCamerPan = 60;
+
+let maxBuckos = 50;
+let maxBuckosUpperLimit = 200;
+var particlesNames = [];
 
 let seed;
 
@@ -197,7 +201,7 @@ function initFirstTime() {
 		e.preventDefault();
 		var $this = $(this);
 		var modalId = $this.attr('data-modal-id');
-		var $modal = $('#'+modalId);
+		var $modal = $('#' + modalId);
 		$modal.removeClass('hide');
 	});
 	$('.play-button').on('click', function (e) {
@@ -361,11 +365,23 @@ function initFirstTime() {
 		value: 5,
 		slide: function (event, ui) {
 			musicVolume = ui.value / 100.0;
-			if(bgm){
+			if (bgm) {
 				bgm.setVolume(musicVolume);
 			}
-			
+
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
+		}
+	});
+	$(".hud--maxBucko-slider").slider({
+		orientation: "horizontal",
+		range: "min",
+		min: 0,
+		max: maxBuckosUpperLimit,
+		value: 50,
+		slide: function (event, ui) {
+			maxBuckos = ui.value;
+			$(".hud--maxBucko-display").text(maxBuckos + " buckos");
+			initBuckoParticles();
 		}
 	});
 
@@ -425,7 +441,100 @@ function init(currentWorld, currentLevel, inEditor, inPlayTest) {
 	dead = false;
 	won = false;
 }
+function removeObject3D(object) {
+	if (!(object instanceof THREE.Object3D)) return false;
+	// for better memory management and performance
+	if (object.geometry) {
+		object.geometry.dispose();
+	}
+	if (object.material) {
+		if (object.material instanceof Array) {
+			// for better memory management and performance
+			object.material.forEach(material => material.dispose());
+		} else {
+			// for better memory management and performance
+			object.material.dispose();
+		}
+	}
+	if (object.parent) {
+		object.parent.remove(object);
+	}
+	// the parent might be the scene or another Object3D, but it is sure to be removed this way
+	return true;
+}
 
+function initBuckoParticles() {
+	for (var i = 0; i < particlesNames.length; i++) {
+		var particlesObject = scene.getObjectByName(particlesNames[i]);
+		if (particlesObject) {
+			removeObject3D(particlesObject);
+		}
+	}
+	particlesNames = [];
+
+	const materials = [];
+
+	const geometry = new THREE.BufferGeometry();
+	const vertices = [];
+
+	const textureLoader = new THREE.TextureLoader();
+
+	const sprite1 = textureLoader.load('./images/amiyaroad/Bucko.png');
+	const sprite2 = textureLoader.load('./images/amiyaroad/Bucko2.png');
+	const sprite3 = textureLoader.load('./images/amiyaroad/Bucko3.png');
+	const sprite4 = textureLoader.load('./images/amiyaroad/Bucko4.png');
+	const sprite5 = textureLoader.load('./images/amiyaroad/Bucko5.png');
+
+	for (let i = 0; i < maxBuckos; i++) {
+
+		let x = -2000 + Math.random() * 4000;
+		let y = -5;
+		let z = Math.random() * 5000;
+		if (currentWorld == "2") {
+			x = -20 + i * 10;
+			y = -25 + Math.random() * 10;
+			z = Math.random() * 5000;
+		}
+
+		vertices.push(x, y, z);
+
+	}
+
+	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+	let parameters = [
+		[[110, 20, 35], sprite1, 50],
+		[[195, 10, 35], sprite2, 30],
+		[[190, 5, 35], sprite3, 20],
+		[[185, 10, 35], sprite4, 10],
+		[[180, 10, 35], sprite5, 5]
+	];
+
+	for (let i = 0; i < parameters.length; i++) {
+
+		const color = parameters[i][0];
+		const sprite = parameters[i][1];
+		const size = parameters[i][2];
+
+		materials[i] = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true });
+		materials[i].color.setHSL(color[0], color[1], color[2]);
+
+		const particles = new THREE.Points(geometry, materials[i]);
+
+
+		if (currentWorld == "2") {
+			particles.rotation.y = Math.random() * 60;
+		} else {
+			particles.rotation.z = Math.random() * 120;
+		}
+		particles.name = "buckoParticles" + particlesNames.length;
+		particlesNames.push(particles.name);
+		scene.add(particles);
+
+	}
+
+
+}
 function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	console.log("initSky");
 	// Add Sky
@@ -474,71 +583,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 
 	uniforms['sunPosition'].value.copy(sun);
 
-	const materials = [];
-
-	const geometry = new THREE.BufferGeometry();
-	const vertices = [];
-
-	const textureLoader = new THREE.TextureLoader();
-
-	const sprite1 = textureLoader.load('./images/amiyaroad/Bucko.png');
-	const sprite2 = textureLoader.load('./images/amiyaroad/Bucko2.png');
-	const sprite3 = textureLoader.load('./images/amiyaroad/Bucko3.png');
-	const sprite4 = textureLoader.load('./images/amiyaroad/Bucko4.png');
-	const sprite5 = textureLoader.load('./images/amiyaroad/Bucko5.png');
-
-	let maxBuckos = 50;
-	if (currentWorld == "2") {
-		maxBuckos = 200;
-	}
-	for (let i = 0; i < maxBuckos; i++) {
-
-		let x = -2000 + Math.random()*4000;
-		let y = -5;
-		let z = Math.random() * 5000;
-		if (currentWorld == "2") {
-			x = -20 + i * 10;
-			y = -25 + Math.random() * 10;
-			z = Math.random() * 5000;
-		}
-
-		vertices.push(x, y, z);
-
-	}
-
-	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-	let parameters = [
-		[[110, 20, 35], sprite1, 50],
-		[[195, 10, 35], sprite2, 30],
-		[[190, 5, 35], sprite3, 20],
-		[[185, 10, 35], sprite4, 10],
-		[[180, 10, 35], sprite5, 5]
-	];
-
-	for (let i = 0; i < parameters.length; i++) {
-
-		const color = parameters[i][0];
-		const sprite = parameters[i][1];
-		const size = parameters[i][2];
-
-		materials[i] = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true });
-		materials[i].color.setHSL(color[0], color[1], color[2]);
-
-		const particles = new THREE.Points(geometry, materials[i]);
-
-
-		if (currentWorld == "2") {
-			particles.rotation.y = Math.random() * 60;
-		}else{
-			particles.rotation.z = Math.random() * 120;
-		}
-
-		scene.add(particles);
-
-	}
-
-
+	initBuckoParticles();
 
 	renderer.toneMappingExposure = effectController.exposure;
 
@@ -961,7 +1006,7 @@ function updateWorld(deltaTime) {
 		water.material.uniforms['sunDirection'].value.copy(sun).normalize();
 		water.material.uniforms['time'].value += deltaTime;
 	}
-	
+
 	camera.position.set(0, 100 + Math.max(player.position.y - yCamerPan, 0), player.position.z - 200);
 	camera.lookAt(0, 5 + Math.max(player.position.y - yCamerPan, 0), player.position.z);
 	spotLight.position.set(player.position.x, 200, player.position.z);
