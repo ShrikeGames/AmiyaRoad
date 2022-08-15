@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.14 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.15 \"Cat-Crab\"";
 
 let stats;
 
