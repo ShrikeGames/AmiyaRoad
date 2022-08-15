@@ -150,14 +150,16 @@ function initFirstTime() {
 	}
 
 	$('.version').text(versionString);
-	$('.modal, .modal--close').on('click', function (e) {
+	$('.modal--close').on('click', function (e) {
 		e.preventDefault();
 		$('.modal').addClass('hide');
 	});
 	$('.export-button').on('click', function (e) {
 		e.preventDefault();
 		var cover = $("#cover");
-		var base64LevelString = btoa($('#levelSelect').attr("val"));
+		mapGenerator.generateLevelString();
+		console.log("level Code", $('#levelSelect').val());
+		var base64LevelString = btoa($('#levelSelect').val());
 		console.log(base64LevelString);
 
 		var screenshotImage = renderer.domElement.toDataURL("image/png");
@@ -174,6 +176,11 @@ function initFirstTime() {
 			var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, dx: dxWindow, dy: dyWindow, width: 600, height: 600 });
 			cover.attr("src", encodedImageURL);
 			console.log(cover.attr("src"));
+
+			var link = $('a.download-level-link');
+			link.attr('download', 'AmiyaRoads_CustomLevel.png');
+			link.attr('href', encodedImageURL.replace("image/png", "image/octet-stream"));
+			link.click();
 
 			$('.modal--share').removeClass('hide');
 		};
@@ -301,6 +308,7 @@ function initFirstTime() {
 				var imageData = shadowCtx.getImageData(0, 0, 600, 600);
 				var decodeMessage = steg.decode(imageData, { t: 3, width: 600, height: 600 });
 				var levelString = atob(decodeMessage);
+				console.log("levelString", levelString);
 				$('#levelSelect').attr('value', levelString);
 				inEditor = false;
 				inPlayTest = true;
