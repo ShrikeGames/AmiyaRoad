@@ -59,7 +59,7 @@ let currentLevel;
 let inEditor;
 let inPlaytest;
 
-let editorLastPos = new THREE.Vector3();
+let editorLastPos = new THREE.Vector3(0, 30, 0);
 
 const colourMap = {
     "1": [COLOUR_MAIN, COLOUR_SECONDARY, COLOUR_BLANK],
@@ -151,7 +151,7 @@ class MapGenerator {
         this.rigidBodies = [];
         this.allObjects = [];
         if (this.editorLastPos == undefined) {
-            this.editorLastPos = new THREE.Vector3();
+            this.editorLastPos = new THREE.Vector3(0, 30, 0);
         }
 
         if (inEditor) {
