@@ -113,27 +113,29 @@
 
 	background-color: #dda7fc;
 }
+
 .hud--level_export {
 	line-height: 1;
-	width: 130px;
+	width: auto;
 	height: 130px;
 	position: absolute;
 	right: 140px;
 	bottom: 10px;
 	vertical-align: bottom;
-	background-color: #dda7fc;
+	background-color: transparent;
 }
 
-#level-image-input{
+#level-image-input {
 	display: block;
 }
+
 .hud--stamina-value {
 	background-color: #0F0;
 	margin-bottom: 0;
 
 }
 
-#display-image{
+#display-image {
 	width: 600px;
 	height: 600px;
 	border: 1px solid black;
@@ -177,6 +179,47 @@
 
 .hide {
 	display: none;
+}
+
+.modal {
+	display: block;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+.modal.hide {
+	display: none;
+}
+.modal-content {
+	background-color: #dda7fc;
+	margin: auto;
+	padding: 20px;
+	margin-top:5%;
+	border: 1px solid #888;
+	width: 100%;
+}
+@media (min-width: 750px) {
+	.modal-content {
+		width: 50%;
+	}
+}
+.modal--close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.modal--close:hover,
+.modal--close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
 }
 
 h1 {
@@ -2208,5 +2251,5 @@ a.ui-button:active,
 }
 
 li {
-    margin-bottom: 0.2rem;
+	margin-bottom: 0.2rem;
 }

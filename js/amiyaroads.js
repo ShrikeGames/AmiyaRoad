@@ -150,7 +150,35 @@ function initFirstTime() {
 	}
 
 	$('.version').text(versionString);
+	$('.modal, .modal--close').on('click', function (e) {
+		e.preventDefault();
+		$('.modal').addClass('hide');
+	});
+	$('.export-button').on('click', function (e) {
+		e.preventDefault();
+		var cover = $("#cover");
+		var base64LevelString = btoa($('#levelSelect').attr("val"));
+		console.log(base64LevelString);
 
+		var screenshotImage = renderer.domElement.toDataURL("image/png");
+		console.log("screenshot", screenshotImage);
+
+		var imageElement = document.getElementById("img");
+		imageElement.src = screenshotImage;
+		console.log(imageElement);
+		console.log("test");
+		imageElement.onload = function () {
+			var dxWindow = Math.max(0, (window.innerWidth * 0.5) - 300);
+			var dyWindow = Math.max(0, (window.innerHeight * 0.5) - 300);
+			console.log(dxWindow, dyWindow);
+			var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, dx: dxWindow, dy: dyWindow, width: 600, height: 600 });
+			cover.attr("src", encodedImageURL);
+			console.log(cover.attr("src"));
+
+			$('.modal--share').removeClass('hide');
+		};
+		
+	});
 	$('.play-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Play");
@@ -323,7 +351,7 @@ function initFirstTime() {
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color(0xbfd1e5);
 
-	renderer = new THREE.WebGLRenderer();
+	renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMap.enabled = true;
@@ -766,7 +794,6 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
 	if (mapGenerator == null) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
-
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));

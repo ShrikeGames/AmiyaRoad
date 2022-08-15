@@ -198,16 +198,6 @@ class MapGenerator {
             this.loadMapFromLevelString(this.levelString);
         }
 
-        if (this.inEditor) {
-            var cover = $("#cover");
-            var base64LevelString = btoa(this.levelString);
-            console.log(base64LevelString);
-
-            var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, width: 600, height: 600 });
-            cover.attr("src", encodedImageURL);
-            console.log(cover.attr("src"));
-
-        }
         return this.rigidBodies;
 
     }
@@ -247,20 +237,6 @@ class MapGenerator {
 
             this.levelString = newLevelString.slice(0, -1);
             $('#levelSelect').val(this.levelString);
-            console.log(this.levelString);
-            console.log(this.inEditor);
-            if (this.inEditor) {
-                var cover = $("#cover");
-                var base64LevelString = btoa(this.levelString);
-                console.log(base64LevelString);
-
-                var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, width: 600, height: 600 });
-                cover.attr("src", encodedImageURL);
-                console.log(cover.attr("src"));
-
-            }
-
-
         }
         return this.levelString;
     }

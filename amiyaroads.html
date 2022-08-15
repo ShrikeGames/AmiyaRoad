@@ -70,7 +70,7 @@
                 </div>
                 <div class="row">
                     <h2 data-lang-en="1. Amiyaland" data-lang-jp="1. アミヤランド">1. Amiyaland</h2>
-                    
+
                     <div class="level-select-container">
                         <img class="level-select-image play-button" data-world="1" data-level="1"
                             src="./images/amiyaroad/levels/LevelWIP.png" />
@@ -103,7 +103,7 @@
                         <img class="level-select-image play-button" data-world="1" data-level="8"
                             src="./images/amiyaroad/levels/LevelWIP.png" />
                     </div>
-                    
+
                 </div>
                 <div class="row">
                     <h2 data-lang-en="2. Dehumidifier" data-lang-jp="2. 除湿器">2. Dehumidifier</h2>
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <h2 data-lang-en="X. Extra" data-lang-jp="X. 余分">X. Extra</h2>
                     <div class="level-select-container">
@@ -182,9 +182,12 @@
                     </div>
                 </div>
                 <div class="row">
-                    <label for="levelSelect">Level Code: </label><input type="text" id="levelSelect" />
+                    <h2 data-lang-en="T. Upload Custom Level" data-lang-jp="T. Upload Custom Level">T. Upload Custom
+                        Level</h2>
+                    <label class="hide" for="levelSelect">Level Code: </label><input class="hide" type="text"
+                        id="levelSelect" />
                     <input type="file" id="image-input" accept="image/jpeg, image/png, image/jpg">
-                    <div id="display-image"></div>
+                    <div class="hide" id="display-image"></div>
                 </div>
 
                 <div class="row">
@@ -237,7 +240,7 @@
                 <li>+ = Scale Up.</li>
                 <li>- = Scale Down.</li>
                 <li>Enter = Add to map.</li>
-                <li>R = Normalize tilt.</li>  
+                <li>R = Normalize tilt.</li>
                 <li>Backspace = Undo.</li>
             </ul>
             <select class="hud--worldSelect">
@@ -258,11 +261,11 @@
         <div class="hud hud--buttons hud--basic">
             <a class="button button-primary button--menu" target='_blank' rel='noopener' href='#' data-lang-en="Menu"
                 data-lang-jp="メニュー">Menu</a>
-            <a class="button button-primary hud--editor playtest-button hide" data-playtest="true" target='_blank' rel='noopener' href='#'
-                data-lang-en="Test" data-level="T-T" data-lang-jp="Test">Test</a>
-            <a class="button button-special hud--playtest editor-button hide" data-editor="true" target='_blank' rel='noopener' href='#'
-                data-lang-en="Edit" data-level="*-*" data-lang-jp="Edit">Edit</a>
-            
+            <a class="button button-primary hud--editor playtest-button hide" data-playtest="true" target='_blank'
+                rel='noopener' href='#' data-lang-en="Test" data-level="T-T" data-lang-jp="Test">Test</a>
+            <a class="button button-special hud--playtest editor-button hide" data-editor="true" target='_blank'
+                rel='noopener' href='#' data-lang-en="Edit" data-level="*-*" data-lang-jp="Edit">Edit</a>
+
             <div class="hud hud--volume-container">
                 <p>Music Volume <span class="hud--volume-display"></span></p>
                 <div class="hud hud--volume-slider" style="width:120px;"></div>
@@ -271,9 +274,20 @@
         <div class="hud--tile_selection hud--editor">
             <img src="./images/amiyaroad/tiles/Tile0.png" width="130" height="auto" />
         </div>
+        <div class="modal modal--share hide">
+            <div class="modal-content">
+                <span class="modal--close">&times;</span>
+                <p>Right click -> Save image as...</p>
+                <p>Share the image on Twitter with the tag #AmiyaRoads, or your favourite site, for others to play your level.</p>
+                <img id="img" class="hide template" src="/images/amiyaroad/AmiyaRoadsCustomLevelTemplate.jpg"/>
+                <img id="cover" class="export_image" src="/images/amiyaroad/AmiyaRoadsCustomLevelTemplate.jpg" width="300"
+                    height="300" />
+            </div>
+        </div>
         <div class="hud--level_export hud--editor">
-            <img id="img" class="hide template" src="/images/amiyaroad/AmiyaRoadsCustomLevelTemplate.jpg" width="130" height="130" />
-            <img id="cover" class="export_image" src="/images/amiyaroad/AmiyaRoadsCustomLevelTemplate.jpg" width="130" height="130" />
+            <a class="button button-primary hud--editor export-button hide" target='_blank' rel='noopener' href='#'
+                data-lang-en="Share Level" data-lang-jp="Share Level">Share Level</a>
+            
         </div>
     </div>
     <div class="hud hud--left hud--basic hide">
