@@ -155,7 +155,6 @@ function initFirstTime() {
 
 	$('.version').text(versionString);
 	$('.modal-content').on('click', function (e) {
-		e.preventDefault();
 		e.stopPropagation();
 	});
 	$('.modal, .modal--close').on('click', function (e) {
