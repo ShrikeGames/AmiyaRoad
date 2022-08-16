@@ -221,7 +221,7 @@
 .modal--close {
 	color: rgb(118, 46, 235);
 	float: right;
-	font-size: 28px;
+	font-size: 52px;
 	font-weight: bold;
 }
 
@@ -309,13 +309,11 @@
 	text-align: center;
 	pointer-events: none;
 }
-
 @media (min-width: 750px) {
 	.hud--mobile {
 		display: none;
 	}
 }
-
 
 h1 {
 	font-size: 2.0em;

@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.22 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.23 \"Cat-Crab\"";
 
 let stats;
 
@@ -158,20 +158,27 @@ Ammo().then(function (AmmoLib) {
 
 function initFirstTime() {
 	console.log("initFirstTime");
+	$('.menu--loading-screen').removeClass('hide');
 	if (initialized) {
 		return;
 	}
 
 	$('.version').text(versionString);
-	$('.modal-content').on('click,', function (e) {
-		e.stopPropagation();
-	});
-	$('.hud--mobile').on('click', function (e) {
-		e.stopPropagation();
-	});
-	$('.modal, .modal--close').on('click', function (e) {
+
+	$('.modal--close').on('click', function (e) {
 		e.preventDefault();
 		$('.modal').addClass('hide');
+	});
+	$('.modal').on('click', function (e) {
+		if ($(e.target).hasClass("modal")) {
+			$('.modal').addClass('hide');
+		} else {
+			e.stopPropagation();
+		}
+	});
+
+	$('.hud--mobile').on('click', function (e) {
+		e.stopPropagation();
 	});
 	$('.hud--mobile-keyCap').on('touchstart', function (e) {
 		e.preventDefault();
@@ -484,6 +491,7 @@ function initFirstTime() {
 
 
 	initialized = true;
+	$('.menu--loading-screen').addClass('hide');
 }
 
 function init(currentWorld, currentLevel, inEditor, inPlayTest) {
