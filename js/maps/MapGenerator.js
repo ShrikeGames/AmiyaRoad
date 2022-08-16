@@ -498,7 +498,7 @@ class MapGenerator {
         }
         this.allObjects = [];
         this.rigidBodies = [];
-
+        
     }
 
     createMapRandomChaos() {

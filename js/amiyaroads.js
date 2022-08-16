@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.23 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.24 \"Cat-Crab\"";
 
 let stats;
 
@@ -287,7 +287,6 @@ function initFirstTime() {
 		console.log("Go to main menu");
 		inEditor = false;
 		inPlayTest = false;
-		mapGenerator.generateLevelString(currentWorld);
 		lose();
 	});
 
@@ -900,24 +899,30 @@ function setupContactResultCallback() {
 	}
 
 }
-
-function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
-	console.log("createObjects");
+function initPlayer() {
+	if (player) {
+		removeObject3D(player);
+	}
 	onGround = false;
 	stamina = maxStamina;
 	timeLastOnGround = 0;
 	maxSpeed = regularMaxSpeed;
 	tileSelection = 0;
 	tileScale = 1;
-	if (mapGenerator == null) {
-		mapGenerator = new MapGenerator(scene, physicsWorld);
-	}
-	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
 	spotLight.target = player;
 	lastUpdateVelocity = new THREE.Vector3(0, 0, 0);
 	updates = 0;
+}
+function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
+	console.log("createObjects");
+
+	if (mapGenerator == null) {
+		mapGenerator = new MapGenerator(scene, physicsWorld);
+	}
+	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
+	initPlayer();
 }
 
 
@@ -982,8 +987,14 @@ function onWindowResize() {
 	}
 
 }
-
+let animating = false;
 function animate() {
+	if (animating) {
+		return;
+	}
+
+	console.log("animate");
+	animating = true;
 	const deltaTime = clock.getDelta();
 	//requestAnimationFrame(animate);
 	renderer.setAnimationLoop(gameLoop.loop);
@@ -1235,6 +1246,14 @@ function updatePhysics(deltaTime) {
 
 	updateWorld(deltaTime);
 }
+function clearScene() {
+	mapGenerator.clear();
+	scene.clear();
+	console.log("remove", scene.children.length);
+	for (var i = 0; i < scene.children.length; i++) {
+		removeObject3D(scene.children[i]);
+	}
+}
 function lose() {
 	console.log("lose");
 	won = false;
@@ -1244,9 +1263,9 @@ function lose() {
 	if (bgm && bgm.isPlaying) {
 		bgm.stop();
 	}
-	mapGenerator.clear();
 
-	scene.clear();
+	clearScene();
+
 	$('.hud--mobile').addClass("hide");
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud--basic').addClass('hide');
@@ -1262,8 +1281,8 @@ function win() {
 		bgm.stop();
 	}
 
-	mapGenerator.clear();
-	scene.clear();
+	clearScene();
+
 	$('.hud--mobile').addClass("hide");
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud--basic').addClass('hide');
@@ -1278,13 +1297,21 @@ function reset() {
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
 
-	mapGenerator.clear();
-	scene.clear();
-	init(currentWorld, currentLevel, inEditor, inPlayTest);
+	console.log(player);
+
+	initPlayer();
+	//clearScene();
+
+	//init(currentWorld, currentLevel, inEditor, inPlayTest);
 
 	camera.position.set(0, 120, player.position.z - 200);
 	camera.lookAt(0, 5, player.position.z);
 	spotLight.position.set(0, 200, player.position.z);
+	won = false;
+	dead = false;
+	$('.menu--loading-screen').addClass('hide');
+	$('#container').removeClass('hide');
+
 }
 
 export function createGameLoop(func, fps = 60) {
