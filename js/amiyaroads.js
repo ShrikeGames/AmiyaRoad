@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.21 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.22 \"Cat-Crab\"";
 
 let stats;
 
@@ -415,7 +415,7 @@ function initFirstTime() {
 	});
 	$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 	$(".hud--maxBucko-display").text(maxBuckos + " buckos");
-	$(".hud--fogDensity-display").text(fogDensity*10000);
+	$(".hud--fogDensity-display").text(fogDensity * 10000);
 	$(".hud--drawDistance-display").text(drawDistance);
 
 	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
@@ -505,8 +505,6 @@ function initBuckoParticles() {
 	}
 	particlesNames = [];
 
-	const materials = [];
-
 	const geometry = new THREE.BufferGeometry();
 	const vertices = [];
 
@@ -521,51 +519,29 @@ function initBuckoParticles() {
 	for (let i = 0; i < maxBuckos; i++) {
 
 		let x = -2000 + Math.random() * 4000;
-		let y = -5;
-		let z = Math.random() * 5000;
+		let y = -200 + Math.random() * 400;
+		let z = Math.random() * 10000;
 		if (currentWorld == "2") {
-			x = -20 + i * 10;
 			y = -25 + Math.random() * 10;
-			z = Math.random() * 5000;
 		}
 
 		vertices.push(x, y, z);
 
 	}
-
+	console.log(vertices);
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+	const color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
+	const sprite = sprite1;
+	const size = 30 + Math.random() * 50;
 
-	let parameters = [
-		[[110, 20, 35], sprite1, 50],
-		[[195, 10, 35], sprite2, 30],
-		[[190, 5, 35], sprite3, 20],
-		[[185, 10, 35], sprite4, 10],
-		[[180, 10, 35], sprite5, 5]
-	];
+	const material = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true });
+	material.color.setHSL(color[0], color[1], color[2]);
 
-	for (let i = 0; i < parameters.length; i++) {
+	const particles = new THREE.Points(geometry, material);
 
-		const color = parameters[i][0];
-		const sprite = parameters[i][1];
-		const size = parameters[i][2];
-
-		materials[i] = new THREE.PointsMaterial({ size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true });
-		materials[i].color.setHSL(color[0], color[1], color[2]);
-
-		const particles = new THREE.Points(geometry, materials[i]);
-
-
-		if (currentWorld == "2") {
-			particles.rotation.y = Math.random() * 60;
-		} else {
-			particles.rotation.z = Math.random() * 120;
-		}
-		particles.name = "buckoParticles" + particlesNames.length;
-		particlesNames.push(particles.name);
-		scene.add(particles);
-
-	}
-
+	particles.name = "buckoParticles" + particlesNames.length;
+	particlesNames.push(particles.name);
+	scene.add(particles);
 
 }
 function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
