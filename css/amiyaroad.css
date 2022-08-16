@@ -267,43 +267,43 @@
 }
 
 .hud--mobile--left {
-	width: 30%;
-	height: 50%;
-	display: block;
-	position: fixed;
-	z-index: 300;
-	left: 0;
-	bottom: 0;
+	width: 100px;
+    height: 200px;
+    display: block;
+    position: fixed;
+    z-index: 300;
+    left: 0;
+    bottom: 0;
 }
 
 .hud--mobile--right {
-	width: 30%;
-	height: 50%;
-	display: block;
-	position: fixed;
-	z-index: 300;
-	right: 0;
-	bottom: 0;
+	width: 100px;
+    height: 200px;
+    display: block;
+    position: fixed;
+    z-index: 300;
+    left: 100px;
+    bottom: 0;
 }
 
 .hud--mobile--top {
 	height: 100px;
-	width: 40%;
-	display: block;
-	position: fixed;
-	z-index: 300;
-	left: 30%;
-	bottom: 100px;
+    width: 100px;
+    display: block;
+    position: fixed;
+    z-index: 300;
+    right: 0;
+    bottom: 100px;
 }
 
 .hud--mobile--bottom {
 	height: 100px;
-	width: 40%;
-	display: block;
-	position: fixed;
-	z-index: 300;
-	left: 30%;
-	bottom: 0;
+    width: 100px;
+    display: block;
+    position: fixed;
+    z-index: 300;
+    right: 0;
+    bottom: 0;
 }
 
 .hud--mobile-keyCap {
