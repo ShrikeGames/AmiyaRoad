@@ -201,7 +201,7 @@ class MapGenerator {
             }
             this.loadMapFromLevelString(this.levelString);
         }
-
+        
         return this.rigidBodies;
 
     }

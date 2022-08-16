@@ -163,13 +163,43 @@ function initFirstTime() {
 	}
 
 	$('.version').text(versionString);
-	$('.modal-content').on('click', function (e) {
+	$('.modal-content').on('click,', function (e) {
+		e.stopPropagation();
+	});
+	$('.hud--mobile').on('click', function (e) {
 		e.stopPropagation();
 	});
 	$('.modal, .modal--close').on('click', function (e) {
 		e.preventDefault();
 		$('.modal').addClass('hide');
 	});
+	
+	$('.hud--mobile--left').on('touchstart', function (e) {
+		keyStates.ArrowLeft = true;
+	});
+	$('.hud--mobile--left').on('touchend', function (e) {
+		keyStates.ArrowLeft = false;
+	});
+	$('.hud--mobile--right').on('touchstart', function (e) {
+		keyStates.ArrowRight = true;
+	});
+	$('.hud--mobile--right').on('touchend', function (e) {
+		keyStates.ArrowRight = false;
+	});
+	$('.hud--mobile--top').on('touchstart', function (e) {
+		keyStates.ArrowUp = true;
+	});
+	$('.hud--mobile--top').on('touchend', function (e) {
+		keyStates.ArrowUp = false;
+	});
+	$('.hud--mobile--bottom').on('touchstart', function (e) {
+		keyStates.KeyZ = true;
+	});
+	$('.hud--mobile--bottom').on('touchend', function (e) {
+		keyStates.KeyZ = false;
+	});
+
+
 	$('.export-button').on('click', function (e) {
 		e.preventDefault();
 		var cover = $("#cover");
@@ -211,7 +241,7 @@ function initFirstTime() {
 		console.log(currentWorld, "-", currentLevel);
 		inEditor = "true" == $this.attr("data-editor");
 		inPlayTest = "true" == $this.attr("data-playtest");
-
+		$('.hud--mobile').removeClass("hide");
 		$('.button--menu').removeClass('hide');
 		$('.hud--tile_selection').addClass("hide");
 		$('.hud--playtest').addClass("hide");
@@ -279,6 +309,7 @@ function initFirstTime() {
 
 		init(currentWorld, currentLevel, inEditor, inPlayTest);
 		$('.menu--start-screen').addClass('hide');
+		$('.hud--mobile').removeClass("hide");
 		$('.button--menu').addClass('hide');
 		$('.hud--basic').removeClass("hide");
 		$('.hud--playtest').removeClass("hide");
@@ -528,7 +559,7 @@ function initBuckoParticles() {
 		vertices.push(x, y, z);
 
 	}
-	console.log(vertices);
+
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 	const color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
 	const sprite = sprite1;
@@ -1075,7 +1106,7 @@ function updatePhysics(deltaTime) {
 	velocity = player.body.getLinearVelocity();
 
 
-	$debug.text("Random Seed: " + seed);
+	//$debug.text("Random Seed: " + seed);
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina < 0) {
 		stamina = 0;
@@ -1203,7 +1234,7 @@ function lose() {
 	mapGenerator.clear();
 
 	scene.clear();
-
+	$('.hud--mobile').addClass("hide");
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud--basic').addClass('hide');
 	$('.menu--loading-screen').addClass('hide');
@@ -1220,6 +1251,7 @@ function win() {
 
 	mapGenerator.clear();
 	scene.clear();
+	$('.hud--mobile').addClass("hide");
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud--basic').addClass('hide');
 	$('.menu--loading-screen').addClass('hide');

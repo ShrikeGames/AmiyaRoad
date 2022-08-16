@@ -45,9 +45,13 @@
 	display: block;
 	color: #333333;
 	line-height: 0;
-	background-color: #c0bdf2;
+	background-color: transparent;
 }
-
+@media (min-width: 750px) {
+	.hud--bottom {
+		background-color: #c0bdf2;
+	}
+}
 .hud--left {
 	position: absolute;
 	top: 100px;
@@ -96,10 +100,14 @@
 	left: 10px;
 	bottom: 10px;
 	vertical-align: bottom;
-
-	background-color: #b84ff4;
+	background-color: transparent;
+	
 }
-
+@media (min-width: 750px) {
+	.hud--stamina {
+		background-color: #b84ff4;
+	}
+}
 .hud--tile_selection {
 	line-height: 1;
 	width: 130px;
@@ -176,13 +184,13 @@
 }
 
 .hide {
-	display: none;
+	display: none !important;
 }
 
 .modal {
 	display: block;
 	position: fixed;
-	z-index: 1;
+	z-index: 10;
 	left: 0;
 	top: 0;
 	width: 100%;
@@ -190,23 +198,27 @@
 	overflow: auto;
 	background-color: rgba(0, 0, 0, 0.4);
 }
+
 .modal.hide {
 	display: none;
 }
+
 .modal-content {
 	background-color: #dda7fc;
-	z-index: 2;
+	z-index: 20;
 	margin: auto;
 	padding: 20px;
-	margin-top:5%;
+	margin-top: 5%;
 	border: 1px solid #888;
 	width: 100%;
 }
+
 @media (min-width: 750px) {
 	.modal-content {
 		width: 50%;
 	}
 }
+
 .modal--close {
 	color: rgb(118, 46, 235);
 	float: right;
@@ -221,6 +233,92 @@
 	cursor: pointer;
 }
 
+.hud--basic {
+	text-align: right;
+}
+.hud--buttons.hud--basic{
+	position:fixed;
+	top:0;
+	right:0;
+}
+
+@media (min-width: 750px) {
+	.hud--basic {
+		text-align: center;
+	}
+}
+@media (min-width: 750px) {
+	.hud--buttons.hud--basic{
+		display: block;
+		position: relative;
+	}
+	
+}
+.hud--mobile {
+	display: block;
+}
+
+.hud--mobile--control-button {
+	background-color: rgba(255, 155, 225, 0.4);
+	z-index: 20;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #888;
+}
+
+.hud--mobile--left {
+	width: 30%;
+	height: 50%;
+	display: block;
+	position: fixed;
+	z-index: 300;
+	left: 0;
+	bottom: 0;
+}
+
+.hud--mobile--right {
+	width: 30%;
+	height: 50%;
+	display: block;
+	position: fixed;
+	z-index: 300;
+	right: 0;
+	bottom: 0;
+}
+
+.hud--mobile--top {
+	height: 100px;
+	width: 40%;
+	display: block;
+	position: fixed;
+	z-index: 300;
+	left: 30%;
+	bottom: 100px;
+}
+
+.hud--mobile--bottom {
+	height: 100px;
+	width: 40%;
+	display: block;
+	position: fixed;
+	z-index: 300;
+	left: 30%;
+	bottom: 0;
+}
+
+.hud--mobile-keyCap {
+	text-align: center;
+	padding-top: 50px;
+	pointer-events: none;
+}
+
+@media (min-width: 750px) {
+	.hud--mobile {
+		display: none;
+	}
+}
+
+
 h1 {
 	font-size: 2.0em;
 }
@@ -228,17 +326,21 @@ h1 {
 h2 {
 	font-size: 1.5em;
 }
+
 h3 {
-    font-size: 1.2em;
+	font-size: 1.2em;
 	margin-bottom: 0;
 }
+
 h4 {
-    font-size: 1em;
+	font-size: 1em;
 	margin-bottom: 0;
 }
+
 .ui-slider {
 	margin-bottom: 10px;
 }
+
 p,
 span {
 	line-height: 1;
