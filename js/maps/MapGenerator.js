@@ -178,11 +178,11 @@ class MapGenerator {
         }
 
         if (inEditor) {
-            console.log("Editor");
+            console.log(">Editor");
             this.levelString = levelString;
             this.createMapBuilder();
         } else if (inPlayTest) {
-            console.log("Playtest");
+            console.log(">Playtest");
             if (levelString != "") {
                 this.loadMapFromLevelString(levelString);
             } else {
@@ -190,11 +190,11 @@ class MapGenerator {
             }
 
         } else if (this.currentLevel == "?") {
-            console.log("Random Map");
+            console.log(">Random Map");
             this.levelString = "";
             this.createMapRandomChaos();
         } else {
-            console.log("Level");
+            console.log(">Level");
             this.levelString = mapData[this.currentWorld][this.currentLevel];
             if (loadedFromImage) {
                 this.levelString = levelString;
@@ -777,7 +777,6 @@ class MapGenerator {
     }
 
     getTileNameFromIndex(tileIndex, i) {
-        console.log(tileIndex);
         return tileTypes[tileIndex] + i;
     }
     getTileIndexFromName(tileName) {
@@ -883,7 +882,6 @@ class MapGenerator {
         if (lastObject) {
             let lastTile = lastObject.body;
             while (lastTile.name.indexOf("GhostTile") >= 0 || lastTile.name.indexOf("Player") >= 0) {
-                console.log("Last Tile", lastTile.name);
                 index--;
                 if (index < 0) {
                     return;

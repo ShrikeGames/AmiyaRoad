@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.20 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.21 \"Cat-Crab\"";
 
 let stats;
 
@@ -57,6 +57,11 @@ const yCamerPan = 60;
 let maxBuckos = 50;
 let maxBuckosUpperLimit = 200;
 var particlesNames = [];
+
+let fogDensity = 0.0008;
+const fogColour = new THREE.Color(0xfbddff);
+
+let drawDistance = 6000;
 
 let seed;
 
@@ -169,24 +174,17 @@ function initFirstTime() {
 		e.preventDefault();
 		var cover = $("#cover");
 		mapGenerator.generateLevelString();
-		console.log("level Code", $('#levelSelect').val());
 		var base64LevelString = btoa($('#levelSelect').val());
-		console.log(base64LevelString);
 
 		var screenshotImage = renderer.domElement.toDataURL("image/png");
-		console.log("screenshot", screenshotImage);
 
 		var imageElement = document.getElementById("img");
 		imageElement.src = screenshotImage;
-		console.log(imageElement);
-		console.log("test");
 		imageElement.onload = function () {
 			var dxWindow = Math.max(0, (window.innerWidth * 0.5) - 300);
 			var dyWindow = Math.max(0, (window.innerHeight * 0.5) - 300);
-			console.log(dxWindow, dyWindow);
 			var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, dx: dxWindow, dy: dyWindow, width: 600, height: 600 });
 			cover.attr("src", encodedImageURL);
-			console.log(cover.attr("src"));
 
 			var link = $('a.download-level-link');
 			link.attr('download', 'AmiyaRoads_CustomLevel.png');
@@ -247,7 +245,6 @@ function initFirstTime() {
 		console.log("Go to main menu");
 		inEditor = false;
 		inPlayTest = false;
-		console.log(mapGenerator);
 		mapGenerator.generateLevelString(currentWorld);
 		lose();
 	});
@@ -293,12 +290,11 @@ function initFirstTime() {
 
 	$('.editor-button').on('click', function (e) {
 		e.preventDefault();
-		console.log("Playtest");
+		console.log("Editor");
 		lose();
 
 		inEditor = true;
 		inPlayTest = false;
-		console.log($('.hud--worldSelect').val());
 		init(currentWorld, currentLevel, inEditor, inPlayTest);
 
 		$('.menu--start-screen').addClass('hide');
@@ -315,7 +311,6 @@ function initFirstTime() {
 			var imageObj = new Image();
 			imageObj.src = uploaded_image;
 			imageObj.onload = function () {
-				console.log("imageObj onload");
 				var shadowCanvas = document.createElement('canvas');
 				shadowCanvas.style.display = 'none';
 				shadowCanvas.width = 600;
@@ -327,8 +322,8 @@ function initFirstTime() {
 				var imageData = shadowCtx.getImageData(0, 0, 600, 600);
 				var decodeMessage = steg.decode(imageData, { t: 3, width: 600, height: 600 });
 				var levelString = atob(decodeMessage);
-				console.log("levelString", levelString);
 				$('#levelSelect').attr('value', levelString);
+
 				inEditor = false;
 				inPlayTest = true;
 				if (levelString.indexOf("~") >= 0) {
@@ -338,7 +333,7 @@ function initFirstTime() {
 				} else {
 					currentWorld = $('.hud--worldSelect').val();
 				}
-				console.log("currentWorld", currentWorld);
+
 				currentLevel = "T";
 				seed = "amiyaroads_" + Math.round(Math.random() * 25600);
 				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString, true);
@@ -350,7 +345,7 @@ function initFirstTime() {
 				animate();
 				return imageObj;
 			};
-			console.log(uploaded_image);
+
 			document.querySelector("#display-image").style.backgroundImage = `url(${uploaded_image})`;
 		});
 		reader.readAsDataURL(this.files[0]);
@@ -384,6 +379,44 @@ function initFirstTime() {
 			initBuckoParticles();
 		}
 	});
+
+	$(".hud--fogDensity-slider").slider({
+		orientation: "horizontal",
+		range: "min",
+		min: 0,
+		max: 50,
+		value: 8,
+		slide: function (event, ui) {
+			fogDensity = ui.value / 10000;
+			if (scene) {
+				const fog = new THREE.FogExp2(fogColour, fogDensity);
+				scene.fog = fog;
+			}
+
+			$(".hud--fogDensity-display").text(ui.value);
+		}
+	});
+
+	$(".hud--drawDistance-slider").slider({
+		orientation: "horizontal",
+		range: "min",
+		min: 1000,
+		max: 10000,
+		value: 6000,
+		slide: function (event, ui) {
+			drawDistance = ui.value;
+			if (camera) {
+				camera.far = drawDistance;
+				camera.updateProjectionMatrix();
+			}
+
+			$(".hud--drawDistance-display").text(ui.value);
+		}
+	});
+	$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
+	$(".hud--maxBucko-display").text(maxBuckos + " buckos");
+	$(".hud--fogDensity-display").text(fogDensity*10000);
+	$(".hud--drawDistance-display").text(drawDistance);
 
 	musicVolume = $(".hud--volume-slider").slider("value") / 100.0;
 	$(".hud--volume-display").text((musicVolume * 100) + "%");
@@ -541,8 +574,7 @@ function initSky(currentWorld, currentLevel, inEditor, inPlayTest) {
 	sky = new Sky();
 	sky.scale.setScalar(150000);
 	scene.add(sky);
-	const fogColour = new THREE.Color(0xfbddff);
-	const fog = new THREE.FogExp2(fogColour, 0.0008);
+	const fog = new THREE.FogExp2(fogColour, fogDensity);
 	scene.fog = fog;
 
 
@@ -688,12 +720,12 @@ function initMusic() {
 
 		// onProgress callback
 		function (xhr) {
-			console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+			//console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 		},
 
 		// onError callback
 		function (err) {
-			console.log('An error happened');
+			console.log('An error happened loading the music');
 		}
 	);
 }
@@ -701,7 +733,7 @@ function initMusic() {
 
 function initGraphics() {
 	console.log("initGraphics");
-	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 6000);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, drawDistance);
 
 	camera.position.set(0, 120, -210);
 	camera.lookAt(0, 5, 0);
@@ -810,10 +842,6 @@ function setupContactResultCallback() {
 			localPos = contactPoint.get_m_localPointB();
 			worldPos = contactPoint.get_m_positionWorldOnB();
 		}
-		if (keyStates.KeyB || keyStates.KeyZ) {
-			//debug block key
-			console.log(tag);
-		}
 		if (tag.indexOf("Death") >= 0) {
 			dead = true;
 			won = false;
@@ -844,7 +872,6 @@ function setupContactResultCallback() {
 
 		} else if (tag.indexOf("Tile") >= 0) {
 			if (localPos.y() >= 0.99) {
-				//console.log(tag + " x:" + localPos.x() + ", y: " + localPos.y() + ", z: " + localPos.z());
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
@@ -884,7 +911,6 @@ function initInput() {
 		});
 
 		document.addEventListener('keyup', (event) => {
-			console.log(event.code);
 			if (inEditor) {
 				if (keyStates.Digit0 && event.code == "Digit0") {
 					tileSelection = 0;
