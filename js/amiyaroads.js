@@ -173,7 +173,12 @@ function initFirstTime() {
 		e.preventDefault();
 		$('.modal').addClass('hide');
 	});
-	
+	$('.hud--mobile-keyCap').on('touchstart', function (e) {
+		e.preventDefault();
+	});
+	$('.hud--mobile-keyCap').on('touchend', function (e) {
+		e.preventDefault();
+	});
 	$('.hud--mobile--left').on('touchstart', function (e) {
 		keyStates.ArrowLeft = true;
 	});
