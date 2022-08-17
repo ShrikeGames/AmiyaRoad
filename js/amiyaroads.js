@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.24 \"Cat-Crab\"";
+const versionString = "PRE-ALPHA Build 0.3.25 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -175,6 +175,37 @@ function initFirstTime() {
 		} else {
 			e.stopPropagation();
 		}
+	});
+	//https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+	//Not for crypto use, public domain
+	const cyrb53 = function (str, seed = 0) {
+		let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+		for (let i = 0, ch; i < str.length; i++) {
+			ch = str.charCodeAt(i);
+			h1 = Math.imul(h1 ^ ch, 2654435761);
+			h2 = Math.imul(h2 ^ ch, 1597334677);
+		}
+		h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+		h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+		return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+	};
+	$('.apply-chotCode').on('click', function (e) {
+		e.preventDefault();
+		console.log("test");
+		var chotCodeInput = $('input#chotCode').val();
+		var chotCodeHashed = cyrb53(chotCodeInput);
+		console.log(chotCodeHashed);
+		var message = "";
+		if (chotCodeHashed == 5370197679744504) {
+			message = "Accepted. I'll protect you this time.";
+			mapGenerator.activateCheat1();
+		} else if (chotCodeHashed == 5269442767054596) {
+			message = "Accepted. In your next life you'll see your changes.";
+			mapGenerator.activateCheat2();
+		} else {
+			message = "Denied.";
+		}
+		$('.hud--chotCode-display').text(message);
 	});
 
 	$('.hud--mobile').on('click', function (e) {

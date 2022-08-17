@@ -54,6 +54,11 @@ const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/tiles/
 const TEXTURE_DEATH = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile5.png');
 const TEXTURE_BALL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile6.png');
 
+const TEXTURE_CHOT = new THREE.TextureLoader().load('../images/amiyaroad/tiles/ChotTile.png');
+TEXTURE_CHOT.wrapS = THREE.RepeatWrapping;
+TEXTURE_CHOT.wrapT = THREE.RepeatWrapping;
+TEXTURE_CHOT.repeat.set(500, 500);
+
 let currentWorld;
 let currentLevel;
 let inEditor;
@@ -76,7 +81,7 @@ let physicsWorld;
 let rigidBodies;
 let allObjects;
 const margin = 0.05;
-const TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
+var TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
 
 TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
 TEXTURE_PLAYER.wrapT = THREE.RepeatWrapping;
@@ -107,6 +112,9 @@ let rollingFriciton = 0;
 let ghostTile;
 
 let lastTileSelection = 0;
+
+let cheat1 = false;
+let cheat2 = false;
 
 class MapGenerator {
     constructor(scene, physicsWorld) {
@@ -201,7 +209,7 @@ class MapGenerator {
             }
             this.loadMapFromLevelString(this.levelString);
         }
-        
+
         return this.rigidBodies;
 
     }
@@ -302,6 +310,9 @@ class MapGenerator {
                 newTile.scale.z = this.scale.z;
             }
 
+        }
+        if (cheat1) {
+            this.createCheatBarrier();
         }
     }
 
@@ -498,7 +509,7 @@ class MapGenerator {
         }
         this.allObjects = [];
         this.rigidBodies = [];
-        
+
     }
 
     createMapRandomChaos() {
@@ -695,7 +706,53 @@ class MapGenerator {
 
 
     }
-
+    removeObject3D(object) {
+        if (!(object instanceof THREE.Object3D)) return false;
+        // for better memory management and performance
+        if (object.geometry) {
+            object.geometry.dispose();
+        }
+        if (object.material) {
+            if (object.material instanceof Array) {
+                // for better memory management and performance
+                object.material.forEach(material => material.dispose());
+            } else {
+                // for better memory management and performance
+                object.material.dispose();
+            }
+        }
+        if (object.parent) {
+            object.parent.remove(object);
+        }
+        // the parent might be the scene or another Object3D, but it is sure to be removed this way
+        return true;
+    }
+    createCheatBarrier() {
+        if (cheat1) {
+            this.pos.set(0, -45, 24000);
+            this.quat.set(0, 0, 0, 1);
+            this.scale = new THREE.Vector3(1, 1, 1);
+            let material = new THREE.MeshPhongMaterial({map: TEXTURE_CHOT, shininess: 30, specular: 0xd4aae7 });
+            let newTile = this.createTileWithPhysics("AmiyaBarChot", 50000, 50, 50000, 0, this.pos, this.quat, this.scale, material);
+        } else {
+            let cheat1Object = this.scene.getObjectByName("AmiyaBarChot");
+            this.removeObject3D(cheat1Object);
+        }
+    }
+    activateCheat1() {
+        //toggle
+        cheat1 = !cheat1;
+        this.createCheatBarrier();
+    }
+    activateCheat2() {
+        //toggle
+        cheat2 = !cheat2;
+        if (cheat2) {
+            TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Plok.png');
+        } else {
+            TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
+        }
+    }
     createMapBuilder() {
         console.log("Map builder");
         this.pos.set(0, 0, 0);
