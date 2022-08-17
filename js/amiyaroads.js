@@ -194,7 +194,7 @@ function initFirstTime() {
 		console.log("test");
 		var chotCodeInput = $('input#chotCode').val();
 		var chotCodeHashed = cyrb53(chotCodeInput);
-		console.log(chotCodeHashed);
+		//console.log(chotCodeHashed);
 		var message = "";
 		if (chotCodeHashed == 5370197679744504) {
 			message = "Accepted. I'll protect you this time.";

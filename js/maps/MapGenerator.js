@@ -724,6 +724,21 @@ class MapGenerator {
         if (object.parent) {
             object.parent.remove(object);
         }
+        for (var i = 0; i <  this.allObjects.length - 1; i++) {
+            let tile = this.allObjects[i];
+            if (tile.name == object.name || tile.name == object.body.name) {
+                this.allObjects.splice(i, 1);
+                console.log(this.allObjects);
+                break;
+            }
+        }
+        for (var i = this.rigidBodies.length - 1; i >= 0; i--) {
+            let tile = this.rigidBodies[i].body;
+            if (tile.name == object.name || tile.name == object.body.name) {
+                this.rigidBodies.splice(i, 1);
+                break;
+            }
+        }
         // the parent might be the scene or another Object3D, but it is sure to be removed this way
         return true;
     }
@@ -732,12 +747,14 @@ class MapGenerator {
             this.pos.set(0, -45, 24000);
             this.quat.set(0, 0, 0, 1);
             this.scale = new THREE.Vector3(1, 1, 1);
-            let material = new THREE.MeshPhongMaterial({map: TEXTURE_CHOT, shininess: 30, specular: 0xd4aae7 });
+            let material = new THREE.MeshPhongMaterial({ map: TEXTURE_CHOT, shininess: 30, specular: 0xd4aae7 });
             let newTile = this.createTileWithPhysics("AmiyaBarChot", 50000, 50, 50000, 0, this.pos, this.quat, this.scale, material);
         } else {
             let cheat1Object = this.scene.getObjectByName("AmiyaBarChot");
             this.removeObject3D(cheat1Object);
+            this.physicsWorld.removeRigidBody(cheat1Object.body);
         }
+
     }
     activateCheat1() {
         //toggle
