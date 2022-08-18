@@ -427,7 +427,7 @@ class MapGenerator {
         let step = (endAngle - startAngle) / TUNNEL_RADIAL_SEGMENTS;
 
         let dx = 0;
-        let dy = playerRadius;
+        let dy = 0;
         let dz = 0;
         console.log(dx, dy, dz);
         for (let i = startAngle; i <= endAngle; i += step) {
@@ -490,7 +490,7 @@ class MapGenerator {
             getPoint(t, optionalTarget = new THREE.Vector3()) {
 
                 const tx = 0;
-                const ty = playerRadius;
+                const ty = 0;
                 const tz = t * TUNNEL_DEPTH - (TUNNEL_DEPTH * 0.5);
 
                 return optionalTarget.set(tx, ty, tz).multiplyScalar(this.scale);
@@ -627,7 +627,10 @@ class MapGenerator {
         body.scale = new Vector3(scale.x, scale.y, scale.z);
         if (object.name.indexOf("GhostTile") < 0) {
             this.allObjects.push(object);
-            this.physicsWorld.addRigidBody(body);
+            if(!this.inEditor || object.name.indexOf("Player") >= 0){
+                this.physicsWorld.addRigidBody(body);
+            }
+            
         }
 
         return body;
