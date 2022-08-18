@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.26 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.27 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -928,6 +928,9 @@ function setupContactResultCallback() {
 		} else if (tag.indexOf("Tunnel") >= 0) {
 			timeLastOnGround = clock.elapsedTime;
 			onGround = true;
+		} else if (tag.indexOf("HalfPipe") >= 0) {
+			timeLastOnGround = clock.elapsedTime;
+			onGround = true;
 		}
 
 	}
@@ -987,6 +990,8 @@ function initInput() {
 					tileSelection = 6;
 				} else if (keyStates.Digit7 && event.code == "Digit7") {
 					tileSelection = 7;
+				} else if (keyStates.Digit8 && event.code == "Digit8") {
+					tileSelection = 8;
 				}
 
 				if (keyStates.Equal && event.code == "Equal") {
