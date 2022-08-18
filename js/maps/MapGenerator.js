@@ -71,7 +71,7 @@ const colourMap = {
     "2": [COLOUR_MAIN_WORLD2, COLOUR_SECONDARY_WORLD2, COLOUR_BLANK],
     "3": [COLOUR_MAIN_WORLD3, COLOUR_SECONDARY_WORLD3, COLOUR_BLANK]
 };
-const tileTypes = ["Tile", "AmiyaBar", "Goal", "Boost", "Death", "Ball", "Player"];
+const tileTypes = ["Tile", "AmiyaBar", "Goal", "Boost", "Death", "Ball", "Tunnel", "", "", "Player"];
 
 let pos;
 let quad;
@@ -90,6 +90,7 @@ TEXTURE_PLAYER.repeat.set(1, 1);
 const TILE_WIDTH = 50;
 const TILE_HEIGHT = 20;
 const TILE_DEPTH = 100;
+
 const AMIYABAR_WIDTH = 50;
 const AMIYABAR_HEIGHT = 20;
 const AMIYABAR_DEPTH = 50;
@@ -103,6 +104,30 @@ const GOAL_DEPTH = 40;
 const playerRadius = 8;
 const BALL_RADIUS = 6;
 const BALL_MASS = 2;
+
+let tileOpacity = 1;
+let tileTransparent = tileOpacity < 1;
+
+let tunnelOpacity = 0.75;
+let tunnelTransparent = tunnelOpacity < 1;
+
+
+const TUNNEL_WIDTH = 50;
+const TUNNEL_HEIGHT = 60;
+const TUNNEL_DEPTH = 100;
+const TUNNEL_RADIAL_SEGMENTS = 16;
+
+const TEXTURE_TUNNEL_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile7.png');
+TEXTURE_TUNNEL_MAIN.wrapS = THREE.RepeatWrapping;
+TEXTURE_TUNNEL_MAIN.wrapT = THREE.RepeatWrapping;
+TEXTURE_TUNNEL_MAIN.repeat.set(2, 2);
+
+
+let playerShininess = 30;
+let iceShininess = 70;
+let regularShininess = 4;
+let dullShininess = 2;
+let tileShininess = 0;
 
 const DEATH_MARGIN = 0.5;
 let seed;
@@ -166,23 +191,27 @@ class MapGenerator {
             this.xFriction = 0;
             this.physicsFriction = 0;
             this.rollingFriciton = 0;
+
         } else if (this.currentWorld == "1") {
             this.xFriction = 0.15;
             this.physicsFriction = 0.2;
             this.rollingFriciton = 0;
+            this.tileShininess = regularShininess;
         } else if (this.currentWorld == "2") {
             this.xFriction = 0.4;
             this.physicsFriction = 0.4;
             this.rollingFriciton = 0;
+            this.tileShininess = dullShininess;
         } else if (this.currentWorld == "3") {
             this.xFriction = 0.05;
             this.physicsFriction = 0;
             this.rollingFriciton = 0;
+            this.tileShininess = iceShininess;
         } else {
             this.xFriction = 0.15;
             this.physicsFriction = 0.2;
             this.rollingFriciton = 0;
-
+            this.tileShininess = regularShininess;
         }
 
         if (inEditor) {
@@ -285,24 +314,28 @@ class MapGenerator {
                 continue;
             }
             let newTile;
+
             if (tileType.indexOf("Tile") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("AmiyaBar") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_AMIYABAR });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createAmiyaBarWithPhysics("AmiyaBar", AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Goal") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL });
+                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Boost") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: 30, specular: 0xd4aae7 });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createTileWithPhysics("Boost" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Death") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: 30, specular: 0xd4aae7 });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createTileWithPhysics("Death" + i, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Ball") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: 30, specular: 0xd4aae7, transparent: true, opacity: 1 });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createBallWithPhysics("Ball" + i, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
+            } else if (tileType.indexOf("Tunnel") >= 0) {
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                newTile = this.createTunnelWithPhysics("Tunnel" + i, TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_DEPTH, 0, this.pos, this.quat, this.scale, material);
             }
             if (newTile) {
                 newTile.scale.x = this.scale.x;
@@ -325,7 +358,7 @@ class MapGenerator {
         this.pos.set(0, 30, 0);
         this.scale.set(1, 1, 1);
         this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
-        const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: 30, specular: 0xd4aae7 });
+        const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: playerShininess, specular: 0xd4aae7 });
         if (this.inEditor) {
             this.pos.set(this.editorLastPos.x, this.editorLastPos.y, this.editorLastPos.z);
         }
@@ -367,6 +400,80 @@ class MapGenerator {
         object.scale.set(scale.x, scale.y, scale.z);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
+        object.name = name;
+        object.receiveShadow = true;
+        object.castShadow = true;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+
+        return object;
+
+    }
+    createTunnelWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const mesh = new Ammo.btTriangleMesh(true, true);
+        mesh.setScaling(new Ammo.btVector3(scale.x, scale.y, scale.z));
+
+        let r = TUNNEL_WIDTH * 0.5;
+        let step = (2 * Math.PI) / TUNNEL_RADIAL_SEGMENTS;
+
+        let dx = 0;
+        let dy = playerRadius;
+        let dz = 0;
+        console.log(dx, dy, dz);
+        for (let i = 0; i <= 2 * Math.PI; i += step) {
+            let x = dx + (r * Math.cos(i));
+            let y = dy + (r * Math.sin(i));
+            let z = dz + ((TUNNEL_DEPTH * 0.5));
+            let x2 = dx + (r * Math.cos(i + step));
+            let y2 = dy + (r * Math.sin(i + step));
+            let z2 = dz - (TUNNEL_DEPTH * 0.5);
+
+            mesh.addTriangle(
+                new Ammo.btVector3(x, y, z),
+                new Ammo.btVector3(x, y, z2),
+                new Ammo.btVector3(x2, y2, z2),
+                true
+            );
+
+            mesh.addTriangle(
+                new Ammo.btVector3(x2, y2, z2),
+                new Ammo.btVector3(x2, y2, z),
+                new Ammo.btVector3(x, y, z),
+                true
+            );
+
+        }
+
+
+        class Tunnel extends THREE.Curve {
+
+            constructor(scale = 1) {
+
+                super();
+
+                this.scale = scale;
+
+            }
+
+            getPoint(t, optionalTarget = new THREE.Vector3()) {
+
+                const tx = 0;
+                const ty = playerRadius;
+                const tz = t * TUNNEL_DEPTH - (TUNNEL_DEPTH*0.5);
+
+                return optionalTarget.set(tx, ty, tz).multiplyScalar(this.scale);
+
+            }
+
+        }
+
+        const path = new Tunnel(1);
+        const geometry = new THREE.TubeGeometry(path, 24, TUNNEL_WIDTH * 0.5, TUNNEL_RADIAL_SEGMENTS, true);
+
+        const shape = new Ammo.btBvhTriangleMeshShape(mesh, true, true);
+        shape.setMargin(margin);
+
+        const object = new THREE.Mesh(geometry, material);
+        object.scale.set(scale.x, scale.y, scale.z);
         object.name = name;
         object.receiveShadow = true;
         object.castShadow = true;
@@ -514,197 +621,6 @@ class MapGenerator {
 
     createMapRandomChaos() {
 
-        const length = 80 + Math.round(Math.random() * 100);
-        let x = 0;
-        let y = 0;
-        let z = -TILE_DEPTH;
-        let zTilt = 0;
-        let xTilt = 0;
-        let tileType = 1;
-        let xAlgo;
-        let yAlgo;
-        let zTiltAlgo;
-        let xTiltAlgo;
-        let randomSwitchupRate = 5 + Math.round(Math.random() * 10);
-        let verticalRangeRate;
-        let randomSkipRate;
-        let randomBoostRate;
-        let randomAmiyaBarRate;
-
-        let randomTiltRate;
-        let tiltRangeRate;
-
-        let buckoRate;
-
-        let tileScale = 1;
-        for (let i = 0; i < length; i++) {
-            tileType = 1;
-            x = 0;
-            y = 0;
-            zTilt = 0;
-            xTilt = 0;
-            if (i == 0 || (i % randomSwitchupRate == 0)) {
-                xAlgo = Math.round(Math.random() * 10);
-                yAlgo = Math.round(Math.random() * 10);
-                verticalRangeRate = Math.random() * 0.5;
-                randomSkipRate = 2 + Math.round(Math.random() * 6);
-                randomBoostRate = 1 + Math.round(Math.random() * 20);
-                randomAmiyaBarRate = 5 + Math.round(Math.random() * 15);
-                randomTiltRate = 1 + Math.round(Math.random() * 10);
-                xTiltAlgo = Math.round(Math.random() * 6);
-                zTiltAlgo = Math.round(Math.random() * 6);
-                tiltRangeRate = Math.random() * 0.1;
-                buckoRate = Math.round(Math.random() * 20);
-            }
-            if (i > 2) {
-
-                switch (xAlgo) {
-                    case 0:
-                        x = Math.sin(i);
-                        break;
-                    case 1:
-                        x = Math.cos(i);
-                        break;
-                    case 2:
-                        x = Math.sin(i) + Math.cos(i);
-                        break;
-                    case 3:
-                        x = Math.sin(i) * 2.0;
-                        break;
-                    case 4:
-                        x = Math.cos(i) * 2.0;
-                        break;
-                    case 5:
-                        x = (Math.sin(i) + Math.cos(i)) * 2.0;
-                        break;
-                    case 6:
-                        x = 3.5;
-                        break;
-                    case 7:
-                        x = -3.5;
-                        break;
-                    case 8:
-                        x = 1.5;
-                        break;
-                    case 9:
-                        x = -1.5;
-                        break;
-                    case 10:
-                        x = 0;
-                        break;
-                }
-                switch (yAlgo) {
-                    case 0:
-                        y = Math.sin(i) * verticalRangeRate;
-                        break;
-                    case 1:
-                        y = Math.cos(i) * verticalRangeRate;
-                        break;
-                    case 2:
-                        y = (Math.sin(i) + Math.cos(i)) * verticalRangeRate;
-                        break;
-                    case 3:
-                        y = Math.sin(i) * 2.0 * verticalRangeRate;
-                        break;
-                    case 4:
-                        y = Math.cos(i) * 2.0 * verticalRangeRate;
-                        break;
-                    case 5:
-                        y = (Math.sin(i) + Math.cos(i)) * 2.0 * verticalRangeRate;
-                        break;
-                    case 6:
-                        y = 2.5;
-                        break;
-                    case 7:
-                        y = 0;
-                        break;
-                    case 8:
-                        y = 1.5;
-                        break;
-                    case 9:
-                        y = -1.5;
-                        break;
-                }
-                if (i % randomTiltRate == 0) {
-                    switch (zTiltAlgo) {
-                        case 0:
-                            zTilt = Math.sin(i) * tiltRangeRate;
-                            break;
-                        case 1:
-                            zTilt = Math.cos(i) * tiltRangeRate;
-                            break;
-                        case 2:
-                            zTilt = (Math.sin(i) + Math.cos(i)) * tiltRangeRate;
-                            break;
-                        case 3:
-                            zTilt = Math.sin(i) * 2.0 * tiltRangeRate;
-                            break;
-                        case 4:
-                            zTilt = Math.cos(i) * 2.0 * tiltRangeRate;
-                            break;
-                        case 5:
-                            zTilt = (Math.sin(i) + Math.cos(i)) * 2.0 * tiltRangeRate;
-                            break;
-                    }
-                    switch (xTiltAlgo) {
-                        case 0:
-                            xTilt = Math.sin(i) * tiltRangeRate;
-                            break;
-                        case 1:
-                            xTilt = Math.cos(i) * tiltRangeRate;
-                            break;
-                        case 2:
-                            xTilt = (Math.sin(i) + Math.cos(i)) * tiltRangeRate;
-                            break;
-                        case 3:
-                            xTilt = Math.sin(i) * 2.0 * tiltRangeRate;
-                            break;
-                        case 4:
-                            xTilt = Math.cos(i) * 2.0 * tiltRangeRate;
-                            break;
-                        case 5:
-                            xTilt = (Math.sin(i) + Math.cos(i)) * 2.0 * tiltRangeRate;
-                            break;
-                    }
-                }
-            }
-
-
-            if (i == length - 1) {
-                //goal
-                tileType = 3;
-            } else if (i > 0 && i % randomAmiyaBarRate == 0) {
-                tileType = 2;
-                z -= (AMIYABAR_DEPTH * 0.5);
-            } else if (i > 0 && i % randomBoostRate == 0) {
-                tileType = 4;
-            }
-
-            let tilePos = new THREE.Vector3(x, y * 10, z);
-            let tileQuat = new THREE.Quaternion(xTilt, 0, zTilt, 1);
-            if ((i % randomSkipRate != 0) || tileType == 2) {
-                this.addTile(tileScale, tileType, tilePos, tileQuat, false);
-            }
-            if (i % buckoRate == 0) {
-                tilePos = new THREE.Vector3(x, y + BALL_RADIUS, z);
-                this.addTile(tileScale, 6, tilePos, tileQuat, false);
-            }
-
-            if (tileType == 1) {
-                z += (TILE_DEPTH);
-            } else if (tileType == 2) {
-                z += (AMIYABAR_DEPTH * 1.5);
-            } else if (tileType == 3) {
-                z += (GOAL_DEPTH);
-            } else if (tileType == 4) {
-                z += (TILE_DEPTH);
-            } else if (tileType == 5) {
-                z += (DEATH_DEPTH);
-            }
-
-        }
-
-
     }
     removeObject3D(object) {
         if (!(object instanceof THREE.Object3D)) return false;
@@ -724,7 +640,7 @@ class MapGenerator {
         if (object.parent) {
             object.parent.remove(object);
         }
-        for (var i = 0; i <  this.allObjects.length - 1; i++) {
+        for (var i = 0; i < this.allObjects.length - 1; i++) {
             let tile = this.allObjects[i];
             if (tile.name == object.name || tile.name == object.body.name) {
                 this.allObjects.splice(i, 1);
@@ -747,7 +663,7 @@ class MapGenerator {
             this.pos.set(0, -45, 24000);
             this.quat.set(0, 0, 0, 1);
             this.scale = new THREE.Vector3(1, 1, 1);
-            let material = new THREE.MeshPhongMaterial({ map: TEXTURE_CHOT, shininess: 30, specular: 0xd4aae7 });
+            let material = new THREE.MeshPhongMaterial({ map: TEXTURE_CHOT, shininess: tileShininess, specular: 0xd4aae7 });
             let newTile = this.createTileWithPhysics("AmiyaBarChot", 50000, 50, 50000, 0, this.pos, this.quat, this.scale, material);
         } else {
             let cheat1Object = this.scene.getObjectByName("AmiyaBarChot");
@@ -812,7 +728,7 @@ class MapGenerator {
                 this.ghostTile.quaternion.y = this.quat.y;
                 this.ghostTile.quaternion.z = this.quat.z;
                 this.ghostTile.scale.x = tileScale;
-                if (tileSelection == 6) {
+                if (tileSelection == 6 || tileSelection == 7) {
                     this.ghostTile.scale.y = tileScale;
                 } else {
                     this.ghostTile.scale.y = 1;
@@ -827,7 +743,7 @@ class MapGenerator {
 
                 this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
                 this.ghostTile.scale.x = tileScale;
-                if (tileSelection == 6) {
+                if (tileSelection == 6 || tileSelection == 7) {
                     this.ghostTile.scale.y = tileScale;
                 } else {
                     this.ghostTile.scale.y = 1;
@@ -868,7 +784,7 @@ class MapGenerator {
 
         if (tileSelection == 1) {
             //console.log("Add tile");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: 30, specular: 0xd4aae7 });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -878,7 +794,7 @@ class MapGenerator {
         } else if (tileSelection == 2) {
             //console.log("Add amiyabar");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -896,7 +812,7 @@ class MapGenerator {
         } else if (tileSelection == 4) {
             //console.log("Add boost");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -905,7 +821,7 @@ class MapGenerator {
         } else if (tileSelection == 5) {
             //console.log("Add death");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -914,7 +830,7 @@ class MapGenerator {
         } else if (tileSelection == 6) {
             //console.log("Add ball");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: 30, specular: 0xd4aae7, transparent: true, opacity: 1 });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -923,11 +839,23 @@ class MapGenerator {
                 return this.createBallWithPhysics(actualTileName, BALL_RADIUS, 0, this.pos, this.quat, this.scale, material);
             }
             return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
+        } else if (tileSelection == 7) {
+            //console.log("Add tunnel");
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            let actualTileName = this.getOrDefault(tileName, "Tunnel" + this.allObjects.length);
+            return this.createTunnelWithPhysics(actualTileName, TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_DEPTH, 0, this.pos, this.quat, this.scale, material);
         }
         return null;
     }
     addTile(scale, tileSelection, tilePos = null, tileQuat = null, genLevelString) {
-        this.scale = new Vector3(scale, 1, scale);
+        this.scale = new Vector3(scale, scale, scale);
+        if (tileSelection != 6 && tileSelection != 7) {
+            this.scale.y = 1;
+        }
         this.editorLastPos.set(this.pos.x, this.pos.y + 20, this.pos.z);
         if (tilePos != null) {
             this.pos.x = tilePos.x;

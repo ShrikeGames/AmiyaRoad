@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.25 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.26 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -499,7 +499,7 @@ function initFirstTime() {
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color(0xbfd1e5);
 
-	renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
+	renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true});
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMap.enabled = true;
@@ -925,6 +925,9 @@ function setupContactResultCallback() {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
+		} else if (tag.indexOf("Tunnel") >= 0) {
+			timeLastOnGround = clock.elapsedTime;
+			onGround = true;
 		}
 
 	}
@@ -982,6 +985,8 @@ function initInput() {
 					tileSelection = 5;
 				} else if (keyStates.Digit6 && event.code == "Digit6") {
 					tileSelection = 6;
+				} else if (keyStates.Digit7 && event.code == "Digit7") {
+					tileSelection = 7;
 				}
 
 				if (keyStates.Equal && event.code == "Equal") {
