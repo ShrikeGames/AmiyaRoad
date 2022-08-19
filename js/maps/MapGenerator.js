@@ -423,7 +423,7 @@ class MapGenerator {
         let points = [];
         var geometry = new THREE.BufferGeometry();
 
-        let r = TUNNEL_WIDTH * 0.5;
+        let r = (TUNNEL_WIDTH * 0.5);
         let step = (endAngle - startAngle) / TUNNEL_RADIAL_SEGMENTS;
 
         let dx = 0;
@@ -451,20 +451,9 @@ class MapGenerator {
                 new Ammo.btVector3(x, y, z),
                 true
             );
-            points.push(x);
-            points.push(y);
-            points.push(z);
 
             points.push(x);
             points.push(y);
-            points.push(z2);
-
-            points.push(x2);
-            points.push(y2);
-            points.push(z2);
-
-            points.push(x2);
-            points.push(y2);
             points.push(z2);
 
             points.push(x2);
@@ -474,8 +463,20 @@ class MapGenerator {
             points.push(x);
             points.push(y);
             points.push(z);
+
+
+            points.push(x2);
+            points.push(y2);
+            points.push(z2);
+
+            points.push(x2);
+            points.push(y2);
+            points.push(z);
+
+            points.push(x);
+            points.push(y);
+            points.push(z2);
         }
-
 
         class Tunnel extends THREE.Curve {
 
@@ -513,7 +514,7 @@ class MapGenerator {
         object.scale.set(scale.x, scale.y, scale.z);
         object.name = name;
         object.receiveShadow = true;
-        object.castShadow = true;
+        object.castShadow = false;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
@@ -627,10 +628,10 @@ class MapGenerator {
         body.scale = new Vector3(scale.x, scale.y, scale.z);
         if (object.name.indexOf("GhostTile") < 0) {
             this.allObjects.push(object);
-            if(!this.inEditor || object.name.indexOf("Player") >= 0){
+            if (!this.inEditor || object.name.indexOf("Player") >= 0) {
                 this.physicsWorld.addRigidBody(body);
             }
-            
+
         }
 
         return body;
@@ -750,7 +751,7 @@ class MapGenerator {
         let rotation = player.quaternion;
         let rotationSnap = 0.1;
 
-        this.pos.set(Math.round(playerPos.x / tileSnapDistanceX) * tileSnapDistanceX, Math.round((playerPos.y - TILE_HEIGHT) / tileSnapDistanceY) * tileSnapDistanceY, Math.round(playerPos.z / tileSnapDistanceZ) * tileSnapDistanceZ);
+        this.pos.set(Math.round(playerPos.x / tileSnapDistanceX) * tileSnapDistanceX, Math.round(playerPos.y / tileSnapDistanceY) * tileSnapDistanceY, Math.round(playerPos.z / tileSnapDistanceZ) * tileSnapDistanceZ);
 
         this.quat.set(Math.round(rotation.x / rotationSnap) * rotationSnap, 0, Math.round(rotation.z / rotationSnap) * rotationSnap, Math.round(rotation.w / rotationSnap) * rotationSnap);
 
@@ -892,14 +893,14 @@ class MapGenerator {
         } else if (tileSelection == 8) {
             //console.log("Add half-pipe");
             let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
-            
+
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "HalfPipe" + this.allObjects.length);
             return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material, Math.PI);
         }
-                
+
         return null;
     }
     addTile(scale, tileSelection, tilePos = null, tileQuat = null, genLevelString) {

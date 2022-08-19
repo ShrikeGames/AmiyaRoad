@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.29 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.30 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -43,7 +43,7 @@ const acceleration = 50;
 const turnSpeed = 25;
 const turnSpeedOnGround = 25;
 const regularMaxSpeed = 400;
-const boostMaxSpeed = 650;
+const boostMaxSpeed = 550;
 const BOOST_DECAY_RATE = 50;
 const maxTurnSpeed = 100;
 const jumpSpeed = 170;
