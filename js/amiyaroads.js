@@ -899,7 +899,7 @@ function setupContactResultCallback() {
 			won = true;
 			dead = false;
 		} else if (tag.indexOf("Boost") >= 0) {
-			if (localPos.y() >= 0.99) {
+			if (localPos.y() >= 9.99) {
 				maxSpeed = boostMaxSpeed;
 				if (Math.abs(velocity.x()) <= 0.01) {
 					velocity.setX(0);
@@ -915,13 +915,13 @@ function setupContactResultCallback() {
 			}
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
-			if (localPos.y() >= 0.99) {
+			if (localPos.y() >= 9.99) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
 
 		} else if (tag.indexOf("Tile") >= 0) {
-			if (localPos.y() >= 0.99) {
+			if (localPos.y() >= 9.99) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
