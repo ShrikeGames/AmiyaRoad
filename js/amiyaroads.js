@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.30 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.31 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -43,7 +43,7 @@ const acceleration = 50;
 const turnSpeed = 25;
 const turnSpeedOnGround = 25;
 const regularMaxSpeed = 400;
-const boostMaxSpeed = 550;
+const boostMaxSpeed = 650;
 const BOOST_DECAY_RATE = 50;
 const maxTurnSpeed = 100;
 const jumpSpeed = 170;
@@ -106,6 +106,7 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
+const SPRING_BOOST = 550;
 const WATER_LEVEL_Y_WORLD2 = 60;
 const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
@@ -871,26 +872,41 @@ function setupContactResultCallback() {
 			return;
 		}
 		*/
-
+		
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
 
 		let colWrapper1 = Ammo.wrapPointer(colObj1Wrap, Ammo.btCollisionObjectWrapper);
 		let rb1 = Ammo.castObject(colWrapper1.getCollisionObject(), Ammo.btRigidBody);
 
-		let tag, localPos, worldPos
+		let tag, localPos, worldPos;
 
+		
 		if (rb0.name != "Player") {
 
 			tag = rb0.name;
 			localPos = contactPoint.get_m_localPointA();
 			worldPos = contactPoint.get_m_positionWorldOnA();
-
+			
+			
 		} else {
 
 			tag = rb1.name;
 			localPos = contactPoint.get_m_localPointB();
 			worldPos = contactPoint.get_m_positionWorldOnB();
+		}
+		if (keyStates.KeyI) {
+			//debug info key
+			console.log(tag);
+			console.log(rb1);
+			
+			//const vector = new THREE.Vector3( velocity.x(), velocity.y(), velocity.z() ).normalize();
+			//vector.applyQuaternion( quaternion );
+			//console.log(vector.x, vector.y, vector.z);
+			
+			
+			
+			//console.log(direction.x, direction.y, direction.z);
 		}
 		if (tag.indexOf("Death") >= 0) {
 			dead = true;
@@ -899,13 +915,23 @@ function setupContactResultCallback() {
 			won = true;
 			dead = false;
 		} else if (tag.indexOf("Boost") >= 0) {
+
 			if (localPos.y() >= 9.99) {
 				maxSpeed = boostMaxSpeed;
-				if (Math.abs(velocity.x()) <= 0.01) {
-					velocity.setX(0);
-				}
+				let quat=colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
+				console.log(typeof(quat));
+				const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
+				console.log(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+				
+				//default direction is traveling on the z axis, and a little bit down so the tile keeps you more grounded by default
+				const direction = new THREE.Vector3(0, -0.1, 1);
+				direction.applyQuaternion(quaternion);
+				console.log(direction.x, direction.y, direction.z);
+
+				const b = new THREE.Vector3( );
+
 				//always accelerate when on a boost tile
-				let boostImpulse = new Ammo.btVector3(velocity.x(), velocity.y(), velocity.z());
+				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
 				boostImpulse.normalize();
 				boostImpulse.op_mul(acceleration * 2);
 				player.body.applyCentralImpulse(boostImpulse);
@@ -913,6 +939,32 @@ function setupContactResultCallback() {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
+			
+		} else if (tag.indexOf("Spring") >= 0) {
+			if (localPos.y() >= 9.99) {
+				maxSpeed = boostMaxSpeed;
+				let quat=colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
+				console.log(typeof(quat));
+				const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
+				console.log(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+				
+				//default direction is straight up
+				const direction = new THREE.Vector3(0, 1, 0);
+				direction.applyQuaternion(quaternion);
+				console.log(direction.x, direction.y, direction.z);
+
+				const b = new THREE.Vector3( );
+
+				//always accelerate when on a boost tile
+				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
+				boostImpulse.normalize();
+				boostImpulse.op_mul(SPRING_BOOST);
+				//player.body.applyCentralImpulse(boostImpulse);
+				player.body.setLinearVelocity(boostImpulse);
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
+			}
+			
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
 			if (localPos.y() >= 9.99) {
@@ -992,6 +1044,8 @@ function initInput() {
 					tileSelection = 7;
 				} else if (keyStates.Digit8 && event.code == "Digit8") {
 					tileSelection = 8;
+				} else if (keyStates.Digit9 && event.code == "Digit9") {
+					tileSelection = 9;
 				}
 
 				if (keyStates.Equal && event.code == "Equal") {
@@ -1163,7 +1217,7 @@ function updatePhysics(deltaTime) {
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
 		if (inEditor) {
-			mapGenerator.moveGhostTile(player, new THREE.Vector3(0, 0, 0), tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
+			mapGenerator.moveGhostTile(player, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
 		}
 		updateWorld(deltaTime);
 		return;

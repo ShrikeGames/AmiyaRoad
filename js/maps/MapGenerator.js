@@ -89,6 +89,15 @@ TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
 TEXTURE_PLAYER.wrapT = THREE.RepeatWrapping;
 TEXTURE_PLAYER.repeat.set(1, 1);
 
+const TEXTURE_SPRING = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile9.png');
+TEXTURE_SPRING.wrapS = THREE.RepeatWrapping;
+TEXTURE_SPRING.wrapT = THREE.RepeatWrapping;
+TEXTURE_SPRING.repeat.set(1, 1);
+const SPRING_WIDTH = 50;
+const SPRING_HEIGHT = 20;
+const SPRING_DEPTH = 50;
+
+
 const TILE_WIDTH = 50;
 const TILE_HEIGHT = 20;
 const TILE_DEPTH = 100;
@@ -345,6 +354,9 @@ class MapGenerator {
             } else if (tileType.indexOf("HalfPipe") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createTunnelWithPhysics("HalfPipe" + i, 0, this.pos, this.quat, this.scale, material, Math.PI);
+            } else if (tileType.indexOf("Spring") >= 0) {
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                newTile = this.createTileWithPhysics("Spring" + i, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
             }
             if (newTile) {
                 newTile.scale.x = this.scale.x;
@@ -746,7 +758,7 @@ class MapGenerator {
         this.scene.add(gridHelper);
 
     }
-    moveGhostTile(player, direction, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
+    moveGhostTile(player, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
         let playerPos = player.position;
         let rotation = player.quaternion;
         let rotationSnap = 0.1;
@@ -899,6 +911,15 @@ class MapGenerator {
             }
             let actualTileName = this.getOrDefault(tileName, "HalfPipe" + this.allObjects.length);
             return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material, Math.PI);
+        } else if (tileSelection == 9) {
+            //console.log("Add spring");
+
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            let actualTileName = this.getOrDefault(tileName, "Spring" + this.allObjects.length);
+            return this.createTileWithPhysics(actualTileName, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
         }
 
         return null;
