@@ -112,14 +112,13 @@ const DEATH_DEPTH = 20;
 const GOAL_WIDTH = 120;
 const GOAL_HEIGHT = 120;
 const GOAL_DEPTH = 40;
-const playerRadius = 8;
+
 const BALL_RADIUS = 6;
 const BALL_MASS = 2;
 
 let tileOpacity = 1;
-let tileTransparent = tileOpacity < 1;
-
 let tunnelOpacity = 0.75;
+let tileTransparent = tileOpacity < 1;
 let tunnelTransparent = tunnelOpacity < 1;
 
 
@@ -156,6 +155,13 @@ let lastTileSelection = 0;
 
 let cheat1 = false;
 let cheat2 = false;
+let cheat3 = false;
+const PLAYER_RADIUS = 8;
+const PLAYER_SCALE = 1;
+const PLAYER_MASS = 4;
+let playerRadius = PLAYER_RADIUS;
+let playerScale = PLAYER_SCALE;
+let playerMass = PLAYER_MASS;
 
 class MapGenerator {
     constructor(scene, physicsWorld) {
@@ -380,13 +386,13 @@ class MapGenerator {
 
     createPlayer() {
         this.pos.set(0, 30, 0);
-        this.scale.set(1, 1, 1);
+        this.scale.set(playerScale, playerScale, playerScale);
         this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: playerShininess, specular: 0xd4aae7 });
         if (this.inEditor) {
             this.pos.set(this.editorLastPos.x, this.editorLastPos.y, this.editorLastPos.z);
         }
-        let body = this.createPlayerWithPhysics(playerRadius, 4, this.pos, this.quat, this.scale, playerMaterial);
+        let body = this.createPlayerWithPhysics(playerRadius, playerMass, this.pos, this.quat, this.scale, playerMaterial);
 
         return body;
 
@@ -760,6 +766,17 @@ class MapGenerator {
             TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
         }
     }
+    activateCheat3() {
+        //toggle
+        cheat3 = !cheat3;
+        if (cheat3) {
+            playerRadius = PLAYER_RADIUS * 4;
+            playerMass = PLAYER_MASS * 4;
+        } else {
+            playerRadius = PLAYER_RADIUS;
+            playerMass = PLAYER_MASS;
+        }
+    }
     createMapBuilder() {
         console.log("Map builder");
         this.pos.set(0, 0, 0);
@@ -784,6 +801,15 @@ class MapGenerator {
     }
     toggleSnapRotation() {
         this.snapRotation = !this.snapRotation;
+    }
+    toggleTranspancy() {
+        tileOpacity = 1.5 - tileOpacity;
+        tunnelOpacity = 1.5 - tileOpacity;
+
+        tileTransparent = tileOpacity < 1;
+        tunnelTransparent = tunnelOpacity < 1;
+
+
     }
     moveGhostTile(player, rotation, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
         let playerPos = player.position;

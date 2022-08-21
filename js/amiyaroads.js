@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.33 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.34 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -195,14 +195,18 @@ function initFirstTime() {
 		console.log("test");
 		var chotCodeInput = $('input#chotCode').val();
 		var chotCodeHashed = cyrb53(chotCodeInput);
-		//console.log(chotCodeHashed);
+		console.log(chotCodeHashed);
 		var message = "";
+
 		if (chotCodeHashed == 5370197679744504) {
 			message = "Accepted. I'll protect you this time.";
 			mapGenerator.activateCheat1();
 		} else if (chotCodeHashed == 5269442767054596) {
 			message = "Accepted. In your next life you'll see your changes.";
 			mapGenerator.activateCheat2();
+		} else if (chotCodeHashed == 5120961133847674) {
+			message = "Accepted. >         <";
+			mapGenerator.activateCheat3();
 		} else {
 			message = "Denied.";
 		}
@@ -1044,7 +1048,7 @@ function initInput() {
 					tileSelection = 9;
 				}
 
-				if (keyStates.CapsLock && event.code == "CapsLock") {
+				if (keyStates.KeyS && event.code == "KeyY") {
 					mapGenerator.toggleSnapPosition();
 					mapGenerator.toggleSnapRotation();
 				}
