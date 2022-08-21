@@ -108,7 +108,7 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const SPRING_BOOST = 250;
+const SPRING_BOOST = 300;
 const WATER_LEVEL_Y_WORLD2 = 60;
 const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
@@ -872,12 +872,10 @@ function playSoundEffect(soundIndex) {
 	if (player.children.length > soundIndex - 1) {
 		const audio = player.children[soundIndex];
 		if (audio) {
-			if(audio.isPlaying){
-				audio.stop();
+			if (!audio.isPlaying) {
+				audio.setVolume(soundEffectsVolume);
+				audio.play();
 			}
-			
-			audio.setVolume(soundEffectsVolume);
-			audio.play();
 		}
 
 	}
@@ -885,10 +883,10 @@ function playSoundEffect(soundIndex) {
 }
 function stopSoundEffects() {
 	console.log("stops sound effects");
-	for(var i=0; i < player.children.length; i++) {
+	for (var i = 0; i < player.children.length; i++) {
 		const audio = player.children[i];
 		if (audio) {
-			if(audio.isPlaying){
+			if (audio.isPlaying) {
 				audio.stop();
 			}
 		}
@@ -1056,11 +1054,11 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
-			timeLastOnGround = clock.elapsedTime;
-			onGround = true;
-			if (Math.abs(velocity.y()) >= 3) {
-				playSoundEffect(0);
+			if (localPos.y() >= 0.49) {
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
 			}
+			playSoundEffect(0);
 			
 			maxSpeed = boostMaxSpeed;
 			let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
@@ -1075,10 +1073,15 @@ function setupContactResultCallback() {
 			//always accelerate when on a boost tile
 			let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
 			boostImpulse.normalize();
-			boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
+			if (localPos.y() <= 0) {
+				boostImpulse.op_mul(-SPRING_BOOST * rb1.scale.z);
+			} else {
+				boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
+			}
+
 			//player.body.applyCentralImpulse(boostImpulse);
 			player.body.setLinearVelocity(boostImpulse);
-			
+
 
 
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
@@ -1165,7 +1168,7 @@ function initInput() {
 					tileSelection = 9;
 				}
 
-				if (keyStates.KeyS && event.code == "KeyY") {
+				if (keyStates.KeyY && event.code == "KeyY") {
 					mapGenerator.toggleSnapPosition();
 					mapGenerator.toggleSnapRotation();
 				}
