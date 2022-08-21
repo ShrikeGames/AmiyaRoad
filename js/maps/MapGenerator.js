@@ -94,7 +94,7 @@ TEXTURE_SPRING.wrapS = THREE.RepeatWrapping;
 TEXTURE_SPRING.wrapT = THREE.RepeatWrapping;
 TEXTURE_SPRING.repeat.set(1, 1);
 const SPRING_WIDTH = 50;
-const SPRING_HEIGHT = 20;
+const SPRING_HEIGHT = 2;
 const SPRING_DEPTH = 50;
 
 
@@ -359,7 +359,7 @@ class MapGenerator {
                 newTile = this.createTunnelWithPhysics("HalfPipe" + i, 0, this.pos, this.quat, this.scale, material, Math.PI);
             } else if (tileType.indexOf("Spring") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
-                newTile = this.createTileWithPhysics("Spring" + i, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
+                newTile = this.createSpringWithPhysics("Spring" + i, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
             }
             if (newTile) {
                 newTile.scale.x = this.scale.x;
@@ -535,6 +535,24 @@ class MapGenerator {
         return object;
 
     }
+    createSpringWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const SPRING_HEIGHT_SEGMENTS = 1;
+        const SPRING_RADIAL_SEGMENTS = 32;
+        const geometry = new THREE.CylinderGeometry(SPRING_WIDTH * 0.5, SPRING_DEPTH * 0.5, SPRING_HEIGHT, SPRING_RADIAL_SEGMENTS, SPRING_HEIGHT_SEGMENTS);
+
+        const object = new THREE.Mesh(geometry, material);
+
+        const shape = new Ammo.btCylinderShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
+
+        object.scale.set(scale.x, scale.y, scale.z);
+        object.name = name;
+        object.receiveShadow = true;
+        object.castShadow = false;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+
+        return object;
+    }
+
     createDeathWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
         object.scale.set(scale.x, scale.y, scale.z);
@@ -770,11 +788,14 @@ class MapGenerator {
     moveGhostTile(player, rotation, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
         let playerPos = player.position;
         let rotationSnap = 0.1;
-        
+        let yOffset = playerRadius * 3;
+        if (tileSelection == 9) {
+            yOffset -= 10;
+        }
         if (this.snapPosition) {
-            this.pos.set(Math.round(playerPos.x / tileSnapDistanceX) * tileSnapDistanceX, Math.round((playerPos.y - playerRadius * 3) / tileSnapDistanceY) * tileSnapDistanceY, Math.round(playerPos.z / tileSnapDistanceZ) * tileSnapDistanceZ);
+            this.pos.set(Math.round(playerPos.x / tileSnapDistanceX) * tileSnapDistanceX, Math.round((playerPos.y - yOffset) / tileSnapDistanceY) * tileSnapDistanceY, Math.round(playerPos.z / tileSnapDistanceZ) * tileSnapDistanceZ);
         } else {
-            this.pos.set(playerPos.x, playerPos.y - playerRadius * 3, playerPos.z);
+            this.pos.set(playerPos.x, playerPos.y - yOffset, playerPos.z);
         }
         if (this.snapRotation) {
             this.quat.set(Math.round(rotation.x / rotationSnap) * rotationSnap, Math.round(rotation.y / rotationSnap) * rotationSnap, Math.round(rotation.z / rotationSnap) * rotationSnap, Math.round(rotation.w / rotationSnap) * rotationSnap);
@@ -934,7 +955,7 @@ class MapGenerator {
                 material = tileMaterial;
             }
             let actualTileName = this.getOrDefault(tileName, "Spring" + this.allObjects.length);
-            return this.createTileWithPhysics(actualTileName, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
+            return this.createSpringWithPhysics(actualTileName, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
         }
 
         return null;

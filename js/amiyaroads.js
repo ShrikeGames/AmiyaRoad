@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.32 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.33 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -941,26 +941,25 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
-			if (localPos.y() >= 9.99) {
-				maxSpeed = boostMaxSpeed;
-				let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
-				const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
+			maxSpeed = boostMaxSpeed;
+			let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
+			const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
 
-				//default direction is straight up
-				const direction = new THREE.Vector3(0, 1, 0);
-				direction.applyQuaternion(quaternion);
+			//default direction is straight up
+			const direction = new THREE.Vector3(0, 1, 0);
+			direction.applyQuaternion(quaternion);
 
-				const b = new THREE.Vector3();
+			const b = new THREE.Vector3();
 
-				//always accelerate when on a boost tile
-				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
-				boostImpulse.normalize();
-				boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
-				//player.body.applyCentralImpulse(boostImpulse);
-				player.body.setLinearVelocity(boostImpulse);
-				timeLastOnGround = clock.elapsedTime;
-				onGround = true;
-			}
+			//always accelerate when on a boost tile
+			let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
+			boostImpulse.normalize();
+			boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
+			//player.body.applyCentralImpulse(boostImpulse);
+			player.body.setLinearVelocity(boostImpulse);
+			timeLastOnGround = clock.elapsedTime;
+			onGround = true;
+			
 
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
@@ -1049,7 +1048,6 @@ function initInput() {
 					mapGenerator.toggleSnapPosition();
 					mapGenerator.toggleSnapRotation();
 				}
-				console.log(event.code);
 
 				if (keyStates.Equal && event.code == "Equal") {
 					tileScale = Math.min(tileScale + 0.25, maxTileScale);
