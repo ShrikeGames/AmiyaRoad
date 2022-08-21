@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.34 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.35 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -92,7 +92,9 @@ let inEditor;
 let inPlayTest;
 
 let musicVolume = 0.05;
+let soundEffectsVolume = 0.10;
 
+let soundEffectsInitialized = false;
 //ui
 let $debug = $('.hud.hud--debug');
 
@@ -445,6 +447,18 @@ function initFirstTime() {
 			$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
 		}
 	});
+	$(".hud--soundEffectsVolume-slider").slider({
+		orientation: "horizontal",
+		range: "min",
+		min: 0,
+		max: 100,
+		value: 10,
+		slide: function (event, ui) {
+			soundEffectsVolume = ui.value / 100.0;
+
+			$(".hud--soundEffectsVolume-display").text(Math.round(soundEffectsVolume * 100) + "%");
+		}
+	});
 	$(".hud--maxBucko-slider").slider({
 		orientation: "horizontal",
 		range: "min",
@@ -492,6 +506,7 @@ function initFirstTime() {
 		}
 	});
 	$(".hud--volume-display").text(Math.round(musicVolume * 100) + "%");
+	$(".hud--soundEffectsVolume-display").text(Math.round(soundEffectsVolume * 100) + "%");
 	$(".hud--maxBucko-display").text(maxBuckos + " buckos");
 	$(".hud--fogDensity-display").text(fogDensity * 10000);
 	$(".hud--drawDistance-display").text(drawDistance);
@@ -785,7 +800,102 @@ function initMusic() {
 	);
 }
 
+function initSoundEffects() {
+	console.log("initSoundEffects");
+	// instantiate a listener
+	const audioListener = new THREE.AudioListener();
 
+	// add the listener to the camera
+	camera.add(audioListener);
+
+
+
+	// instantiate a loader
+	const loader = new THREE.AudioLoader();
+
+	// load a resource
+	loader.load(
+		// resource URL
+		'../audio/tsunderia amiya noooo scream.mp3',
+
+		// onLoad callback
+		function (audioBuffer) {
+			// instantiate audio object
+			const soundEffects1 = new THREE.Audio(audioListener);
+			soundEffects1.setBuffer(audioBuffer);
+			soundEffects1.setVolume(soundEffectsVolume);
+			soundEffects1.setLoop(false);
+			player.add(soundEffects1);
+
+		},
+
+		// onProgress callback
+		function (xhr) {
+			//console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+		},
+
+		// onError callback
+		function (err) {
+			console.log('An error happened loading the sound effect');
+		}
+	);
+	// load a resource
+	loader.load(
+		// resource URL
+		'../audio/tsunderia amiya BONK.mp3',
+
+		// onLoad callback
+		function (audioBuffer) {
+			const soundEffects2 = new THREE.Audio(audioListener);
+			soundEffects2.setBuffer(audioBuffer);
+			soundEffects2.setVolume(soundEffectsVolume);
+			soundEffects2.setLoop(false);
+			player.add(soundEffects2);
+
+		},
+
+		// onProgress callback
+		function (xhr) {
+			//console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+		},
+
+		// onError callback
+		function (err) {
+			console.log('An error happened loading the sound effect');
+		}
+	);
+	soundEffectsInitialized = true;
+}
+
+function playSoundEffect(soundIndex) {
+	console.log("play sound effect ", soundIndex);
+	if (player.children.length > soundIndex - 1) {
+		const audio = player.children[soundIndex];
+		if (audio) {
+			if(audio.isPlaying){
+				audio.stop();
+			}
+			
+			audio.setVolume(soundEffectsVolume);
+			audio.play();
+		}
+
+	}
+
+}
+function stopSoundEffects() {
+	console.log("stops sound effects");
+	for(var i=0; i < player.children.length; i++) {
+		const audio = player.children[i];
+		if (audio) {
+			if(audio.isPlaying){
+				audio.stop();
+			}
+		}
+
+	}
+
+}
 function initGraphics() {
 	console.log("initGraphics");
 	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, drawDistance);
@@ -899,6 +1009,7 @@ function setupContactResultCallback() {
 			localPos = contactPoint.get_m_localPointB();
 			worldPos = contactPoint.get_m_positionWorldOnB();
 		}
+
 		if (keyStates.KeyI) {
 			//debug info key
 			console.log(tag);
@@ -945,6 +1056,12 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
+			timeLastOnGround = clock.elapsedTime;
+			onGround = true;
+			if (Math.abs(velocity.y()) >= 3) {
+				playSoundEffect(0);
+			}
+			
 			maxSpeed = boostMaxSpeed;
 			let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
 			const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
@@ -961,9 +1078,8 @@ function setupContactResultCallback() {
 			boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
 			//player.body.applyCentralImpulse(boostImpulse);
 			player.body.setLinearVelocity(boostImpulse);
-			timeLastOnGround = clock.elapsedTime;
-			onGround = true;
 			
+
 
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
@@ -1003,6 +1119,7 @@ function initPlayer() {
 	spotLight.target = player;
 	lastUpdateVelocity = new THREE.Vector3(0, 0, 0);
 	updates = 0;
+	initSoundEffects();
 }
 function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
 	console.log("createObjects");
@@ -1192,7 +1309,7 @@ function updatePhysics(deltaTime) {
 		if (keyStates.ArrowLeft) {
 			impulse.setX(BUILD_CAMERA_SPEED_X);
 		}
-		
+
 		if (keyStates.KeyW) {
 			angularImpulse.setX(BUILD_ROTATION_SPEED);
 		}
@@ -1211,7 +1328,7 @@ function updatePhysics(deltaTime) {
 		if (keyStates.KeyE) {
 			angularImpulse.setY(-BUILD_ROTATION_SPEED);
 		}
-		
+
 		if (keyStates.KeyR) {
 			angularImpulse.setX(-player.quaternion.x);
 			angularImpulse.setY(-player.quaternion.y);
@@ -1229,7 +1346,7 @@ function updatePhysics(deltaTime) {
 		}
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
-		
+
 		if (inEditor) {
 			mapGenerator.moveGhostTile(player, player.quaternion, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
 		}
@@ -1372,7 +1489,7 @@ function lose() {
 	if (bgm && bgm.isPlaying) {
 		bgm.stop();
 	}
-
+	stopSoundEffects();
 	clearScene();
 
 	$('.hud--mobile').addClass("hide");
@@ -1390,6 +1507,8 @@ function win() {
 		bgm.stop();
 	}
 
+	stopSoundEffects();
+
 	clearScene();
 
 	$('.hud--mobile').addClass("hide");
@@ -1406,8 +1525,7 @@ function reset() {
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
 
-	console.log(player);
-
+	playSoundEffect(1);
 	initPlayer();
 	//clearScene();
 
