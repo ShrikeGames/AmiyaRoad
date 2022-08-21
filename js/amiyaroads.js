@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.35 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.36 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -108,7 +108,7 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const SPRING_BOOST = 300;
+const SPRING_BOOST = GRAVITY*2;
 const WATER_LEVEL_Y_WORLD2 = 60;
 const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
@@ -1054,12 +1054,9 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
-			if (localPos.y() >= 0.49) {
-				timeLastOnGround = clock.elapsedTime;
-				onGround = true;
-			}
+
 			playSoundEffect(0);
-			
+
 			maxSpeed = boostMaxSpeed;
 			let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
 			const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
@@ -1073,14 +1070,19 @@ function setupContactResultCallback() {
 			//always accelerate when on a boost tile
 			let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
 			boostImpulse.normalize();
+			if (localPos.y() >= 0.49){
+				
+				boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
+				player.body.applyCentralImpulse(boostImpulse);
+			}
 			if (localPos.y() <= 0) {
 				boostImpulse.op_mul(-SPRING_BOOST * rb1.scale.z);
-			} else {
-				boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
+				player.body.applyCentralImpulse(boostImpulse);
 			}
 
-			//player.body.applyCentralImpulse(boostImpulse);
-			player.body.setLinearVelocity(boostImpulse);
+			//player.body.setLinearVelocity(boostImpulse);
 
 
 
