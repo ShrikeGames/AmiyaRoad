@@ -1045,6 +1045,12 @@ function initInput() {
 					tileSelection = 9;
 				}
 
+				if (keyStates.CapsLock && event.code == "CapsLock") {
+					mapGenerator.toggleSnapPosition();
+					mapGenerator.toggleSnapRotation();
+				}
+				console.log(event.code);
+
 				if (keyStates.Equal && event.code == "Equal") {
 					tileScale = Math.min(tileScale + 0.25, maxTileScale);
 				} else if (keyStates.Minus && event.code == "Minus") {
@@ -1184,11 +1190,12 @@ function updatePhysics(deltaTime) {
 		if (keyStates.ArrowLeft) {
 			impulse.setX(BUILD_CAMERA_SPEED_X);
 		}
+		
 		if (keyStates.KeyW) {
-			angularImpulse.setX(-BUILD_ROTATION_SPEED);
+			angularImpulse.setX(BUILD_ROTATION_SPEED);
 		}
 		if (keyStates.KeyS) {
-			angularImpulse.setX(BUILD_ROTATION_SPEED);
+			angularImpulse.setX(-BUILD_ROTATION_SPEED);
 		}
 		if (keyStates.KeyD) {
 			angularImpulse.setZ(BUILD_ROTATION_SPEED);
@@ -1196,6 +1203,13 @@ function updatePhysics(deltaTime) {
 		if (keyStates.KeyA) {
 			angularImpulse.setZ(-BUILD_ROTATION_SPEED);
 		}
+		if (keyStates.KeyQ) {
+			angularImpulse.setY(BUILD_ROTATION_SPEED);
+		}
+		if (keyStates.KeyE) {
+			angularImpulse.setY(-BUILD_ROTATION_SPEED);
+		}
+		
 		if (keyStates.KeyR) {
 			angularImpulse.setX(-player.quaternion.x);
 			angularImpulse.setY(-player.quaternion.y);
@@ -1213,8 +1227,9 @@ function updatePhysics(deltaTime) {
 		}
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
+		
 		if (inEditor) {
-			mapGenerator.moveGhostTile(player, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
+			mapGenerator.moveGhostTile(player, player.quaternion, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
 		}
 		updateWorld(deltaTime);
 		return;

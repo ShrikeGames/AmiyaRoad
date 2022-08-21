@@ -153,6 +153,7 @@ let ghostTile;
 
 let lastTileSelection = 0;
 
+
 let cheat1 = false;
 let cheat2 = false;
 
@@ -165,6 +166,8 @@ class MapGenerator {
         this.rigidBodies = [];
         this.allObjects = [];
         this.levelString = "";
+        this.snapPosition = true;
+        this.snapRotation = true;
     }
 
     initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString = "", loadedFromImage = false) {
@@ -758,14 +761,26 @@ class MapGenerator {
         this.scene.add(gridHelper);
 
     }
-    moveGhostTile(player, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
+    toggleSnapPosition() {
+        this.snapPosition = !this.snapPosition;
+    }
+    toggleSnapRotation() {
+        this.snapRotation = !this.snapRotation;
+    }
+    moveGhostTile(player, rotation, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
         let playerPos = player.position;
-        let rotation = player.quaternion;
         let rotationSnap = 0.1;
-
-        this.pos.set(Math.round(playerPos.x / tileSnapDistanceX) * tileSnapDistanceX, Math.round(playerPos.y / tileSnapDistanceY) * tileSnapDistanceY, Math.round(playerPos.z / tileSnapDistanceZ) * tileSnapDistanceZ);
-
-        this.quat.set(Math.round(rotation.x / rotationSnap) * rotationSnap, 0, Math.round(rotation.z / rotationSnap) * rotationSnap, Math.round(rotation.w / rotationSnap) * rotationSnap);
+        
+        if (this.snapPosition) {
+            this.pos.set(Math.round(playerPos.x / tileSnapDistanceX) * tileSnapDistanceX, Math.round((playerPos.y - playerRadius * 3) / tileSnapDistanceY) * tileSnapDistanceY, Math.round(playerPos.z / tileSnapDistanceZ) * tileSnapDistanceZ);
+        } else {
+            this.pos.set(playerPos.x, playerPos.y - playerRadius * 3, playerPos.z);
+        }
+        if (this.snapRotation) {
+            this.quat.set(Math.round(rotation.x / rotationSnap) * rotationSnap, Math.round(rotation.y / rotationSnap) * rotationSnap, Math.round(rotation.z / rotationSnap) * rotationSnap, Math.round(rotation.w / rotationSnap) * rotationSnap);
+        } else {
+            this.quat.set(rotation.x, rotation.y, rotation.z, rotation.w);
+        }
 
         if (this.lastTileSelection != tileSelection) {
             this.scene.remove(this.ghostTile);
