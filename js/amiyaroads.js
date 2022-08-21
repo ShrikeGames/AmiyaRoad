@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.31 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.32 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -106,7 +106,7 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const SPRING_BOOST = 550;
+const SPRING_BOOST = 250;
 const WATER_LEVEL_Y_WORLD2 = 60;
 const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
@@ -500,7 +500,7 @@ function initFirstTime() {
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color(0xbfd1e5);
 
-	renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true});
+	renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMap.enabled = true;
@@ -872,7 +872,7 @@ function setupContactResultCallback() {
 			return;
 		}
 		*/
-		
+
 		let colWrapper0 = Ammo.wrapPointer(colObj0Wrap, Ammo.btCollisionObjectWrapper);
 		let rb0 = Ammo.castObject(colWrapper0.getCollisionObject(), Ammo.btRigidBody);
 
@@ -881,14 +881,14 @@ function setupContactResultCallback() {
 
 		let tag, localPos, worldPos;
 
-		
+
 		if (rb0.name != "Player") {
 
 			tag = rb0.name;
 			localPos = contactPoint.get_m_localPointA();
 			worldPos = contactPoint.get_m_positionWorldOnA();
-			
-			
+
+
 		} else {
 
 			tag = rb1.name;
@@ -899,13 +899,13 @@ function setupContactResultCallback() {
 			//debug info key
 			console.log(tag);
 			console.log(rb1);
-			
+
 			//const vector = new THREE.Vector3( velocity.x(), velocity.y(), velocity.z() ).normalize();
 			//vector.applyQuaternion( quaternion );
 			//console.log(vector.x, vector.y, vector.z);
-			
-			
-			
+
+
+
 			//console.log(direction.x, direction.y, direction.z);
 		}
 		if (tag.indexOf("Death") >= 0) {
@@ -918,17 +918,17 @@ function setupContactResultCallback() {
 
 			if (localPos.y() >= 9.99) {
 				maxSpeed = boostMaxSpeed;
-				let quat=colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
-				console.log(typeof(quat));
+				let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
+				console.log(typeof (quat));
 				const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
 				console.log(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-				
+
 				//default direction is traveling on the z axis, and a little bit down so the tile keeps you more grounded by default
 				const direction = new THREE.Vector3(0, -0.1, 1);
 				direction.applyQuaternion(quaternion);
 				console.log(direction.x, direction.y, direction.z);
 
-				const b = new THREE.Vector3( );
+				const b = new THREE.Vector3();
 
 				//always accelerate when on a boost tile
 				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
@@ -939,32 +939,29 @@ function setupContactResultCallback() {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
-			
+
 		} else if (tag.indexOf("Spring") >= 0) {
 			if (localPos.y() >= 9.99) {
 				maxSpeed = boostMaxSpeed;
-				let quat=colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
-				console.log(typeof(quat));
+				let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
 				const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
-				console.log(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-				
+
 				//default direction is straight up
 				const direction = new THREE.Vector3(0, 1, 0);
 				direction.applyQuaternion(quaternion);
-				console.log(direction.x, direction.y, direction.z);
 
-				const b = new THREE.Vector3( );
+				const b = new THREE.Vector3();
 
 				//always accelerate when on a boost tile
 				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
 				boostImpulse.normalize();
-				boostImpulse.op_mul(SPRING_BOOST);
+				boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
 				//player.body.applyCentralImpulse(boostImpulse);
 				player.body.setLinearVelocity(boostImpulse);
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
-			
+
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
 			if (localPos.y() >= 9.99) {
@@ -1161,7 +1158,7 @@ function updateWorld(deltaTime) {
 
 	camera.position.set(0, 100 + Math.max(player.position.y - yCamerPan, 0), player.position.z - 200);
 	camera.lookAt(0, 5 + Math.max(player.position.y - yCamerPan, 0), player.position.z);
-	spotLight.position.set(player.position.x, 200, player.position.z);
+	spotLight.position.set(player.position.x, player.position.y + 200, player.position.z);
 
 }
 function isUnderWater() {
