@@ -10,7 +10,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
-
+import { TTFLoader } from './jsm/loaders/TTFLoader.js';
 const versionString = "PRE-ALPHA Build 0.3.39 \"Cat-Crab-Chotter\"";
 
 let stats;
@@ -291,7 +291,7 @@ function initFirstTime() {
 			cover.attr("src", encodedImageURL);
 
 			var link = $('a.download-level-link');
-			link.attr('download', 'AmiyaRoads_CustomLevel.png');
+			link.attr('download', 'AmiyaRoads_'+$('#level-name').val()+'.png');
 			link.attr('href', encodedImageURL.replace("image/png", "image/octet-stream"));
 			link.click();
 
@@ -461,7 +461,6 @@ function initFirstTime() {
 				inEditor = false;
 				inPlayTest = true;
 				if (levelString.indexOf("~") >= 0) {
-
 					let parts = levelString.split("~");
 					currentWorld = parts[0];
 				} else {
@@ -1212,8 +1211,10 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 function initFont() {
 
 	removeObject3D(text);
-	const loader = new FontLoader();
-	loader.load('js/fonts/helvetiker_regular.typeface.json', function (font) {
+	const loader = new TTFLoader();
+	const fontLoader = new FontLoader();
+	loader.load('js/fonts/LotuscoderBold-eZZYn.ttf', function (fnt) {
+		let font = fontLoader.parse(fnt);
 		const color = new THREE.Color(0xb84ff4);
 		const matLite = new THREE.MeshBasicMaterial({
 			color: color,
@@ -1222,7 +1223,7 @@ function initFont() {
 			side: THREE.DoubleSide
 		});
 		const message = $('#level-name').val();
-		const shapes = font.generateShapes(message, 16);
+		const shapes = font.generateShapes(message, 8);
 		const geometry = new THREE.ShapeGeometry(shapes);
 		geometry.rotateY(Math.PI);
 		geometry.center();
