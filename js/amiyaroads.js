@@ -394,7 +394,13 @@ function initFirstTime() {
 
 
 	});
+	$('#level-name').on('change', function (e) {
+		e.preventDefault();
+		console.log("Change level name");
+		initFont();
 
+
+	});
 
 	$('.playtest-button').on('click', function (e) {
 		e.preventDefault();
@@ -617,7 +623,12 @@ function init(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage 
 	won = false;
 }
 function removeObject3D(object) {
-	if (!(object instanceof THREE.Object3D)) return false;
+	if (!object) {
+		return false;
+	}
+	if (!(object instanceof THREE.Object3D)) {
+		return false;
+	}
 	// for better memory management and performance
 	if (object.geometry) {
 		object.geometry.dispose();
@@ -1200,7 +1211,7 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 
 function initFont() {
 
-
+	removeObject3D(text);
 	const loader = new FontLoader();
 	loader.load('js/fonts/helvetiker_regular.typeface.json', function (font) {
 		const color = new THREE.Color(0xb84ff4);
@@ -1210,7 +1221,7 @@ function initFont() {
 			opacity: 0,
 			side: THREE.DoubleSide
 		});
-		const message = '#AmiyaRoads';
+		const message = $('#level-name').val();
 		const shapes = font.generateShapes(message, 16);
 		const geometry = new THREE.ShapeGeometry(shapes);
 		geometry.rotateY(Math.PI);
@@ -1218,6 +1229,7 @@ function initFont() {
 
 		// make shape ( N.B. edge view not visible )
 		text = new THREE.Mesh(geometry, matLite);
+		text.name = "LevelName";
 		text.position.x = player.position.x;
 		text.position.y = player.position.y;
 		text.position.z = player.position.z - 10;
