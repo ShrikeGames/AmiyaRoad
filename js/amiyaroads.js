@@ -9,7 +9,7 @@ import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
 
-const versionString = "PRE-ALPHA Build 0.3.37 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.38 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -108,7 +108,7 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const SPRING_BOOST = GRAVITY * 0.5;
+const SPRING_BOOST = GRAVITY * 1;
 const WATER_LEVEL_Y_WORLD2 = 60;
 const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
@@ -129,7 +129,7 @@ let defaultEffectController = {
 	exposure: 1
 };
 let effectController = defaultEffectController;
-let collidedObjects = [];
+
 
 const mainGameLoop = function (deltaTime) {
 
@@ -1058,11 +1058,9 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
-			var tileObject = scene.getObjectByName(tag);
-			if (!tileObject.userData.collided) {
-				console.log(tileObject.userData.collided);
-				console.log(tileObject.userData.collidedTime);
+			if (localPos.y() >= 0) {
 				playSoundEffect(0);
+				var tileObject = scene.getObjectByName(tag);
 
 				maxSpeed = boostMaxSpeed;
 				let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
@@ -1075,31 +1073,31 @@ function setupContactResultCallback() {
 				//always accelerate when on a boost tile
 				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
 				boostImpulse.normalize();
-				let prevVelocity = new Ammo.btVector3(velocity.x(), velocity.y(), velocity.z());
+				let prevVelocity = new Ammo.btVector3(velocity.x(), 0, velocity.z());
 				console.log(player.body);
 				if (localPos.y() <= 0) {
 					boostImpulse.op_mul(-SPRING_BOOST * rb1.scale.z);
-					//player.body.clearForces();
+					player.body.clearForces();
 					player.body.setLinearVelocity(boostImpulse * 0.5);
 
 				} else {
 					boostImpulse.op_mul(SPRING_BOOST * rb1.scale.z);
-					//player.body.clearForces();
+					player.body.clearForces();
 					player.body.setLinearVelocity(boostImpulse);
 
 				}
-				console.log(prevVelocity);
+
 				prevVelocity.normalize();
 				prevVelocity.op_mul(SPRING_BOOST * rb1.scale.z)
 				player.body.applyCentralImpulse(prevVelocity);
-				timeLastOnGround = clock.elapsedTime;
-				onGround = true;
+
 				tileObject.userData.collided = true;
 				tileObject.userData.collidedTime = clock.elapsedTime;
-				collidedObjects.push(tileObject);
+				
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
 			}
 
-			//player.body.setLinearVelocity(boostImpulse);
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
 			stamina = maxStamina;
 			if (localPos.y() >= 9.99) {
@@ -1146,7 +1144,7 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
 	if (mapGenerator == null) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
-	collidedObjects = [];
+
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
 	initPlayer();
 }
@@ -1462,6 +1460,7 @@ function updatePhysics(deltaTime) {
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
+			console.log(onGround, (clock.elapsedTime - timeLastOnGround));
 			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
 			if (isUnderWater()) {
 				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, waterJumpSpeed * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
@@ -1491,15 +1490,7 @@ function updatePhysics(deltaTime) {
 	player.body.setLinearVelocity(linearVelocity);
 
 	updateWorld(deltaTime);
-	if (onGround) {
-		for (var i = 0; i < collidedObjects.length; i++) {
-			if ((clock.elapsedTime - collidedObjects[i].userData.collidedTime) <= coyoteTimeLimit) {
-				collidedObjects[i].userData.collided = false;
-				collidedObjects.splice(i, 1);
-			}
-
-		}
-	}
+	onGround = false;
 }
 function clearScene() {
 	mapGenerator.clear();
@@ -1553,9 +1544,7 @@ function reset() {
 
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
-	for (var i = 0; i < collidedObjects.length; i++) {
-		collidedObjects[i].userData.collided = false;
-	}
+
 	playSoundEffect(1);
 	initPlayer();
 	//clearScene();
