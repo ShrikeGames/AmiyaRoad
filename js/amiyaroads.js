@@ -312,13 +312,38 @@ function initFirstTime() {
 			} else {
 				currentWorld = $('.hud--worldSelect').val();
 			}
+			init(currentWorld, currentLevel, inEditor, inPlayTest, seed, true);
+			animate();
+
+			$('.menu--start-screen').addClass('hide');
+			$('.modal').addClass('hide');
+		} else {
+			var levelImage = $('#Level' + currentWorld + "-" + currentLevel);
+			var imageObj = new Image();
+			imageObj.src = levelImage.attr("src");
+			imageObj.onload = function () {
+				var shadowCanvas = document.createElement('canvas');
+				shadowCanvas.style.display = 'none';
+				shadowCanvas.width = 600;
+				shadowCanvas.height = 600;
+
+				var shadowCtx = shadowCanvas.getContext('2d');
+				shadowCtx.drawImage(imageObj, 0, 0, 600, 600);
+
+				var imageData = shadowCtx.getImageData(0, 0, 600, 600);
+				var decodeMessage = steg.decode(imageData, { t: 3, width: 600, height: 600 });
+
+				console.log(atob(decodeMessage));
+				$('#levelSelect').val(atob(decodeMessage));
+				console.log($('#levelSelect').val());
+				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, true);
+				animate();
+
+				$('.menu--start-screen').addClass('hide');
+				$('.modal').addClass('hide');
+			};
 		}
 
-		init(currentWorld, currentLevel, inEditor, inPlayTest, seed);
-		animate();
-
-		$('.menu--start-screen').addClass('hide');
-		$('.modal').addClass('hide');
 	});
 
 	$('.button--menu').on('click', function (e) {
@@ -337,7 +362,7 @@ function initFirstTime() {
 		currentWorld = $(this).val();
 		inEditor = true;
 		inPlayTest = false;
-		init(currentWorld, currentLevel, inEditor, inPlayTest);
+		init(currentWorld, currentLevel, inEditor, inPlayTest, false);
 
 		$('.menu--start-screen').addClass('hide');
 		$('.button--menu').removeClass('hide');
@@ -357,7 +382,7 @@ function initFirstTime() {
 		inEditor = false;
 		inPlayTest = true;
 
-		init(currentWorld, currentLevel, inEditor, inPlayTest);
+		init(currentWorld, currentLevel, inEditor, inPlayTest, false);
 		$('.menu--start-screen').addClass('hide');
 		$('.hud--mobile').removeClass("hide");
 		$('.button--menu').addClass('hide');
@@ -376,7 +401,7 @@ function initFirstTime() {
 
 		inEditor = true;
 		inPlayTest = false;
-		init(currentWorld, currentLevel, inEditor, inPlayTest);
+		init(currentWorld, currentLevel, inEditor, inPlayTest, false);
 
 		$('.menu--start-screen').addClass('hide');
 		$('.button--menu').removeClass('hide');
@@ -417,7 +442,7 @@ function initFirstTime() {
 
 				currentLevel = "T";
 				seed = "amiyaroads_" + Math.round(Math.random() * 25600);
-				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString, true);
+				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString, true, true);
 				$('.menu--start-screen').addClass('hide');
 				$('.button--menu').addClass('hide');
 				$('.hud--basic').removeClass("hide");
@@ -545,7 +570,7 @@ function initFirstTime() {
 	$('.menu--loading-screen').addClass('hide');
 }
 
-function init(currentWorld, currentLevel, inEditor, inPlayTest) {
+function init(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage = true) {
 	console.log("init");
 	clock = new THREE.Clock();
 
@@ -555,7 +580,7 @@ function init(currentWorld, currentLevel, inEditor, inPlayTest) {
 
 	initPhysics();
 
-	createObjects(currentWorld, currentLevel, inEditor, inPlayTest);
+	createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage);
 
 	initSky(currentWorld, currentLevel, inEditor, inPlayTest);
 
@@ -1093,7 +1118,7 @@ function setupContactResultCallback() {
 
 				tileObject.userData.collided = true;
 				tileObject.userData.collidedTime = clock.elapsedTime;
-				
+
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
@@ -1138,14 +1163,14 @@ function initPlayer() {
 	updates = 0;
 	initSoundEffects();
 }
-function createObjects(currentWorld, currentLevel, inEditor, inPlayTest) {
+function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage = true) {
 	console.log("createObjects");
 
 	if (mapGenerator == null) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
 
-	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val());
+	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val(), loadedFromImage);
 	initPlayer();
 }
 
@@ -1209,9 +1234,6 @@ function initInput() {
 
 function onWindowResize() {
 	console.log("onWindowResize");
-	if (won || dead) {
-		return;
-	}
 	if (camera) {
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
