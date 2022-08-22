@@ -8,8 +8,10 @@ import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
 import { Vector3 } from 'three';
+import { SVGLoader } from './jsm/loaders/SVGLoader.js';
+import { FontLoader } from './jsm/loaders/FontLoader.js';
 
-const versionString = "PRE-ALPHA Build 0.3.38 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.39 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -97,6 +99,8 @@ let soundEffectsVolume = 0.10;
 let soundEffectsInitialized = false;
 //ui
 let $debug = $('.hud.hud--debug');
+let text;
+let strokeText;
 
 //level editor
 const BUILD_CAMERA_SPEED_X = 50;
@@ -171,6 +175,9 @@ function initFirstTime() {
 
 	$('.modal--close').on('click', function (e) {
 		e.preventDefault();
+		if (text) {
+			text.material.opacity = 0;
+		}
 		$('.modal').addClass('hide');
 	});
 	$('.modal').on('click', function (e) {
@@ -249,21 +256,37 @@ function initFirstTime() {
 	$('.hud--mobile--bottom').on('touchend', function (e) {
 		keyStates.KeyZ = false;
 	});
+	function create2DVector(vector, camera, width, height) {
+		var vector = vector.clone().project(camera);
 
+		vector.x = (vector.x + 1) / 2 * width;
+		vector.y = -(vector.y - 1) / 2 * height;
 
+		return vector;
+	}
 	$('.export-button').on('click', function (e) {
 		e.preventDefault();
 		var cover = $("#cover");
+		text.material.opacity = 1;
+		text.position.x = player.position.x;
+		text.position.y = player.position.y;
+		text.position.z = player.position.z - 10;
+		render();
+
 		mapGenerator.generateLevelString();
 		var base64LevelString = btoa($('#levelSelect').val());
-
 		var screenshotImage = renderer.domElement.toDataURL("image/png");
-
 		var imageElement = document.getElementById("img");
 		imageElement.src = screenshotImage;
 		imageElement.onload = function () {
-			var dxWindow = Math.max(0, (window.innerWidth * 0.5) - 300);
-			var dyWindow = Math.max(0, (window.innerHeight * 0.5) - 300);
+			console.log(text.position);
+			let screenWidth = $('#container canvas').attr('width');
+			let screenHeight = $('#container canvas').attr('height');
+
+			let screenPos = create2DVector(player.position, camera, screenWidth, screenHeight);
+			var dxWindow = Math.max(0, screenPos.x - 300);
+			var dyWindow = Math.max(0, screenPos.y - 300);
+			console.log(dxWindow, dyWindow);
 			var encodedImageURL = steg.encode(base64LevelString, "img", { t: 3, dx: dxWindow, dy: dyWindow, width: 600, height: 600 });
 			cover.attr("src", encodedImageURL);
 
@@ -274,7 +297,6 @@ function initFirstTime() {
 
 			$('.modal--share').removeClass('hide');
 		};
-
 	});
 	$('.open-modal').on('click', function (e) {
 		e.preventDefault();
@@ -1172,6 +1194,36 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val(), loadedFromImage);
 	initPlayer();
+
+	initFont();
+}
+
+function initFont() {
+
+
+	const loader = new FontLoader();
+	loader.load('js/fonts/helvetiker_regular.typeface.json', function (font) {
+		const color = new THREE.Color(0xb84ff4);
+		const matLite = new THREE.MeshBasicMaterial({
+			color: color,
+			transparent: true,
+			opacity: 0,
+			side: THREE.DoubleSide
+		});
+		const message = '#AmiyaRoads';
+		const shapes = font.generateShapes(message, 16);
+		const geometry = new THREE.ShapeGeometry(shapes);
+		geometry.rotateY(Math.PI);
+		geometry.center();
+
+		// make shape ( N.B. edge view not visible )
+		text = new THREE.Mesh(geometry, matLite);
+		text.position.x = player.position.x;
+		text.position.y = player.position.y;
+		text.position.z = player.position.z - 10;
+
+		scene.add(text);
+	});
 }
 
 
