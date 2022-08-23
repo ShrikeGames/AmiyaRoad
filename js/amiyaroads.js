@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.40 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.41 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -183,6 +183,9 @@ function initFirstTime() {
 	$('.modal').on('click', function (e) {
 		if ($(e.target).hasClass("modal")) {
 			$('.modal').addClass('hide');
+			if (text) {
+				text.material.opacity = 0;
+			}
 		} else {
 			e.stopPropagation();
 		}
@@ -373,6 +376,7 @@ function initFirstTime() {
 		console.log("Go to main menu");
 		inEditor = false;
 		inPlayTest = false;
+		text = null;
 		lose();
 	});
 
@@ -1204,7 +1208,7 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val(), loadedFromImage);
 	initPlayer();
-	if(!text){
+	if(!text && inEditor){
 		initFont();
 	}
 }
