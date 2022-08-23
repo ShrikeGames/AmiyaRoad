@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.39 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.40 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -1204,12 +1204,13 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val(), loadedFromImage);
 	initPlayer();
-
-	initFont();
+	if(!text){
+		initFont();
+	}
 }
 
 function initFont() {
-
+	console.log("init font");
 	removeObject3D(text);
 	const loader = new TTFLoader();
 	const fontLoader = new FontLoader();
