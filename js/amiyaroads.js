@@ -1577,7 +1577,6 @@ function updatePhysics(deltaTime) {
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
-			console.log(onGround, (clock.elapsedTime - timeLastOnGround));
 			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
 			if (isUnderWater()) {
 				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, waterJumpSpeed * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
