@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.41 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.42 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -133,7 +133,11 @@ let defaultEffectController = {
 	exposure: 1
 };
 let effectController = defaultEffectController;
-
+const loader = new TTFLoader();
+const fontLoader = new FontLoader();
+const fontColor = new THREE.Color(0xb84ff4);
+let font;
+let fontMaterial;
 
 const mainGameLoop = function (deltaTime) {
 
@@ -593,12 +597,22 @@ function initFirstTime() {
 	}
 
 	initInput();
-
 	window.addEventListener('resize', onWindowResize);
 
+	loader.load('js/fonts/LotuscoderBold-eZZYn.ttf', function (fnt) {
+		font = fontLoader.parse(fnt);
+		fontMaterial = new THREE.MeshBasicMaterial({
+			color: fontColor,
+			transparent: true,
+			opacity: 0,
+			side: THREE.DoubleSide
+		});
+		initialized = true;
+		$('.menu--loading-screen').addClass('hide');
+	});
 
-	initialized = true;
-	$('.menu--loading-screen').addClass('hide');
+	
+	
 }
 
 function init(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage = true) {
@@ -1215,33 +1229,24 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 
 function initFont() {
 	console.log("init font");
+	$('.menu--loading-screen').removeClass('hide');
 	removeObject3D(text);
-	const loader = new TTFLoader();
-	const fontLoader = new FontLoader();
-	loader.load('js/fonts/LotuscoderBold-eZZYn.ttf', function (fnt) {
-		let font = fontLoader.parse(fnt);
-		const color = new THREE.Color(0xb84ff4);
-		const matLite = new THREE.MeshBasicMaterial({
-			color: color,
-			transparent: true,
-			opacity: 0,
-			side: THREE.DoubleSide
-		});
-		const message = $('#level-name').val();
-		const shapes = font.generateShapes(message, 8);
-		const geometry = new THREE.ShapeGeometry(shapes);
-		geometry.rotateY(Math.PI);
-		geometry.center();
+	
+	const message = $('#level-name').val();
+	const shapes = font.generateShapes(message, 8);
+	const geometry = new THREE.ShapeGeometry(shapes);
+	geometry.rotateY(Math.PI);
+	geometry.center();
 
-		// make shape ( N.B. edge view not visible )
-		text = new THREE.Mesh(geometry, matLite);
-		text.name = "LevelName";
-		text.position.x = player.position.x;
-		text.position.y = player.position.y;
-		text.position.z = player.position.z - 10;
+	// make shape ( N.B. edge view not visible )
+	text = new THREE.Mesh(geometry, fontMaterial);
+	text.name = "LevelName";
+	text.position.x = player.position.x;
+	text.position.y = player.position.y;
+	text.position.z = player.position.z - 10;
 
-		scene.add(text);
-	});
+	scene.add(text);
+	$('.menu--loading-screen').addClass('hide');
 }
 
 
