@@ -756,10 +756,10 @@ class MapGenerator {
 
         // grid
         const gridTileCount = 500;
-        const gridSize = TILE_WIDTH * gridTileCount;
+        const gridSize = TILE_DEPTH * gridTileCount;
         const gridHelper = new THREE.GridHelper(gridSize, gridTileCount);
         gridHelper.position.x = -TILE_WIDTH / 2;
-        gridHelper.position.z = -TILE_WIDTH / 2;
+        gridHelper.position.z = (-TILE_DEPTH / 2)-3;
         gridHelper.receiveShadow = true;
         gridHelper.castShadow = false;
         this.scene.add(gridHelper);

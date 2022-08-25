@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.43 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.44 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -192,6 +192,12 @@ function initFirstTime() {
 		} else {
 			e.stopPropagation();
 		}
+	});
+	$('#level-name').on("focus", function (e) {
+		$(this).addClass("focused");
+	});
+	$('#level-name').on("focusout", function (e) {
+		$(this).removeClass("focused");
 	});
 	//https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
 	//Not for crypto use, public domain
@@ -1255,7 +1261,9 @@ function initFont() {
 	scene.add(text);
 	$('.menu--loading-screen').addClass('hide');
 }
-
+function gameFocused() {
+	return !$('#level-name').hasClass("focused");
+}
 
 function initInput() {
 	console.log("initInput");
@@ -1263,11 +1271,16 @@ function initInput() {
 	keyStates = {};
 	$(document).ready(function () {
 		document.addEventListener('keydown', (event) => {
-			keyStates[event.code] = true;
+			if (gameFocused()) {
+				keyStates[event.code] = true;
+			} else {
+				keyStates[event.code] = false;
+			}
+
 		});
 
 		document.addEventListener('keyup', (event) => {
-			if (inEditor) {
+			if (inEditor && gameFocused()) {
 				if (keyStates.Digit0 && event.code == "Digit0") {
 					tileSelection = 0;
 				} else if (keyStates.Digit1 && event.code == "Digit1") {
@@ -1485,9 +1498,9 @@ function updatePhysics(deltaTime) {
 	}
 	//$('.hud--speed').text(Math.abs(-velocity.z().toPrecision(4)));
 	//$('.hud--speed').attr("style", "height:" + Math.abs((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
-	let staminaPercent = ((stamina / maxStamina).toPrecision(2) * 100);
-	$('.hud--stamina-label').text(Math.round(staminaPercent) + "%");
-	$('.hud--stamina-value').attr("style", "height:" + staminaPercent + "%;");
+	// let staminaPercent = ((stamina / maxStamina).toPrecision(2) * 100);
+	// $('.hud--stamina-label').text(Math.round(staminaPercent) + "%");
+	// $('.hud--stamina-value').attr("style", "height:" + staminaPercent + "%;");
 
 	checkContact();
 	if (won) {
