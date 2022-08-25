@@ -23,7 +23,9 @@
 .hud--worldSelect {
 	color: #000000;
 }
-
+ .columns.u-no-margins {
+	margin: 0;
+ }
 .version {
 	position: absolute;
 	top: 10px;

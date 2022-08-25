@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.42 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.43 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -160,7 +160,6 @@ const mainGameLoop = function (deltaTime) {
 // game loop limited to 60fps because bullet physics engine only does 60
 const gameLoop = createGameLoop(mainGameLoop, 60);
 
-
 Ammo().then(function (AmmoLib) {
 
 	Ammo = AmmoLib;
@@ -298,7 +297,7 @@ function initFirstTime() {
 			cover.attr("src", encodedImageURL);
 
 			var link = $('a.download-level-link');
-			link.attr('download', 'AmiyaRoads_'+$('#level-name').val()+'.png');
+			link.attr('download', 'AmiyaRoads_' + $('#level-name').val() + '.png');
 			link.attr('href', encodedImageURL.replace("image/png", "image/octet-stream"));
 			link.click();
 
@@ -402,6 +401,7 @@ function initFirstTime() {
 
 
 	});
+
 	$('#level-name').on('change', function (e) {
 		e.preventDefault();
 		console.log("Change level name");
@@ -409,7 +409,14 @@ function initFirstTime() {
 
 
 	});
+	$('.hud--fpsCap').on('change', function (e) {
+		e.preventDefault();
+		console.log("Change FPS cap");
+		var $this = $(this);
+		var newFPS = parseInt($this.val());
+		gameLoop.fps = newFPS;
 
+	});
 	$('.playtest-button').on('click', function (e) {
 		e.preventDefault();
 		console.log("Playtest");
@@ -611,8 +618,8 @@ function initFirstTime() {
 		$('.menu--loading-screen').addClass('hide');
 	});
 
-	
-	
+
+
 }
 
 function init(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage = true) {
@@ -1222,7 +1229,7 @@ function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedF
 
 	rigidBodies = mapGenerator.initMap(currentWorld, currentLevel, inEditor, inPlayTest, seed, $('#levelSelect').val(), loadedFromImage);
 	initPlayer();
-	if(!text && inEditor){
+	if (!text && inEditor) {
 		initFont();
 	}
 }
@@ -1231,7 +1238,7 @@ function initFont() {
 	console.log("init font");
 	$('.menu--loading-screen').removeClass('hide');
 	removeObject3D(text);
-	
+
 	const message = $('#level-name').val();
 	const shapes = font.generateShapes(message, 8);
 	const geometry = new THREE.ShapeGeometry(shapes);

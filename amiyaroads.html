@@ -70,20 +70,33 @@
     <div class="modal hide" id="modal--options">
         <div class="modal-content">
             <span class="modal--close">&times;</span>
-            <h2 data-lang-en="Options" data-lang-jp="Options">Options</h2>
-            <h3>Music Volume: <span class="hud--volume-display"></span></h3>
-            <div class="hud hud--volume-slider" style="width:120px;"></div>
-            <h3>Sound Effects Volume: <span class="hud--soundEffectsVolume-display"></span></h3>
-            <div class="hud hud--soundEffectsVolume-slider" style="width:120px;"></div>
-            <h3>Bucko Particle Count: <span class="hud--maxBucko-display"></span></h3>
-            <div class="hud hud--maxBucko-slider" style="width:120px;"></div>
-            <h3>Fog Density: <span class="hud--fogDensity-display"></span></h3>
-            <div class="hud hud--fogDensity-slider" style="width:120px;"></div>
-            <h3>Draw Distance: <span class="hud--drawDistance-display"></span></h3>
-            <div class="hud hud--drawDistance-slider" style="width:120px;"></div>
-            <h3>Chot Codes: <span class="hud--chotCode-display"></span></h3>
-            <input type="text" name="chotCode" id="chotCode"/>
-            <a href="#" class="button button-primary apply-chotCode">Apply Chot Code</a>
+            <div class="row">
+                <h2 data-lang-en="Options" data-lang-jp="Options">Options</h2>
+                <div class="six columns u-no-margins">
+                    <h3>Music Volume: <span class="hud--volume-display"></span></h3>
+                    <div class="hud hud--volume-slider" style="width:120px;"></div>
+                    <h3>Sound Effects Volume: <span class="hud--soundEffectsVolume-display"></span></h3>
+                    <div class="hud hud--soundEffectsVolume-slider" style="width:120px;"></div>
+                    <h3>Bucko Particle Count: <span class="hud--maxBucko-display"></span></h3>
+                    <div class="hud hud--maxBucko-slider" style="width:120px;"></div>
+                    <h3>Fog Density: <span class="hud--fogDensity-display"></span></h3>
+                    <div class="hud hud--fogDensity-slider" style="width:120px;"></div>
+                    <h3>Draw Distance: <span class="hud--drawDistance-display"></span></h3>
+                    <div class="hud hud--drawDistance-slider" style="width:120px;"></div>
+                    <h3>Max Frames Per Second:</h3>
+                    <select class="hud--fpsCap">
+                        <option value="60">60 FPS</option>
+                        <option value="45">45 FPS</option>
+                        <option value="30">30 FPS</option>
+                    </select>
+                </div>
+                <div class="six columns u-no-margins">
+                    <h3>Chot Codes: <span class="hud--chotCode-display"></span></h3>
+                    <input type="text" name="chotCode" id="chotCode"/>
+                    <a href="#" class="button button-primary apply-chotCode">Apply Chot Code</a>
+                    
+                </div>
+            </div>
         </div>
     </div>
     <div class="modal modal--share hide">
