@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.48 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.49 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -381,6 +381,7 @@ function initFirstTime() {
 	$('.button--menu').on('click', function (e) {
 		e.preventDefault();
 		console.log("Go to main menu");
+		$('#levelSelect').val("");
 		inEditor = false;
 		inPlayTest = false;
 		text = null;
@@ -482,8 +483,7 @@ function initFirstTime() {
 				var imageData = shadowCtx.getImageData(0, 0, 600, 600);
 				var decodeMessage = steg.decode(imageData, { t: 3, width: 600, height: 600 });
 				var levelString = atob(decodeMessage);
-				$('#levelSelect').attr('value', levelString);
-
+				$('#levelSelect').val(levelString);
 				inEditor = false;
 				inPlayTest = true;
 				if (levelString.indexOf("~") >= 0) {
