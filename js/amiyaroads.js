@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.44 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.45 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -37,19 +37,20 @@ let waterRises = false;
 
 // Physics
 // Physics variables
-const GRAVITY = 600;
+const GRAVITY = 480;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 80;
 const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 30;
-const acceleration = 50;
+const acceleration = 40;
+const BOOST_ACCELERATION = 160;
 const turnSpeed = 25;
 const turnSpeedOnGround = 25;
-const regularMaxSpeed = 400;
-const boostMaxSpeed = 650;
-const BOOST_DECAY_RATE = 50;
+const regularMaxSpeed = 320;
+const boostMaxSpeed = 520;
+const BOOST_DECAY_RATE = 40;
 const maxTurnSpeed = 100;
-const jumpSpeed = 170;
-const waterJumpSpeed = 140;
+const jumpSpeed = 136;
+const waterJumpSpeed = 112;
 let maxSpeed = regularMaxSpeed;
 const maxStamina = 2800;
 
@@ -986,6 +987,7 @@ function stopSoundEffects() {
 	}
 
 }
+
 function initGraphics() {
 	console.log("initGraphics");
 	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, drawDistance);
@@ -1013,10 +1015,6 @@ function initGraphics() {
 	spotLight.shadow.camera.bottom = - 1000;
 
 	scene.add(spotLight);
-
-
-	//
-
 
 }
 
@@ -1138,7 +1136,7 @@ function setupContactResultCallback() {
 				//always accelerate when on a boost tile
 				let boostImpulse = new Ammo.btVector3(direction.x, direction.y, direction.z);
 				boostImpulse.normalize();
-				boostImpulse.op_mul(acceleration * 2);
+				boostImpulse.op_mul(BOOST_ACCELERATION);
 				player.body.applyCentralImpulse(boostImpulse);
 
 				timeLastOnGround = clock.elapsedTime;
