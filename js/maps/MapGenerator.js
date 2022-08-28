@@ -451,7 +451,7 @@ class MapGenerator {
             let y4 = dy + (r2 * Math.sin(i + step));
 
             // visible triangles
-            if (i == startAngle && (endAngle - startAngle < 2 * Math.PI)) {
+            if (i == startAngle && ((endAngle - startAngle < 2 * Math.PI) || corkZ > 0)) {
                 //top caps of halfpipe clockwise
                 //A
                 points.push(x3);
@@ -494,8 +494,8 @@ class MapGenerator {
                 );
 
             }
-            console.log(i);
-            if (i >= endAngle - step && (endAngle - startAngle < 2 * Math.PI)) {
+
+            if (i >= endAngle - step && ((endAngle - startAngle < 2 * Math.PI) || corkZ > 0)) {
                 //top caps of halfpipe counterclockwise
 
                 //B2
