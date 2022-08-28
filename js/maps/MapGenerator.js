@@ -63,7 +63,7 @@ TEXTURE_SPRING.wrapS = THREE.RepeatWrapping;
 TEXTURE_SPRING.wrapT = THREE.RepeatWrapping;
 TEXTURE_SPRING.repeat.set(1, 1);
 const SPRING_WIDTH = 50;
-const SPRING_HEIGHT = 2;
+const SPRING_HEIGHT = 10;
 const SPRING_DEPTH = 50;
 
 
@@ -94,7 +94,7 @@ let tunnelTransparent = tunnelOpacity < 1;
 const TUNNEL_WIDTH = 50;
 const TUNNEL_DEPTH = 100;
 const TUNNEL_RADIAL_SEGMENTS = 16;
-const TUNNEL_THICKNESS = 10;
+const TUNNEL_THICKNESS = 5;
 const TEXTURE_TUNNEL_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile7.png');
 TEXTURE_TUNNEL_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_TUNNEL_MAIN.wrapT = THREE.RepeatWrapping;
@@ -113,7 +113,7 @@ TEXTURE_CORKSCREW_MAIN.repeat.set(2, 2);
 const CORKSCREW_OFFSET = TUNNEL_DEPTH * 0.2;
 const CORK_START_ANGLE = Math.PI * 1.25;
 const CORK_END_ANGLE = Math.PI * 3.25;
-const CORK_RADIUS_SCALE = 2.25;
+const CORK_RADIUS_SCALE = 1;
 
 let playerShininess = 30;
 let iceShininess = 70;
@@ -451,7 +451,7 @@ class MapGenerator {
             let y4 = dy + (r2 * Math.sin(i + step));
 
             // visible triangles
-            if (i == startAngle && ((endAngle - startAngle < 2 * Math.PI) || corkZ > 0)) {
+            if ((i == startAngle && (endAngle - startAngle < 2 * Math.PI)) || corkZ > 0) {
                 //top caps of halfpipe clockwise
                 //A
                 points.push(x3);
@@ -495,7 +495,7 @@ class MapGenerator {
 
             }
 
-            if (i >= endAngle - step && ((endAngle - startAngle < 2 * Math.PI) || corkZ > 0)) {
+            if ((i >= endAngle - step && (endAngle - startAngle < 2 * Math.PI)) || corkZ > 0) {
                 //top caps of halfpipe counterclockwise
 
                 //B2

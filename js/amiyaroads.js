@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.47 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.48 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -34,7 +34,7 @@ let waterRises = false;
 
 // Physics
 // Physics variables
-const GRAVITY = 480;
+const GRAVITY = 380;
 //to make you come down fast if not actively jumping, allowing for adjusted jump hight by holding
 const RESPONSIVE_ARTIFICAL_GRAVITY = 80;
 const RESPONSIVE_ARTIFICAL_GRAVITY_UNDERWATER = 30;
@@ -110,7 +110,7 @@ let tileScale = 1;
 let minTileScale = 1;
 let maxTileScale = 2;
 
-const SPRING_BOOST = GRAVITY * 1;
+const SPRING_BOOST = 480;
 const WATER_LEVEL_Y_WORLD2 = 60;
 const WATER_LEVEL_Y_WORLD3 = -40;
 let waterLevel = WATER_LEVEL_Y_WORLD2;
