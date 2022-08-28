@@ -368,7 +368,7 @@ class MapGenerator {
     createPlayer() {
         this.pos.set(0, 30, 0);
         this.scale.set(playerScale, playerScale, playerScale);
-        this.quat.setFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+        this.quat.set(0, 0, 0, 1);
         const playerMaterial = new THREE.MeshPhongMaterial({ map: TEXTURE_PLAYER, name: "Player", shininess: playerShininess, specular: 0xd4aae7 });
         if (this.inEditor) {
             this.pos.set(this.editorLastPos.x, this.editorLastPos.y, this.editorLastPos.z);
@@ -775,7 +775,8 @@ class MapGenerator {
     }
     moveGhostTile(player, rotation, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ) {
         let playerPos = player.position;
-        let rotationSnap = 0.1;
+        //let rotationSnap = 0.1;
+
         let yOffset = playerRadius * 3;
         if (tileSelection == 9) {
             yOffset -= 10;
@@ -785,12 +786,12 @@ class MapGenerator {
         } else {
             this.pos.set(playerPos.x, playerPos.y - yOffset, playerPos.z);
         }
-        if (this.snapRotation) {
-            this.quat.set(Math.round(rotation.x / rotationSnap) * rotationSnap, Math.round(rotation.y / rotationSnap) * rotationSnap, Math.round(rotation.z / rotationSnap) * rotationSnap, Math.round(rotation.w / rotationSnap) * rotationSnap);
-        } else {
-            this.quat.set(rotation.x, rotation.y, rotation.z, rotation.w);
-        }
-
+        //if (this.snapRotation) {
+        //this.quat.set(Math.round(rotation.x / rotationSnap) * rotationSnap, Math.round(rotation.y / rotationSnap) * rotationSnap, Math.round(rotation.z / rotationSnap) * rotationSnap, Math.round(rotation.w / rotationSnap) * rotationSnap);
+        //} else {
+        this.quat.set(rotation.x, rotation.y, rotation.z, rotation.w);
+        //}
+        //console.log(this.quat.x, this.quat.y, this.quat.z, this.quat.w);
         if (this.lastTileSelection != tileSelection) {
             this.scene.remove(this.ghostTile);
             this.ghostTile = null;
