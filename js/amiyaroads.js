@@ -1201,7 +1201,7 @@ function setupContactResultCallback() {
 				onGround = true;
 			}
 		} else if (tag.indexOf("Tunnel") >= 0 || tag.indexOf("HalfPipe") >= 0 || tag.indexOf("Corkscrew") >= 0) {
-			if (localPos.y() <= 0 || velocity.y() >= 20) {
+			if (localPos.y() <= 0 || velocity.y() >= 20 || velocity.y() < 0) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
