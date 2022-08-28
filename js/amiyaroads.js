@@ -94,11 +94,8 @@ let inPlayTest;
 let musicVolume = 0.05;
 let soundEffectsVolume = 0.10;
 
-let soundEffectsInitialized = false;
 //ui
-let $debug = $('.hud.hud--debug');
 let text;
-let strokeText;
 
 //level editor
 const BUILD_CAMERA_SPEED_X = 50;
@@ -961,7 +958,6 @@ function initSoundEffects() {
 			console.log('An error happened loading the sound effect');
 		}
 	);
-	soundEffectsInitialized = true;
 }
 
 function playSoundEffect(soundIndex) {

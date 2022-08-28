@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three';
-import { ConvexGeometry } from '../jsm/geometries/ConvexGeometry.js';
 
 const COLOUR_BLANK = new THREE.Color(0xffffff);
 
@@ -856,7 +854,7 @@ class MapGenerator {
 
         }
         body.name = object.name;
-        body.scale = new Vector3(scale.x, scale.y, scale.z);
+        body.scale = new THREE.Vector3(scale.x, scale.y, scale.z);
         if (object.name.indexOf("GhostTile") < 0) {
             this.allObjects.push(object);
             if (!this.inEditor || object.name.indexOf("Player") >= 0) {
@@ -1190,7 +1188,7 @@ class MapGenerator {
         return null;
     }
     addTile(scale, tileSelection, tilePos = null, tileQuat = null, genLevelString) {
-        this.scale = new Vector3(scale, scale, scale);
+        this.scale = new THREE.Vector3(scale, scale, scale);
         if (tileSelection < 6) {
             this.scale.y = 1;
         }
