@@ -105,6 +105,15 @@ TEXTURE_HALFPIPE_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_HALFPIPE_MAIN.wrapT = THREE.RepeatWrapping;
 TEXTURE_HALFPIPE_MAIN.repeat.set(2, 2);
 
+const TEXTURE_CORKSCREW_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile10.png');
+TEXTURE_CORKSCREW_MAIN.wrapS = THREE.RepeatWrapping;
+TEXTURE_CORKSCREW_MAIN.wrapT = THREE.RepeatWrapping;
+TEXTURE_CORKSCREW_MAIN.repeat.set(2, 2);
+
+const CORKSCREW_OFFSET = TUNNEL_DEPTH * 0.2;
+const CORK_START_ANGLE = Math.PI * 1.25;
+const CORK_END_ANGLE = Math.PI * 3.25;
+const CORK_RADIUS_SCALE = 2;
 
 let playerShininess = 30;
 let iceShininess = 70;
@@ -330,11 +339,14 @@ class MapGenerator {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
                 newTile = this.createTunnelWithPhysics("Tunnel" + i, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("HalfPipe") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
                 newTile = this.createTunnelWithPhysics("HalfPipe" + i, 0, this.pos, this.quat, this.scale, material, Math.PI);
             } else if (tileType.indexOf("Spring") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createSpringWithPhysics("Spring" + i, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
+            } else if (tileType.indexOf("Corkscrew") >= 0) {
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_CORKSCREW_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                newTile = this.createTunnelWithPhysics("Corkscrew" + i, 0, this.pos, this.quat, this.scale, material, CORK_START_ANGLE, CORK_END_ANGLE, CORKSCREW_OFFSET);
             }
             if (newTile) {
                 newTile.scale.x = this.scale.x;
@@ -407,13 +419,16 @@ class MapGenerator {
         return object;
 
     }
-    createTunnelWithPhysics(name, mass, pos, quat, scale, material, startAngle = 0, endAngle = 2 * Math.PI) {
+    createTunnelWithPhysics(name, mass, pos, quat, scale, material, startAngle = 0, endAngle = 2 * Math.PI, corkZ = 0) {
         const mesh = new Ammo.btTriangleMesh(true, true);
         mesh.setScaling(new Ammo.btVector3(scale.x, scale.y, scale.z));
         let points = [];
         var geometry = new THREE.BufferGeometry();
 
         let r = (TUNNEL_WIDTH * 0.5);
+        if (corkZ > 0) {
+            r *= CORK_RADIUS_SCALE;
+        }
         let step = (endAngle - startAngle) / TUNNEL_RADIAL_SEGMENTS;
 
         let dx = 0;
@@ -466,32 +481,10 @@ class MapGenerator {
             points.push(x);
             points.push(y);
             points.push(z2);
+
+            dz += corkZ;
         }
 
-        class Tunnel extends THREE.Curve {
-
-            constructor(scale = 1) {
-
-                super();
-
-                this.scale = scale;
-
-            }
-
-            getPoint(t, optionalTarget = new THREE.Vector3()) {
-
-                const tx = 0;
-                const ty = 0;
-                const tz = t * TUNNEL_DEPTH - (TUNNEL_DEPTH * 0.5);
-
-                return optionalTarget.set(tx, ty, tz).multiplyScalar(this.scale);
-
-            }
-
-        }
-
-        //const path = new Tunnel(1);
-        //const geometry = new THREE.TubeGeometry(path, 24, TUNNEL_WIDTH * 0.5, TUNNEL_RADIAL_SEGMENTS, true);
         const vertices = new Float32Array(points);
         geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
         geometry.computeVertexNormals();
@@ -759,7 +752,7 @@ class MapGenerator {
         const gridSize = TILE_DEPTH * gridTileCount;
         const gridHelper = new THREE.GridHelper(gridSize, gridTileCount);
         gridHelper.position.x = -TILE_WIDTH / 2;
-        gridHelper.position.z = (-TILE_DEPTH / 2)-3;
+        gridHelper.position.z = (-TILE_DEPTH / 2) - 3;
         gridHelper.receiveShadow = true;
         gridHelper.castShadow = false;
         this.scene.add(gridHelper);
@@ -813,7 +806,7 @@ class MapGenerator {
                 this.ghostTile.quaternion.z = this.quat.z;
                 this.ghostTile.quaternion.w = this.quat.w;
                 this.ghostTile.scale.x = tileScale;
-                if (tileSelection == 6 || tileSelection == 7) {
+                if (tileSelection >= 6) {
                     this.ghostTile.scale.y = tileScale;
                 } else {
                     this.ghostTile.scale.y = 1;
@@ -828,7 +821,7 @@ class MapGenerator {
 
                 this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
                 this.ghostTile.scale.x = tileScale;
-                if (tileSelection == 6 || tileSelection == 7) {
+                if (tileSelection >= 6) {
                     this.ghostTile.scale.y = tileScale;
                 } else {
                     this.ghostTile.scale.y = 1;
@@ -935,7 +928,7 @@ class MapGenerator {
             return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 8) {
             //console.log("Add half-pipe");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -951,13 +944,22 @@ class MapGenerator {
             }
             let actualTileName = this.getOrDefault(tileName, "Spring" + this.allObjects.length);
             return this.createSpringWithPhysics(actualTileName, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
+        } else if (tileSelection == 10) {
+            //console.log("Add half-pipe");
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            let actualTileName = this.getOrDefault(tileName, "Corkscrew" + this.allObjects.length);
+            return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material, CORK_START_ANGLE, CORK_END_ANGLE, CORKSCREW_OFFSET);
         }
 
         return null;
     }
     addTile(scale, tileSelection, tilePos = null, tileQuat = null, genLevelString) {
         this.scale = new Vector3(scale, scale, scale);
-        if (tileSelection != 6 && tileSelection != 7) {
+        if (tileSelection < 6) {
             this.scale.y = 1;
         }
         this.editorLastPos.set(this.pos.x, this.pos.y + 20, this.pos.z);

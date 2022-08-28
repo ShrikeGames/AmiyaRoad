@@ -23,7 +23,10 @@
 .hud--worldSelect {
 	color: #000000;
 }
- .columns.u-no-margins {
+.hud--tileSelect {
+	color: #000000;
+}
+.columns.u-no-margins {
 	margin: 0;
  }
 .version {

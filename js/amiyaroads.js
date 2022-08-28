@@ -1,17 +1,14 @@
 // init
 import * as THREE from 'three';
-import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 import { Sky } from './jsm/objects/Sky.js';
 import { Water } from './jsm/objects/Water.js';
 import { MapGenerator } from './maps/MapGenerator.js';
 import Stats from './jsm/libs/stats.module.js';
 import { LanguageToggle } from './utils/LanguageToggle.js';
-import { Vector3 } from 'three';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.45 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.46 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -408,6 +405,13 @@ function initFirstTime() {
 
 
 	});
+	$('.hud--tileSelect').on('change', function (e) {
+		e.preventDefault();
+		console.log("Change tile type");
+		tileSelection = parseInt($(this).val());
+
+	});
+
 
 	$('#level-name').on('change', function (e) {
 		e.preventDefault();
@@ -1196,12 +1200,12 @@ function setupContactResultCallback() {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
-		} else if (tag.indexOf("Tunnel") >= 0) {
-			timeLastOnGround = clock.elapsedTime;
-			onGround = true;
-		} else if (tag.indexOf("HalfPipe") >= 0) {
-			timeLastOnGround = clock.elapsedTime;
-			onGround = true;
+		} else if (tag.indexOf("Tunnel") >= 0 || tag.indexOf("HalfPipe") >= 0 || tag.indexOf("Corkscrew") >= 0) {
+			if (localPos.y() <= 0 || velocity.y() >= 20) {
+				timeLastOnGround = clock.elapsedTime;
+				onGround = true;
+			}
+
 		}
 
 	}
@@ -1215,7 +1219,7 @@ function initPlayer() {
 	stamina = maxStamina;
 	timeLastOnGround = 0;
 	maxSpeed = regularMaxSpeed;
-	tileSelection = 0;
+	tileSelection = parseInt($('.hud--tileSelect').val());
 	tileScale = 1;
 	player = mapGenerator.createPlayer();
 	player.body.setLinearVelocity(new Ammo.btVector3(0, 0, 0));
@@ -1276,29 +1280,42 @@ function initInput() {
 			}
 
 		});
-
+		function updateTileSelectionDropdown(tileSelection) {
+			$('.hud--tilesSelect[val=' + tileSelection + ']').attr("selected", "selected")
+			$('.hud--tileSelect').val('' + tileSelection);
+		}
 		document.addEventListener('keyup', (event) => {
 			if (inEditor && gameFocused()) {
 				if (keyStates.Digit0 && event.code == "Digit0") {
 					tileSelection = 0;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit1 && event.code == "Digit1") {
 					tileSelection = 1;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit2 && event.code == "Digit2") {
 					tileSelection = 2;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit3 && event.code == "Digit3") {
 					tileSelection = 3;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit4 && event.code == "Digit4") {
 					tileSelection = 4;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit5 && event.code == "Digit5") {
 					tileSelection = 5;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit6 && event.code == "Digit6") {
 					tileSelection = 6;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit7 && event.code == "Digit7") {
 					tileSelection = 7;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit8 && event.code == "Digit8") {
 					tileSelection = 8;
+					updateTileSelectionDropdown(tileSelection);
 				} else if (keyStates.Digit9 && event.code == "Digit9") {
 					tileSelection = 9;
+					updateTileSelectionDropdown(tileSelection);
 				}
 
 				if (keyStates.KeyY && event.code == "KeyY") {
@@ -1313,6 +1330,7 @@ function initInput() {
 				}
 
 				if (keyStates.Enter && event.code == "Enter") {
+					tileSelection = parseInt($('.hud--tileSelect').val());
 					mapGenerator.addTile(tileScale, tileSelection, null, null, true);
 				} else if (keyStates.Backspace && event.code == "Backspace") {
 					mapGenerator.undoLastTile();
