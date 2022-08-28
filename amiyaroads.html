@@ -66,7 +66,15 @@
     <div class="hud--mobile hud--mobile--control-button hud--mobile--bottom hide">
         
     </div>
-
+    <div class="modal hide" id="modal--noStamina">
+        <div class="modal-content">
+            <div class="row">
+                You ran out of stamina!<br/>
+                Collect AmiyaBars along the way to refuel your cut round spider body.<br/>
+                Press "R" to reset.
+            </div>
+        </div>
+    </div>
     <div class="modal hide" id="modal--options">
         <div class="modal-content">
             <span class="modal--close">&times;</span>
@@ -139,16 +147,16 @@
             <h2 data-lang-en="2. Dehumidifier" data-lang-jp="2. 除湿器">2. Dehumidifier</h2>
             <div class="level-select-container">
                 <img class="level-select-image play-button" id="Level2-1" data-world="2" data-level="1"
-                    src="./images/amiyaroad/levels/LevelWIP.png" />
+                    src="./images/amiyaroad/levels/Level2-1.png" />
             </div>
-            <div class="level-select-container">
+            <!-- <div class="level-select-container">
                 <img class="level-select-image play-button" id="Level2-2" data-world="2" data-level="2"
                     src="./images/amiyaroad/levels/LevelWIP.png" />
             </div>
             <div class="level-select-container">
                 <img class="level-select-image play-button" id="Level3-3" data-world="2" data-level="3"
                     src="./images/amiyaroad/levels/LevelWIP.png" />
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="modal hide" id="modal--world_3">
@@ -203,9 +211,9 @@
                 <div class="row">
                     <a class="button button-primary open-modal" data-modal-id="modal--world_1" target='_blank' rel='noopener' href='#'
                     data-lang-en="1. Amiyaland" data-lang-jp="1. アミヤランド">1. Amiyaland</a>
-                    <!-- <a class="button button-primary open-modal" data-modal-id="modal--world_2"  target='_blank' rel='noopener' href='#'
+                    <a class="button button-primary open-modal" data-modal-id="modal--world_2"  target='_blank' rel='noopener' href='#'
                     data-lang-en="2. Dehumidifier" data-lang-jp="2. 除湿器">2. Dehumidifier</a>
-                    <a class="button button-primary open-modal" data-modal-id="modal--world_3"  target='_blank' rel='noopener' href='#'
+                    <!-- <a class="button button-primary open-modal" data-modal-id="modal--world_3"  target='_blank' rel='noopener' href='#'
                     data-lang-en="3. Freezer" data-lang-jp="3. 冷凍庫">3. Freezer</a> -->
                     <a class="button button-primary open-modal" data-modal-id="modal--world_X"  target='_blank' rel='noopener' href='#'
                     data-lang-en="X. Extra" data-lang-jp="X. 余分">X. Extra</a>

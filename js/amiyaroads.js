@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.49 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.4.0 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
@@ -43,7 +43,7 @@ const BOOST_ACCELERATION = 160;
 const turnSpeed = 25;
 const turnSpeedOnGround = 25;
 const regularMaxSpeed = 320;
-const boostMaxSpeed = 520;
+const boostMaxSpeed = 620;
 const BOOST_DECAY_RATE = 40;
 const maxTurnSpeed = 100;
 const jumpSpeed = 136;
@@ -1119,7 +1119,7 @@ function setupContactResultCallback() {
 			dead = false;
 		} else if (tag.indexOf("Boost") >= 0) {
 
-			if (localPos.y() >= 9.99) {
+			if (localPos.y() >= 9.99 && velocity.z() <= boostMaxSpeed) {
 				maxSpeed = boostMaxSpeed;
 				let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
 				console.log(typeof (quat));
@@ -1211,6 +1211,7 @@ function initPlayer() {
 	if (player) {
 		removeObject3D(player);
 	}
+	$('#modal--noStamina').addClass("hide");
 	onGround = false;
 	stamina = maxStamina;
 	timeLastOnGround = 0;
@@ -1332,6 +1333,10 @@ function initInput() {
 					mapGenerator.undoLastTile();
 				}
 
+			} else {
+				if (keyStates.KeyR && event.code == "KeyR") {
+					reset();
+				}
 			}
 			keyStates[event.code] = false;
 		});
@@ -1386,7 +1391,7 @@ function checkContact() {
 }
 function updateWorld(deltaTime) {
 	// Step world
-	physicsWorld.stepSimulation(deltaTime, 10, 1.0/gameLoop.fps);
+	physicsWorld.stepSimulation(deltaTime, 10, 1.0 / gameLoop.fps);
 
 	// Update rigid bodies
 	for (let i = 0, il = rigidBodies.length; i < il; i++) {
@@ -1455,42 +1460,39 @@ function updatePhysics(deltaTime) {
 		if (keyStates.ArrowLeft) {
 			impulse.setX(BUILD_CAMERA_SPEED_X);
 		}
-		let xAxis = new THREE.Vector3( 1, 0, 0 );
-		let yAxis = new THREE.Vector3( 0, 1, 0 );
-		let zAxis = new THREE.Vector3( 0, 0, 1 );
-		var xVector = new THREE.Vector3( 1, 0, 0 );
-		var yVector = new THREE.Vector3( 0, 1, 0 );
-		var zVector = new THREE.Vector3( 0, 0, 1 );
+		let xAxis = new THREE.Vector3(1, 0, 0);
+		let yAxis = new THREE.Vector3(0, 1, 0);
+		let zAxis = new THREE.Vector3(0, 0, 1);
+		var xVector = new THREE.Vector3(1, 0, 0);
+		var yVector = new THREE.Vector3(0, 1, 0);
+		var zVector = new THREE.Vector3(0, 0, 1);
 		if (keyStates.KeyW) {
-			yVector.applyAxisAngle( xAxis, BUILD_ROTATION_SPEED );
+			yVector.applyAxisAngle(xAxis, BUILD_ROTATION_SPEED);
 			angularImpulse.setX(xVector.x);
 		}
 		if (keyStates.KeyS) {
-			yVector.applyAxisAngle( xAxis, -BUILD_ROTATION_SPEED );
+			yVector.applyAxisAngle(xAxis, -BUILD_ROTATION_SPEED);
 			angularImpulse.setX(-xVector.x);
 		}
 		if (keyStates.KeyD) {
-			yVector.applyAxisAngle( zAxis, BUILD_ROTATION_SPEED );
+			yVector.applyAxisAngle(zAxis, BUILD_ROTATION_SPEED);
 			angularImpulse.setZ(zVector.z);
 		}
 		if (keyStates.KeyA) {
-			yVector.applyAxisAngle( zAxis, -BUILD_ROTATION_SPEED );
+			yVector.applyAxisAngle(zAxis, -BUILD_ROTATION_SPEED);
 			angularImpulse.setZ(-zVector.z);
 		}
-		
+
 		if (keyStates.KeyQ) {
-			yVector.applyAxisAngle( yAxis, BUILD_ROTATION_SPEED );
+			yVector.applyAxisAngle(yAxis, BUILD_ROTATION_SPEED);
 			angularImpulse.setY(yVector.y);
 
 		}
 		if (keyStates.KeyE) {
-			yVector.applyAxisAngle( yAxis, -BUILD_ROTATION_SPEED );
+			yVector.applyAxisAngle(yAxis, -BUILD_ROTATION_SPEED);
 			angularImpulse.setY(-yVector.y);
 		}
-		
-		if (keyStates.KeyR) {
-			//player.rotateOnAxis(new THREE.Vector3(0,1,0), 0.3);
-		}
+
 		if (keyStates.Space) {
 			impulse.setY(BUILD_CAMERA_SPEED_Y);
 		}
@@ -1503,7 +1505,7 @@ function updatePhysics(deltaTime) {
 		}
 		player.body.setLinearVelocity(impulse);
 		player.body.setAngularVelocity(angularImpulse);
-		
+
 		if (inEditor) {
 			mapGenerator.moveGhostTile(player, player.quaternion, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
 		}
@@ -1515,8 +1517,11 @@ function updatePhysics(deltaTime) {
 
 	//$debug.text("Random Seed: " + seed);
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
-	if (stamina < 0) {
+	if (stamina <= 0) {
 		stamina = 0;
+		if($('#modal--noStamina').hasClass("hide")){
+			$('#modal--noStamina').removeClass("hide");
+		}
 	}
 	//$('.hud--speed').text(Math.abs(-velocity.z().toPrecision(4)));
 	//$('.hud--speed').attr("style", "height:" + Math.abs((-velocity.z().toPrecision(4) / maxSpeed) * 50) + "%;");
@@ -1529,6 +1534,7 @@ function updatePhysics(deltaTime) {
 		win();
 		return;
 	}
+
 	if (player.position.y <= -50 || dead) {
 		reset();
 		return;
@@ -1537,6 +1543,7 @@ function updatePhysics(deltaTime) {
 	if (maxSpeed >= regularMaxSpeed) {
 		maxSpeed -= BOOST_DECAY_RATE * deltaTime;
 	}
+
 	if (stamina > 0) {
 		if (keyStates.ArrowUp || keyStates.KeyW) {
 			let relVelChange = (acceleration);
