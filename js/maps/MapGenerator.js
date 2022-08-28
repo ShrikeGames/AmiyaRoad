@@ -919,7 +919,7 @@ class MapGenerator {
             return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 7) {
             //console.log("Add tunnel");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN, side: THREE.DoubleSide, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
