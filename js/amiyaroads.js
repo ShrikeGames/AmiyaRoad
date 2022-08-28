@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.3.46 \"Cat-Crab-Chotter\"";
+const versionString = "PRE-ALPHA Build 0.3.47 \"Cat-Crab-Chotter\"";
 
 let stats;
 
@@ -1201,7 +1201,7 @@ function setupContactResultCallback() {
 				onGround = true;
 			}
 		} else if (tag.indexOf("Tunnel") >= 0 || tag.indexOf("HalfPipe") >= 0 || tag.indexOf("Corkscrew") >= 0) {
-			if (localPos.y() <= 0 || velocity.y() >= 20 || velocity.y() < 0) {
+			if (localPos.y() <= 0 || velocity.y() >= 20 || velocity.y() < -15) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}

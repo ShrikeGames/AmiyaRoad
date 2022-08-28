@@ -94,7 +94,7 @@ let tunnelTransparent = tunnelOpacity < 1;
 const TUNNEL_WIDTH = 50;
 const TUNNEL_DEPTH = 100;
 const TUNNEL_RADIAL_SEGMENTS = 16;
-
+const TUNNEL_THICKNESS = 10;
 const TEXTURE_TUNNEL_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile7.png');
 TEXTURE_TUNNEL_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_TUNNEL_MAIN.wrapT = THREE.RepeatWrapping;
@@ -113,7 +113,7 @@ TEXTURE_CORKSCREW_MAIN.repeat.set(2, 2);
 const CORKSCREW_OFFSET = TUNNEL_DEPTH * 0.2;
 const CORK_START_ANGLE = Math.PI * 1.25;
 const CORK_END_ANGLE = Math.PI * 3.25;
-const CORK_RADIUS_SCALE = 2;
+const CORK_RADIUS_SCALE = 2.25;
 
 let playerShininess = 30;
 let iceShininess = 70;
@@ -336,16 +336,16 @@ class MapGenerator {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createBallWithPhysics("Ball" + i, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Tunnel") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
                 newTile = this.createTunnelWithPhysics("Tunnel" + i, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("HalfPipe") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
                 newTile = this.createTunnelWithPhysics("HalfPipe" + i, 0, this.pos, this.quat, this.scale, material, Math.PI);
             } else if (tileType.indexOf("Spring") >= 0) {
                 let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
                 newTile = this.createSpringWithPhysics("Spring" + i, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Corkscrew") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_CORKSCREW_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_CORKSCREW_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
                 newTile = this.createTunnelWithPhysics("Corkscrew" + i, 0, this.pos, this.quat, this.scale, material, CORK_START_ANGLE, CORK_END_ANGLE, CORKSCREW_OFFSET);
             }
             if (newTile) {
@@ -434,7 +434,8 @@ class MapGenerator {
         let dx = 0;
         let dy = 0;
         let dz = 0;
-        console.log(dx, dy, dz);
+
+
         for (let i = startAngle; i <= endAngle; i += step) {
             let x = dx + (r * Math.cos(i));
             let y = dy + (r * Math.sin(i));
@@ -442,11 +443,222 @@ class MapGenerator {
             let x2 = dx + (r * Math.cos(i + step));
             let y2 = dy + (r * Math.sin(i + step));
             let z2 = dz - (TUNNEL_DEPTH * 0.5);
+            let r2 = r + TUNNEL_THICKNESS;
+            let x3 = dx + (r2 * Math.cos(i));
+            let x4 = dx + (r2 * Math.cos(i + step));
+
+            let y3 = dy + (r2 * Math.sin(i));
+            let y4 = dy + (r2 * Math.sin(i + step));
+
+            // visible triangles
+            if (i == startAngle && (endAngle - startAngle < 2 * Math.PI)) {
+                //top caps of halfpipe clockwise
+                //A
+                points.push(x3);
+                points.push(y3);
+                points.push(z2);
+                //A2
+                points.push(x3);
+                points.push(y3);
+                points.push(z);
+                //D2
+                points.push(x);
+                points.push(y);
+                points.push(z);
+
+                mesh.addTriangle(
+                    new Ammo.btVector3(x3, y3, z2),
+                    new Ammo.btVector3(x3, y3, z),
+                    new Ammo.btVector3(x, y, z),
+                    true
+                );
+
+                //A
+                points.push(x3);
+                points.push(y3);
+                points.push(z2);
+                //D2
+                points.push(x);
+                points.push(y);
+                points.push(z);
+                //D
+                points.push(x);
+                points.push(y);
+                points.push(z2);
+
+                mesh.addTriangle(
+                    new Ammo.btVector3(x3, y3, z2),
+                    new Ammo.btVector3(x, y, z),
+                    new Ammo.btVector3(x, y, z2),
+                    true
+                );
+
+            }
+            console.log(i);
+            if (i >= endAngle - step && (endAngle - startAngle < 2 * Math.PI)) {
+                //top caps of halfpipe counterclockwise
+
+                //B2
+                points.push(x4);
+                points.push(y4);
+                points.push(z);
+                //B
+                points.push(x4);
+                points.push(y4);
+                points.push(z2);
+                //C2
+                points.push(x2);
+                points.push(y2);
+                points.push(z);
+
+                mesh.addTriangle(
+                    new Ammo.btVector3(x4, y4, z),
+                    new Ammo.btVector3(x4, y4, z2),
+                    new Ammo.btVector3(x2, y2, z),
+                    true
+                );
+
+                //B
+                points.push(x4);
+                points.push(y4);
+                points.push(z2);
+                //C
+                points.push(x2);
+                points.push(y2);
+                points.push(z2);
+                //C2
+                points.push(x2);
+                points.push(y2);
+                points.push(z);
+
+                mesh.addTriangle(
+                    new Ammo.btVector3(x4, y4, z2),
+                    new Ammo.btVector3(x2, y2, z2),
+                    new Ammo.btVector3(x2, y2, z),
+                    true
+                );
+
+
+            }
+
+            //inside clockwise
+            //D2
+            points.push(x);
+            points.push(y);
+            points.push(z);
+            //C2
+            points.push(x2);
+            points.push(y2);
+            points.push(z);
+            //D
+            points.push(x);
+            points.push(y);
+            points.push(z2);
+
+            //inside clockwise
+            //C
+            points.push(x2);
+            points.push(y2);
+            points.push(z2);
+            //D
+            points.push(x);
+            points.push(y);
+            points.push(z2);
+            //C2
+            points.push(x2);
+            points.push(y2);
+            points.push(z);
+
+            //outer counterclockwise
+
+            //A
+            points.push(x3);
+            points.push(y3);
+            points.push(z2);
+            //B2
+            points.push(x4);
+            points.push(y4);
+            points.push(z);
+            //A2
+            points.push(x3);
+            points.push(y3);
+            points.push(z);
+
+            //outer counterclockwise
+            //A
+            points.push(x3);
+            points.push(y3);
+            points.push(z2);
+            //B
+            points.push(x4);
+            points.push(y4);
+            points.push(z2);
+            //B2
+            points.push(x4);
+            points.push(y4);
+            points.push(z);
+
+
+            //camera facing cap counterclockwise
+            //D
+            points.push(x);
+            points.push(y);
+            points.push(z2);
+            //C
+            points.push(x2);
+            points.push(y2);
+            points.push(z2);
+            //A
+            points.push(x3);
+            points.push(y3);
+            points.push(z2);
+
+            //camera facing cap counterclockwise
+            //C
+            points.push(x2);
+            points.push(y2);
+            points.push(z2);
+            //B
+            points.push(x4);
+            points.push(y4);
+            points.push(z2);
+            //A
+            points.push(x3);
+            points.push(y3);
+            points.push(z2);
+
+            //facing away cap counterclockwise
+            //D2
+            points.push(x);
+            points.push(y);
+            points.push(z);
+            //C2
+            points.push(x2);
+            points.push(y2);
+            points.push(z);
+            //A2
+            points.push(x3);
+            points.push(y3);
+            points.push(z);
+
+            //facing away cap counterclockwise
+            //C2
+            points.push(x2);
+            points.push(y2);
+            points.push(z);
+            //B2
+            points.push(x4);
+            points.push(y4);
+            points.push(z);
+            //A2
+            points.push(x3);
+            points.push(y3);
+            points.push(z);
 
             mesh.addTriangle(
-                new Ammo.btVector3(x, y, z),
-                new Ammo.btVector3(x, y, z2),
-                new Ammo.btVector3(x2, y2, z2),
+                new Ammo.btVector3(x, y, z),//D2
+                new Ammo.btVector3(x, y, z2),//D
+                new Ammo.btVector3(x2, y2, z2),//C
                 true
             );
 
@@ -456,31 +668,49 @@ class MapGenerator {
                 new Ammo.btVector3(x, y, z),
                 true
             );
+            mesh.addTriangle(
+                new Ammo.btVector3(x3, y3, z),
+                new Ammo.btVector3(x3, y3, z2),
+                new Ammo.btVector3(x4, y4, z2),
+                true
+            );
 
-            points.push(x);
-            points.push(y);
-            points.push(z2);
+            mesh.addTriangle(
+                new Ammo.btVector3(x4, y4, z2),
+                new Ammo.btVector3(x4, y4, z),
+                new Ammo.btVector3(x3, y3, z),
+                true
+            );
 
-            points.push(x2);
-            points.push(y2);
-            points.push(z);
+            mesh.addTriangle(
+                new Ammo.btVector3(x, y, z2),
+                new Ammo.btVector3(x2, y2, z2),
+                new Ammo.btVector3(x3, y3, z2),
+                true
+            );
 
-            points.push(x);
-            points.push(y);
-            points.push(z);
+            mesh.addTriangle(
+                new Ammo.btVector3(x2, y2, z2),
+                new Ammo.btVector3(x4, y4, z2),
+                new Ammo.btVector3(x3, y3, z2),
+                true
+            );
+
+            mesh.addTriangle(
+                new Ammo.btVector3(x, y, z),
+                new Ammo.btVector3(x2, y2, z),
+                new Ammo.btVector3(x3, y3, z),
+                true
+            );
+
+            mesh.addTriangle(
+                new Ammo.btVector3(x2, y2, z),
+                new Ammo.btVector3(x4, y4, z),
+                new Ammo.btVector3(x3, y3, z),
+                true
+            );
 
 
-            points.push(x2);
-            points.push(y2);
-            points.push(z2);
-
-            points.push(x2);
-            points.push(y2);
-            points.push(z);
-
-            points.push(x);
-            points.push(y);
-            points.push(z2);
 
             dz += corkZ;
         }
@@ -778,6 +1008,7 @@ class MapGenerator {
         //let rotationSnap = 0.1;
 
         let yOffset = playerRadius * 3;
+        //spring
         if (tileSelection == 9) {
             yOffset -= 10;
         }
@@ -818,7 +1049,7 @@ class MapGenerator {
             } else {
 
                 let materialHex = this.createColour(this.allObjects.length);
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GHOST_TILE, side: THREE.DoubleSide, transparent: true, opacity: 0.75 });
+                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GHOST_TILE/*, side: THREE.DoubleSide*/, transparent: true, opacity: 0.75 });
 
                 this.ghostTile = this.getTileFromSelection(tileSelection, "GhostTile", material);
                 this.ghostTile.scale.x = tileScale;
@@ -920,7 +1151,7 @@ class MapGenerator {
             return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 7) {
             //console.log("Add tunnel");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN, side: THREE.DoubleSide, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN/*, side: THREE.DoubleSide*/, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -929,7 +1160,7 @@ class MapGenerator {
             return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 8) {
             //console.log("Add half-pipe");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -947,7 +1178,7 @@ class MapGenerator {
             return this.createSpringWithPhysics(actualTileName, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 10) {
             //console.log("Add half-pipe");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, side: THREE.DoubleSide, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
 
             if (tileMaterial != null) {
                 material = tileMaterial;
