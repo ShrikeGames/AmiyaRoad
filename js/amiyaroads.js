@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.0 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.4.1 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
@@ -133,6 +133,7 @@ const fontLoader = new FontLoader();
 const fontColor = new THREE.Color(0xb84ff4);
 let font;
 let fontMaterial;
+let fontLoaded = false;
 
 const mainGameLoop = function (deltaTime) {
 
@@ -332,20 +333,52 @@ function initFirstTime() {
 		seed = "amiyaroads_" + Math.round(Math.random() * 25600);
 
 		if (inEditor) {
-			$('.hud--editor').removeClass("hide");
+			if (!fontLoaded) {
+				$('.modal').addClass('hide');
+				$('.menu--loading-screen').removeClass('hide');
+				loader.load('js/fonts/LotuscoderBold-eZZYn.ttf', function (fnt) {
+					font = fontLoader.parse(fnt);
+					fontMaterial = new THREE.MeshBasicMaterial({
+						color: fontColor,
+						transparent: true,
+						opacity: 0,
+						side: THREE.DoubleSide
+					});
+					console.log("Loaded font");
+					$('.hud--editor').removeClass("hide");
 
-			if ($('#levelSelect').val().indexOf("~") > 0) {
-				currentWorld = $('#levelSelect').val().split("~")[0];
-			} else if (mapGenerator) {
-				currentWorld = mapGenerator.currentWorld;
+					if ($('#levelSelect').val().indexOf("~") > 0) {
+						currentWorld = $('#levelSelect').val().split("~")[0];
+					} else if (mapGenerator) {
+						currentWorld = mapGenerator.currentWorld;
+					} else {
+						currentWorld = $('.hud--worldSelect').val();
+					}
+					init(currentWorld, currentLevel, inEditor, inPlayTest, seed, true);
+					animate();
+
+					$('.menu--start-screen').addClass('hide');
+
+
+					fontLoaded = true;
+				});
 			} else {
-				currentWorld = $('.hud--worldSelect').val();
-			}
-			init(currentWorld, currentLevel, inEditor, inPlayTest, seed, true);
-			animate();
+				$('.hud--editor').removeClass("hide");
 
-			$('.menu--start-screen').addClass('hide');
-			$('.modal').addClass('hide');
+				if ($('#levelSelect').val().indexOf("~") > 0) {
+					currentWorld = $('#levelSelect').val().split("~")[0];
+				} else if (mapGenerator) {
+					currentWorld = mapGenerator.currentWorld;
+				} else {
+					currentWorld = $('.hud--worldSelect').val();
+				}
+				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, true);
+				animate();
+
+				$('.menu--start-screen').addClass('hide');
+				$('.modal').addClass('hide');
+			}
+
 		} else {
 			var levelImage = $('#Level' + currentWorld + "-" + currentLevel);
 			var imageObj = new Image();
@@ -362,9 +395,8 @@ function initFirstTime() {
 				var imageData = shadowCtx.getImageData(0, 0, 600, 600);
 				var decodeMessage = steg.decode(imageData, { t: 3, width: 600, height: 600 });
 
-				console.log(atob(decodeMessage));
 				$('#levelSelect').val(atob(decodeMessage));
-				console.log($('#levelSelect').val());
+
 				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, true);
 				animate();
 
@@ -450,6 +482,7 @@ function initFirstTime() {
 		e.preventDefault();
 		console.log("Editor");
 		lose();
+		$('.menu--loading-screen').removeClass('hide');
 
 		inEditor = true;
 		inPlayTest = false;
@@ -460,6 +493,7 @@ function initFirstTime() {
 		$('.hud--basic').removeClass('hide');
 		$('.hud--playtest').addClass("hide");
 		$('.hud--editor').removeClass("hide");
+
 	});
 
 	$('#image-input').on("change", function (e) {
@@ -614,18 +648,8 @@ function initFirstTime() {
 	initInput();
 	window.addEventListener('resize', onWindowResize);
 
-	loader.load('js/fonts/LotuscoderBold-eZZYn.ttf', function (fnt) {
-		font = fontLoader.parse(fnt);
-		fontMaterial = new THREE.MeshBasicMaterial({
-			color: fontColor,
-			transparent: true,
-			opacity: 0,
-			side: THREE.DoubleSide
-		});
-		initialized = true;
-		$('.menu--loading-screen').addClass('hide');
-	});
-
+	initialized = true;
+	$('.menu--loading-screen').addClass('hide');
 
 
 }
@@ -910,7 +934,7 @@ function initSoundEffects() {
 	// load a resource
 	loader.load(
 		// resource URL
-		'../audio/tsunderia amiya noooo scream.mp3',
+		'../audio/tsunderia amiya scream 6.mp3',
 
 		// onLoad callback
 		function (audioBuffer) {
@@ -1519,7 +1543,7 @@ function updatePhysics(deltaTime) {
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina <= 0) {
 		stamina = 0;
-		if($('#modal--noStamina').hasClass("hide")){
+		if ($('#modal--noStamina').hasClass("hide")) {
 			$('#modal--noStamina').removeClass("hide");
 		}
 	}
