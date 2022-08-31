@@ -49,7 +49,7 @@ const maxTurnSpeed = 100;
 const jumpSpeed = 136;
 const waterJumpSpeed = 112;
 let maxSpeed = regularMaxSpeed;
-const maxStamina = 2800;
+const maxStamina = 3000;
 
 // if the player goes above this height the camera will pan with them
 const yCamerPan = 60;
@@ -482,17 +482,43 @@ function initFirstTime() {
 		e.preventDefault();
 		console.log("Editor");
 		lose();
+		$('.modal').addClass('hide');
 		$('.menu--loading-screen').removeClass('hide');
+		if (!fontLoaded) {
+			loader.load('js/fonts/LotuscoderBold-eZZYn.ttf', function (fnt) {
+				font = fontLoader.parse(fnt);
+				fontMaterial = new THREE.MeshBasicMaterial({
+					color: fontColor,
+					transparent: true,
+					opacity: 0,
+					side: THREE.DoubleSide
+				});
+				console.log("Loaded font");
 
-		inEditor = true;
-		inPlayTest = false;
-		init(currentWorld, currentLevel, inEditor, inPlayTest, false);
+				inEditor = true;
+				inPlayTest = false;
+				init(currentWorld, currentLevel, inEditor, inPlayTest, false);
 
-		$('.menu--start-screen').addClass('hide');
-		$('.button--menu').removeClass('hide');
-		$('.hud--basic').removeClass('hide');
-		$('.hud--playtest').addClass("hide");
-		$('.hud--editor').removeClass("hide");
+				$('.menu--start-screen').addClass('hide');
+				$('.button--menu').removeClass('hide');
+				$('.hud--basic').removeClass('hide');
+				$('.hud--playtest').addClass("hide");
+				$('.hud--editor').removeClass("hide");
+				fontLoaded = true;
+			});
+		} else {
+
+			inEditor = true;
+			inPlayTest = false;
+			init(currentWorld, currentLevel, inEditor, inPlayTest, false);
+
+			$('.menu--start-screen').addClass('hide');
+			$('.button--menu').removeClass('hide');
+			$('.hud--basic').removeClass('hide');
+			$('.hud--playtest').addClass("hide");
+			$('.hud--editor').removeClass("hide");
+		}
+
 
 	});
 
@@ -1543,7 +1569,7 @@ function updatePhysics(deltaTime) {
 	stamina -= Math.abs((-velocity.z() * deltaTime));//(velocity.x() * deltaTime) + (velocity.y() * deltaTime) + 
 	if (stamina <= 0) {
 		stamina = 0;
-		if ($('#modal--noStamina').hasClass("hide")) {
+		if ($('#modal--noStamina').hasClass("hide") && Math.abs(velocity.z()) <= 5) {
 			$('#modal--noStamina').removeClass("hide");
 		}
 	}

@@ -254,31 +254,34 @@ class MapGenerator {
         return 0;
     }
     generateLevelString(world) {
+
         if (world) {
-            let newLevelString = world + "~";
-            let colourSelection = colourMap[world];
+            this.currentWorld = world;
+        }
+        let newLevelString = this.currentWorld + "~";
+        let colourSelection = colourMap[this.currentWorld];
 
 
-            for (let i = 0; i < this.allObjects.length; i++) {
-                let object = this.allObjects[i];
-                let materialInfo = this.getColourIndex(colourSelection, object.material.color.getHexString());
-                let pos = object.position;
-                let rotation = object.quaternion;
+        for (let i = 0; i < this.allObjects.length; i++) {
+            let object = this.allObjects[i];
+            let materialInfo = this.getColourIndex(colourSelection, object.material.color.getHexString());
+            let pos = object.position;
+            let rotation = object.quaternion;
 
-                let scale = object.scale;
-                if (object.name.indexOf("Player") >= 0) {
-                    rotation.set(0, 0, 0, 1);
-                }
-                if (object.name.indexOf("GhostTile") < 0) {
-                    newLevelString += object.name + "," + materialInfo + "," + Math.round(pos.x) + "," + Math.round(pos.y) + "," + Math.round(pos.z) + "," + rotation.x + "," + rotation.y + "," + rotation.z + "," + rotation.w + "," + scale.x + "," + scale.y + "," + scale.z + "|";
-                }
-
-
+            let scale = object.scale;
+            if (object.name.indexOf("Player") >= 0) {
+                rotation.set(0, 0, 0, 1);
+            }
+            if (object.name.indexOf("GhostTile") < 0) {
+                newLevelString += object.name + "," + materialInfo + "," + Math.round(pos.x) + "," + Math.round(pos.y) + "," + Math.round(pos.z) + "," + rotation.x + "," + rotation.y + "," + rotation.z + "," + rotation.w + "," + scale.x + "," + scale.y + "," + scale.z + "|";
             }
 
-            this.levelString = newLevelString.slice(0, -1);
-            $('#levelSelect').val(this.levelString);
+
         }
+
+        this.levelString = newLevelString.slice(0, -1);
+        $('#levelSelect').val(this.levelString);
+
         return this.levelString;
     }
 
