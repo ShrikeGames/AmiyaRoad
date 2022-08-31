@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.3 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.4.4 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
@@ -865,7 +865,7 @@ function initWater(currentWorld, currentLevel, inEditor, inPlayTest) {
 		water.rotation.x = - Math.PI / 2;
 		scene.add(water);
 	} else if (currentWorld == "3") {
-		const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+		const waterGeometry = new THREE.PlaneGeometry(100000, 100000);
 		water = new Water(
 			waterGeometry,
 			{
