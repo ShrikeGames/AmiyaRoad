@@ -49,6 +49,9 @@ let scene;
 let physicsWorld;
 let rigidBodies;
 let allObjects;
+let useTextures = true;
+let useShadows = true;
+
 const margin = 0.05;
 var TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
 
@@ -284,7 +287,15 @@ class MapGenerator {
 
         return this.levelString;
     }
+    getMaterial(material) {
+        console.log(useTextures);
+        if (useTextures) {
+            return material;
+        }
 
+        material.map = null;
+        return material;
+    }
     loadMapFromLevelString(levelString = "") {
         this.rigidBodies = [];
         this.allObjects = [];
@@ -319,34 +330,34 @@ class MapGenerator {
             let newTile;
 
             if (tileType.indexOf("Tile") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createTileWithPhysics("Tile" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("AmiyaBar") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createAmiyaBarWithPhysics("AmiyaBar", AMIYABAR_WIDTH, AMIYABAR_HEIGHT, AMIYABAR_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Goal") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ map: TEXTURE_GOAL, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createGoalWithPhysics("Goal", GOAL_WIDTH, GOAL_HEIGHT, GOAL_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Boost") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createTileWithPhysics("Boost" + i, TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Death") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createTileWithPhysics("Death" + i, DEATH_WIDTH, DEATH_HEIGHT, DEATH_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Ball") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createBallWithPhysics("Ball" + i, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Tunnel") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_TUNNEL_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
                 newTile = this.createTunnelWithPhysics("Tunnel" + i, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("HalfPipe") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
                 newTile = this.createTunnelWithPhysics("HalfPipe" + i, 0, this.pos, this.quat, this.scale, material, Math.PI);
             } else if (tileType.indexOf("Spring") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
                 newTile = this.createSpringWithPhysics("Spring" + i, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
             } else if (tileType.indexOf("Corkscrew") >= 0) {
-                let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_CORKSCREW_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_CORKSCREW_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
                 newTile = this.createTunnelWithPhysics("Corkscrew" + i, 0, this.pos, this.quat, this.scale, material, CORK_START_ANGLE, CORK_END_ANGLE, CORKSCREW_OFFSET);
             }
             if (newTile) {
@@ -386,8 +397,8 @@ class MapGenerator {
         const shape = new Ammo.btSphereShape(radius);
         shape.setMargin(margin);
         object.name = "Player";
-        object.receiveShadow = true;
-        object.castShadow = true;
+        object.receiveShadow = useShadows;
+        object.castShadow = useShadows;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
@@ -400,8 +411,8 @@ class MapGenerator {
         const shape = new Ammo.btSphereShape(radius * scale.x);
         shape.setMargin(margin);
         object.name = name;
-        object.receiveShadow = true;
-        object.castShadow = true;
+        object.receiveShadow = useShadows;
+        object.castShadow = useShadows;
         object.body = this.createRigidBody(object, shape, mass * scale.x, pos, quat, scale);
 
         return object;
@@ -413,8 +424,8 @@ class MapGenerator {
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
-        object.receiveShadow = true;
-        object.castShadow = true;
+        object.receiveShadow = useShadows;
+        object.castShadow = useShadows;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
@@ -727,7 +738,7 @@ class MapGenerator {
         const object = new THREE.Mesh(geometry, material);
         object.scale.set(scale.x, scale.y, scale.z);
         object.name = name;
-        object.receiveShadow = true;
+        object.receiveShadow = useShadows;
         object.castShadow = false;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
@@ -745,7 +756,7 @@ class MapGenerator {
 
         object.scale.set(scale.x, scale.y, scale.z);
         object.name = name;
-        object.receiveShadow = true;
+        object.receiveShadow = useShadows;
         object.castShadow = false;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
@@ -758,8 +769,8 @@ class MapGenerator {
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
-        object.receiveShadow = true;
-        object.castShadow = true;
+        object.receiveShadow = useShadows;
+        object.castShadow = useShadows;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
@@ -771,8 +782,8 @@ class MapGenerator {
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
         shape.setMargin(margin);
         object.name = name;
-        object.receiveShadow = true;
-        object.castShadow = true;
+        object.receiveShadow = useShadows;
+        object.castShadow = useShadows;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
@@ -785,7 +796,7 @@ class MapGenerator {
         shape.setMargin(margin);
         object.name = name;
         object.receiveShadow = false;
-        object.castShadow = true;
+        object.castShadow = useShadows;
         object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
 
         return object;
@@ -931,6 +942,22 @@ class MapGenerator {
         // the parent might be the scene or another Object3D, but it is sure to be removed this way
         return true;
     }
+    disableTextures() {
+        useTextures = false;
+        console.log("disableTextures");
+    }
+    enableTextures() {
+        useTextures = true;
+        console.log("enableTextures");
+    }
+    disableShadows() {
+        useShadows = false;
+        console.log("disableShadows");
+    }
+    enableShadows() {
+        useShadows = true;
+        console.log("enableShadows");
+    }
     createCheatBarrier() {
         if (cheat1) {
             this.pos.set(0, -45, 24000);
@@ -984,7 +1011,7 @@ class MapGenerator {
         const gridHelper = new THREE.GridHelper(gridSize, gridTileCount);
         gridHelper.position.x = -TILE_WIDTH / 2;
         gridHelper.position.z = (-TILE_DEPTH / 2) - 3;
-        gridHelper.receiveShadow = true;
+        gridHelper.receiveShadow = useShadows;
         gridHelper.castShadow = false;
         this.scene.add(gridHelper);
 
@@ -1095,7 +1122,7 @@ class MapGenerator {
 
         if (tileSelection == 1) {
             //console.log("Add tile");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TILE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -1105,7 +1132,7 @@ class MapGenerator {
         } else if (tileSelection == 2) {
             //console.log("Add amiyabar");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_AMIYABAR, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -1114,7 +1141,7 @@ class MapGenerator {
         } else if (tileSelection == 3) {
             //console.log("Add goal");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GOAL });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_GOAL }));
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -1123,7 +1150,7 @@ class MapGenerator {
         } else if (tileSelection == 4) {
             //console.log("Add boost");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BOOST, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -1132,7 +1159,7 @@ class MapGenerator {
         } else if (tileSelection == 5) {
             //console.log("Add death");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_DEATH, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -1141,7 +1168,7 @@ class MapGenerator {
         } else if (tileSelection == 6) {
             //console.log("Add ball");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_BALL, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -1152,7 +1179,7 @@ class MapGenerator {
             return this.createBallWithPhysics(actualTileName, BALL_RADIUS, BALL_MASS, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 7) {
             //console.log("Add tunnel");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN/*, side: THREE.DoubleSide*/, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_TUNNEL_MAIN/*, side: THREE.DoubleSide*/, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -1161,7 +1188,7 @@ class MapGenerator {
             return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 8) {
             //console.log("Add half-pipe");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
 
             if (tileMaterial != null) {
                 material = tileMaterial;
@@ -1171,7 +1198,7 @@ class MapGenerator {
         } else if (tileSelection == 9) {
             //console.log("Add spring");
 
-            let material = new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SPRING, shininess: tileShininess, specular: 0xd4aae7, transparent: tileTransparent, opacity: tileOpacity }));
             if (tileMaterial != null) {
                 material = tileMaterial;
             }
@@ -1179,7 +1206,7 @@ class MapGenerator {
             return this.createSpringWithPhysics(actualTileName, SPRING_WIDTH, SPRING_HEIGHT, SPRING_DEPTH, 0, this.pos, this.quat, this.scale, material);
         } else if (tileSelection == 10) {
             //console.log("Add half-pipe");
-            let material = new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity });
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_HALFPIPE_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
 
             if (tileMaterial != null) {
                 material = tileMaterial;

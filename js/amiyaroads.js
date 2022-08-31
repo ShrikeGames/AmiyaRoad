@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.4 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.4.5 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
@@ -456,6 +456,30 @@ function initFirstTime() {
 		var $this = $(this);
 		var newFPS = parseInt($this.val());
 		gameLoop.fps = newFPS;
+
+	});
+	$('.hud--textures').on('change', function (e) {
+		e.preventDefault();
+		console.log("Change Textures");
+		var $this = $(this);
+		var textures = $this.val();
+		if (textures == "regular") {
+			mapGenerator.enableTextures();
+		} else {
+			mapGenerator.disableTextures();
+		}
+
+	});
+	$('.hud--shadows').on('change', function (e) {
+		e.preventDefault();
+		console.log("Change Shadows");
+		var $this = $(this);
+		var textures = $this.val();
+		if (textures == "regular") {
+			mapGenerator.enableShadows();
+		} else {
+			mapGenerator.disableShadows();
+		}
 
 	});
 	$('.playtest-button').on('click', function (e) {
@@ -1172,14 +1196,11 @@ function setupContactResultCallback() {
 			if (localPos.y() >= 9.99 && velocity.z() <= boostMaxSpeed) {
 				maxSpeed = boostMaxSpeed;
 				let quat = colWrapper1.getCollisionObject().getWorldTransform().getRotation().normalized();
-				console.log(typeof (quat));
 				const quaternion = new THREE.Quaternion(quat.x(), quat.y(), quat.z(), quat.w());
-				console.log(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 
 				//default direction is traveling on the z axis, and a little bit down so the tile keeps you more grounded by default
 				const direction = new THREE.Vector3(0, -0.1, 1);
 				direction.applyQuaternion(quaternion);
-				console.log(direction.x, direction.y, direction.z);
 
 				const b = new THREE.Vector3();
 
