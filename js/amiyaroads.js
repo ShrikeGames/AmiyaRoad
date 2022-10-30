@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.5.0 \"Elegant-Spooder\"";
+const versionString = "PRE-ALPHA Build 0.5.1 \"Elegant-Spooder\"";
 
 let stats;
 
