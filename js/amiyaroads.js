@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.7 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.4.8 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
@@ -42,8 +42,8 @@ const acceleration = 40;
 const BOOST_ACCELERATION = 160;
 const turnSpeed = 25;
 const turnSpeedOnGround = 25;
-const regularMaxSpeed = 320;
-const boostMaxSpeed = 620;
+const regularMaxSpeed = 420;
+const boostMaxSpeed = 820;
 const BOOST_DECAY_RATE = 40;
 const maxTurnSpeed = 100;
 const jumpSpeed = 136;
@@ -1155,7 +1155,7 @@ function setupContactResultCallback() {
 		let colWrapper1 = Ammo.wrapPointer(colObj1Wrap, Ammo.btCollisionObjectWrapper);
 		let rb1 = Ammo.castObject(colWrapper1.getCollisionObject(), Ammo.btRigidBody);
 
-		let tag, localPos, worldPos;
+		let tag, localPos, worldPos, playerPos;
 
 
 		if (rb0.name != "Player") {
@@ -1163,13 +1163,14 @@ function setupContactResultCallback() {
 			tag = rb0.name;
 			localPos = contactPoint.get_m_localPointA();
 			worldPos = contactPoint.get_m_positionWorldOnA();
-
+			playerPos = contactPoint.get_m_localPointB();
 
 		} else {
 
 			tag = rb1.name;
 			localPos = contactPoint.get_m_localPointB();
 			worldPos = contactPoint.get_m_positionWorldOnB();
+			playerPos = contactPoint.get_m_localPointA();
 		}
 
 		if (keyStates.KeyI) {
@@ -1209,10 +1210,10 @@ function setupContactResultCallback() {
 				boostImpulse.normalize();
 				boostImpulse.op_mul(BOOST_ACCELERATION);
 				player.body.applyCentralImpulse(boostImpulse);
-				
+
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
-				
+
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
@@ -1251,10 +1252,10 @@ function setupContactResultCallback() {
 
 				tileObject.userData.collided = true;
 				tileObject.userData.collidedTime = clock.elapsedTime;
-				
+
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
-				
+
 			}
 
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
@@ -1265,17 +1266,18 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Tile") >= 0) {
-			if (localPos.y() >= 9.99 ) {
+			if (localPos.y() >= 9.99) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
 		} else if (tag.indexOf("Tunnel") >= 0 || tag.indexOf("HalfPipe") >= 0 || tag.indexOf("Corkscrew") >= 0) {
-			//if (localPos.y() <= 0 || velocity.y() >= 20 || velocity.y() < -15) {
-			if (velocity.y() <= 0.1) {
+			console.log(localPos.y());
+			console.log(playerPos.y());
+			if (localPos.y() <= 0 && playerPos.y() <= -2) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
-			
+
 
 		}
 
@@ -1681,9 +1683,11 @@ function updatePhysics(deltaTime) {
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
 		velocity = player.body.getLinearVelocity();
 		if (stamina > 0 && (onGround || (clock.elapsedTime - timeLastOnGround) <= coyoteTimeLimit)) {
-			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed, velocity.z());
+			//jump higher if you're going faster
+			let jumpSpeedBonus = (velocity.z() * 0.1);
+			let jumpImpulse = new Ammo.btVector3(velocity.x(), jumpSpeed + jumpSpeedBonus, velocity.z());
 			if (isUnderWater()) {
-				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, waterJumpSpeed * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
+				jumpImpulse = new Ammo.btVector3(velocity.x() * WATER_ACCELERATION_DEBUFF, (waterJumpSpeed + jumpSpeedBonus) * WATER_ACCELERATION_DEBUFF, velocity.z() * WATER_ACCELERATION_DEBUFF);
 			}
 			player.body.setLinearVelocity(jumpImpulse);
 			onGround = false;
