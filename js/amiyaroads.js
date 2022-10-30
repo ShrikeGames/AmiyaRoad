@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.5.1 \"Elegant-Spooder\"";
+const versionString = "PRE-ALPHA Build 0.5.2 \"Elegant-Spooder\"";
 
 let stats;
 
@@ -45,7 +45,7 @@ const turnSpeedOnGround = 25;
 const regularMaxSpeed = 420;
 const boostMaxSpeed = 820;
 const BOOST_DECAY_RATE = 40;
-const maxTurnSpeed = 100;
+const maxTurnSpeed = 300;
 const jumpSpeed = 136;
 const waterJumpSpeed = 112;
 let maxSpeed = regularMaxSpeed;
@@ -92,7 +92,7 @@ let inEditor;
 let inPlayTest;
 
 let musicVolume = 0.05;
-let soundEffectsVolume = 0.10;
+let soundEffectsVolume = 0.30;
 
 //ui
 let text;
@@ -1013,7 +1013,7 @@ function initSoundEffects() {
 	// load a resource
 	loader.load(
 		// resource URL
-		'../audio/tsunderia amiya BONK.mp3',
+		'../audio/tsunderia amiya bonko.mp3',
 
 		// onLoad callback
 		function (audioBuffer) {
@@ -1036,12 +1036,38 @@ function initSoundEffects() {
 			console.log('An error happened loading the sound effect');
 		}
 	);
+	loader.load(
+		// resource URL
+		'../audio/tsunderia amiya yummy.mp3',
+
+		// onLoad callback
+		function (audioBuffer) {
+			const soundEffects3 = new THREE.Audio(audioListener);
+			soundEffects3.name = "Yummy";
+			soundEffects3.setBuffer(audioBuffer);
+			soundEffects3.setVolume(soundEffectsVolume);
+			soundEffects3.setLoop(false);
+			player.add(soundEffects3);
+
+		},
+
+		// onProgress callback
+		function (xhr) {
+			//console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+		},
+
+		// onError callback
+		function (err) {
+			console.log('An error happened loading the sound effect');
+		}
+	);
 }
 
 function playSoundEffect(soundName) {
 	console.log("play sound effect", soundName);
 	for (var i = 0; i < player.children.length; i++) {
 		const audio = player.children[i];
+		console.log(audio);
 		if (audio && audio.name == soundName && !audio.isPlaying) {
 			audio.setVolume(soundEffectsVolume);
 			audio.play();
@@ -1270,6 +1296,7 @@ function setupContactResultCallback() {
 		} else if (tag.indexOf("Snack") >= 0) {
 			var snackObject = scene.getObjectByName(tag);
 			if (snackObject.userData.collided != true) {
+				playSoundEffect("Yummy");
 				console.log("snack get");
 				var snackStaminaGain = maxStamina * 0.05;
 				stamina = Math.min(stamina + snackStaminaGain, maxStamina);
@@ -1540,76 +1567,80 @@ function updateWorld(deltaTime) {
 function isUnderWater() {
 	return waterRises && player.position.y < waterLevel;
 }
+function updateEditorPhysics(deltaTime) {
+	let impulse = new Ammo.btVector3(0, 0, 0);
+	let angularImpulse = new Ammo.btVector3(0, 0, 0);
+
+	if (keyStates.ArrowUp) {
+		impulse.setZ(BUILD_CAMERA_SPEED_Z);
+	}
+	if (keyStates.ArrowDown) {
+		impulse.setZ(-BUILD_CAMERA_SPEED_Z);
+	}
+	if (keyStates.ArrowRight) {
+		impulse.setX(-BUILD_CAMERA_SPEED_X);
+	}
+	if (keyStates.ArrowLeft) {
+		impulse.setX(BUILD_CAMERA_SPEED_X);
+	}
+	let xAxis = new THREE.Vector3(1, 0, 0);
+	let yAxis = new THREE.Vector3(0, 1, 0);
+	let zAxis = new THREE.Vector3(0, 0, 1);
+	var xVector = new THREE.Vector3(1, 0, 0);
+	var yVector = new THREE.Vector3(0, 1, 0);
+	var zVector = new THREE.Vector3(0, 0, 1);
+	if (keyStates.KeyW) {
+		yVector.applyAxisAngle(xAxis, BUILD_ROTATION_SPEED);
+		angularImpulse.setX(xVector.x);
+	}
+	if (keyStates.KeyS) {
+		yVector.applyAxisAngle(xAxis, -BUILD_ROTATION_SPEED);
+		angularImpulse.setX(-xVector.x);
+	}
+	if (keyStates.KeyD) {
+		yVector.applyAxisAngle(zAxis, BUILD_ROTATION_SPEED);
+		angularImpulse.setZ(zVector.z);
+	}
+	if (keyStates.KeyA) {
+		yVector.applyAxisAngle(zAxis, -BUILD_ROTATION_SPEED);
+		angularImpulse.setZ(-zVector.z);
+	}
+
+	if (keyStates.KeyQ) {
+		yVector.applyAxisAngle(yAxis, BUILD_ROTATION_SPEED);
+		angularImpulse.setY(yVector.y);
+
+	}
+	if (keyStates.KeyE) {
+		yVector.applyAxisAngle(yAxis, -BUILD_ROTATION_SPEED);
+		angularImpulse.setY(-yVector.y);
+	}
+
+	if (keyStates.Space) {
+		impulse.setY(BUILD_CAMERA_SPEED_Y);
+	}
+	if (keyStates.ShiftLeft) {
+		impulse.setY(-BUILD_CAMERA_SPEED_Y);
+	}
+	if (keyStates.KeyI) {
+		//debug info key
+		console.log(mapGenerator.generateLevelString(currentWorld));
+	}
+	player.body.setLinearVelocity(impulse);
+	player.body.setAngularVelocity(angularImpulse);
+
+	if (inEditor) {
+		mapGenerator.moveGhostTile(player, player.quaternion, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
+	}
+	updateWorld(deltaTime);
+	return;
+}
 function updatePhysics(deltaTime) {
 	if (won || dead) {
 		return;
 	}
 	if (inEditor) {
-		let impulse = new Ammo.btVector3(0, 0, 0);
-		let angularImpulse = new Ammo.btVector3(0, 0, 0);
-
-		if (keyStates.ArrowUp) {
-			impulse.setZ(BUILD_CAMERA_SPEED_Z);
-		}
-		if (keyStates.ArrowDown) {
-			impulse.setZ(-BUILD_CAMERA_SPEED_Z);
-		}
-		if (keyStates.ArrowRight) {
-			impulse.setX(-BUILD_CAMERA_SPEED_X);
-		}
-		if (keyStates.ArrowLeft) {
-			impulse.setX(BUILD_CAMERA_SPEED_X);
-		}
-		let xAxis = new THREE.Vector3(1, 0, 0);
-		let yAxis = new THREE.Vector3(0, 1, 0);
-		let zAxis = new THREE.Vector3(0, 0, 1);
-		var xVector = new THREE.Vector3(1, 0, 0);
-		var yVector = new THREE.Vector3(0, 1, 0);
-		var zVector = new THREE.Vector3(0, 0, 1);
-		if (keyStates.KeyW) {
-			yVector.applyAxisAngle(xAxis, BUILD_ROTATION_SPEED);
-			angularImpulse.setX(xVector.x);
-		}
-		if (keyStates.KeyS) {
-			yVector.applyAxisAngle(xAxis, -BUILD_ROTATION_SPEED);
-			angularImpulse.setX(-xVector.x);
-		}
-		if (keyStates.KeyD) {
-			yVector.applyAxisAngle(zAxis, BUILD_ROTATION_SPEED);
-			angularImpulse.setZ(zVector.z);
-		}
-		if (keyStates.KeyA) {
-			yVector.applyAxisAngle(zAxis, -BUILD_ROTATION_SPEED);
-			angularImpulse.setZ(-zVector.z);
-		}
-
-		if (keyStates.KeyQ) {
-			yVector.applyAxisAngle(yAxis, BUILD_ROTATION_SPEED);
-			angularImpulse.setY(yVector.y);
-
-		}
-		if (keyStates.KeyE) {
-			yVector.applyAxisAngle(yAxis, -BUILD_ROTATION_SPEED);
-			angularImpulse.setY(-yVector.y);
-		}
-
-		if (keyStates.Space) {
-			impulse.setY(BUILD_CAMERA_SPEED_Y);
-		}
-		if (keyStates.ShiftLeft) {
-			impulse.setY(-BUILD_CAMERA_SPEED_Y);
-		}
-		if (keyStates.KeyI) {
-			//debug info key
-			console.log(mapGenerator.generateLevelString(currentWorld));
-		}
-		player.body.setLinearVelocity(impulse);
-		player.body.setAngularVelocity(angularImpulse);
-
-		if (inEditor) {
-			mapGenerator.moveGhostTile(player, player.quaternion, tileScale, tileSelection, tileSnapDistanceX, tileSnapDistanceY, tileSnapDistanceZ);
-		}
-		updateWorld(deltaTime);
+		updateEditorPhysics(deltaTime);
 		return;
 	}
 	velocity = player.body.getLinearVelocity();
@@ -1645,29 +1676,23 @@ function updatePhysics(deltaTime) {
 	}
 
 	if (stamina > 0) {
+		var xImpulse = 0;
+		var yImpulse = 0;
+		var zImpulse = 0;
 		if (keyStates.ArrowUp || keyStates.KeyW) {
 			let relVelChange = (acceleration);
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
 			}
-			if (velocity.z() + relVelChange < maxSpeed) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
-			} else {
-				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), maxSpeed);
-				player.body.setLinearVelocity(impulse);
-			}
+			zImpulse += relVelChange;
+
 		}
 		if (keyStates.ArrowDown || keyStates.KeyS) {
 			let relVelChange = (-acceleration);
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
 			}
-			if (velocity.z() + relVelChange > 0) {
-				player.body.applyCentralImpulse(new Ammo.btVector3(0, 0, relVelChange));
-			} else {
-				let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), 0);
-				player.body.setLinearVelocity(impulse);
-			}
+			zImpulse += relVelChange;
 		}
 		if (keyStates.ArrowLeft || keyStates.KeyA) {
 			let relVelChange = (turnSpeed);
@@ -1678,7 +1703,7 @@ function updatePhysics(deltaTime) {
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
 			}
-			player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+			xImpulse += relVelChange;
 		}
 		if (keyStates.ArrowRight || keyStates.KeyD) {
 			let relVelChange = (-turnSpeed);
@@ -1689,7 +1714,8 @@ function updatePhysics(deltaTime) {
 			if (isUnderWater()) {
 				relVelChange *= WATER_ACCELERATION_DEBUFF;
 			}
-			player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+			xImpulse += relVelChange;
+
 		}
 		//if not actively moving left or right and on the ground
 		if (!keyStates.ArrowLeft && !keyStates.KeyA && !keyStates.ArrowRight && !keyStates.KeyD) {
@@ -1699,8 +1725,23 @@ function updatePhysics(deltaTime) {
 				if (isUnderWater()) {
 					relVelChange *= WATER_ACCELERATION_DEBUFF;
 				}
-				player.body.applyCentralImpulse(new Ammo.btVector3(relVelChange, 0, 0));
+				xImpulse += relVelChange;
 			}
+		}
+		var xImpulseCapped = Math.max(Math.min(xImpulse, maxTurnSpeed), -maxTurnSpeed);
+		var yImpulseCapped = yImpulse;
+		var zImpulseCapped = Math.max(Math.min(zImpulse, maxSpeed), -maxSpeed);
+		player.body.applyCentralImpulse(new Ammo.btVector3(xImpulseCapped, yImpulseCapped, zImpulseCapped));
+		if (velocity.z() > maxSpeed) {
+			let impulse = new Ammo.btVector3(velocity.x(), velocity.y(), maxSpeed);
+			player.body.setLinearVelocity(impulse);
+		}
+		if (velocity.x() > maxTurnSpeed) {
+			let impulse = new Ammo.btVector3(maxTurnSpeed, velocity.y(), velocity.z());
+			player.body.setLinearVelocity(impulse);
+		} else if (velocity.x() < -maxTurnSpeed) {
+			let impulse = new Ammo.btVector3(-maxTurnSpeed, velocity.y(), velocity.z());
+			player.body.setLinearVelocity(impulse);
 		}
 	}
 	if (keyStates.Space || keyStates.KeyZ || keyStates.KeyM) {
