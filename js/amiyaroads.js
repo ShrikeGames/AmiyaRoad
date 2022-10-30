@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.9 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.5.0 \"Elegant-Spooder\"";
 
 let stats;
 
@@ -134,6 +134,8 @@ const fontColor = new THREE.Color(0xb84ff4);
 let font;
 let fontMaterial;
 let fontLoaded = false;
+
+let $lastPlayedLevel;
 
 const mainGameLoop = function (deltaTime) {
 
@@ -318,6 +320,7 @@ function initFirstTime() {
 		e.preventDefault();
 		console.log("Play");
 		let $this = $(this);
+		$lastPlayedLevel = $(this);
 		currentLevel = $this.attr("data-level");
 		currentWorld = $this.attr("data-world");
 		console.log(currentWorld, "-", currentLevel);
@@ -329,9 +332,8 @@ function initFirstTime() {
 		$('.hud--playtest').addClass("hide");
 		$('.hud--editor').addClass("hide");
 
-		//random seed when you click play on a level
-		//retries within the level will regenerate the same way.
-		seed = "amiyaroads_" + Math.round(Math.random() * 25600);
+		//random seed
+		seed = "amiyaroads_Level" + currentWorld + "-" + currentLevel;
 
 		if (inEditor) {
 			if (!fontLoaded) {
@@ -487,7 +489,6 @@ function initFirstTime() {
 		e.preventDefault();
 		console.log("Playtest");
 		lose();
-
 		inEditor = false;
 		inPlayTest = true;
 
@@ -549,6 +550,7 @@ function initFirstTime() {
 
 	$('#image-input').on("change", function (e) {
 		const reader = new FileReader();
+		$lastPlayedLevel = null;
 		reader.addEventListener("load", () => {
 			const uploaded_image = reader.result;
 			var imageObj = new Image();
@@ -576,7 +578,7 @@ function initFirstTime() {
 				}
 
 				currentLevel = "T";
-				seed = "amiyaroads_" + Math.round(Math.random() * 25600);
+				seed = "amiyaroads_" + levelString;
 				init(currentWorld, currentLevel, inEditor, inPlayTest, seed, levelString, true, true);
 				$('.menu--start-screen').addClass('hide');
 				$('.button--menu').addClass('hide');
@@ -991,11 +993,11 @@ function initSoundEffects() {
 		function (audioBuffer) {
 			// instantiate audio object
 			const soundEffects1 = new THREE.Audio(audioListener);
+			soundEffects1.name = "Scream";
 			soundEffects1.setBuffer(audioBuffer);
 			soundEffects1.setVolume(soundEffectsVolume);
 			soundEffects1.setLoop(false);
 			player.add(soundEffects1);
-
 		},
 
 		// onProgress callback
@@ -1016,6 +1018,7 @@ function initSoundEffects() {
 		// onLoad callback
 		function (audioBuffer) {
 			const soundEffects2 = new THREE.Audio(audioListener);
+			soundEffects2.name = "Bonk";
 			soundEffects2.setBuffer(audioBuffer);
 			soundEffects2.setVolume(soundEffectsVolume);
 			soundEffects2.setLoop(false);
@@ -1035,15 +1038,13 @@ function initSoundEffects() {
 	);
 }
 
-function playSoundEffect(soundIndex) {
-	console.log("play sound effect ", soundIndex);
-	if (player.children.length > soundIndex - 1) {
-		const audio = player.children[soundIndex];
-		if (audio) {
-			if (!audio.isPlaying) {
-				audio.setVolume(soundEffectsVolume);
-				audio.play();
-			}
+function playSoundEffect(soundName) {
+	console.log("play sound effect", soundName);
+	for (var i = 0; i < player.children.length; i++) {
+		const audio = player.children[i];
+		if (audio && audio.name == soundName && !audio.isPlaying) {
+			audio.setVolume(soundEffectsVolume);
+			audio.play();
 		}
 
 	}
@@ -1219,7 +1220,7 @@ function setupContactResultCallback() {
 
 		} else if (tag.indexOf("Spring") >= 0) {
 			if (localPos.y() >= 0) {
-				playSoundEffect(0);
+				playSoundEffect("Bonk");
 				var tileObject = scene.getObjectByName(tag);
 
 				maxSpeed = boostMaxSpeed;
@@ -1265,6 +1266,20 @@ function setupContactResultCallback() {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
+
+		} else if (tag.indexOf("Snack") >= 0) {
+			var snackObject = scene.getObjectByName(tag);
+			if (snackObject.userData.collided != true) {
+				console.log("snack get");
+				var snackStaminaGain = maxStamina * 0.05;
+				stamina = Math.min(stamina + snackStaminaGain, maxStamina);
+				console.log(tag);
+
+				//console.log(snackObject);
+				snackObject.userData.collided = true;
+				removeObject3D(snackObject);
+			}
+
 
 		} else if (tag.indexOf("Tile") >= 0) {
 			if (localPos.y() >= 9.99) {
@@ -1407,6 +1422,13 @@ function initInput() {
 				if (keyStates.Enter && event.code == "Enter") {
 					tileSelection = parseInt($('.hud--tileSelect').val());
 					mapGenerator.addTile(tileScale, tileSelection, null, null, true);
+					// var symmetryMode = $('.hud--symmetrySelect').val();
+					// if(symmetryMode=="1" || symmetryMode=="4"){
+
+					// }
+					// if(symmetryMode=="1"){
+
+					// }
 				} else if (keyStates.Backspace && event.code == "Backspace") {
 					mapGenerator.undoLastTile();
 				}
@@ -1784,17 +1806,25 @@ function reset() {
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
 
-	playSoundEffect(1);
+	playSoundEffect("Scream");
+	//re-add any eaten snacks and set them as not collided (eaten)
+	for (var i = 0; i < mapGenerator.allObjects.length; i++) {
+		const objThree = mapGenerator.allObjects[i];
+		if (objThree.name.indexOf("Snack") >= 0 && objThree.userData.collided) {
+			console.log(objThree);
+			scene.add(objThree);
+			physicsWorld.addRigidBody(objThree.userData.physicsBody);
+			objThree.userData.collided = false;
+		}
+	}
+	//reset the player
 	initPlayer();
-	//clearScene();
-
-	//init(currentWorld, currentLevel, inEditor, inPlayTest);
-
 	camera.position.set(0, 120, player.position.z - 200);
 	camera.lookAt(0, 5, player.position.z);
 	spotLight.position.set(0, 200, player.position.z);
 	won = false;
 	dead = false;
+
 	$('.menu--loading-screen').addClass('hide');
 	$('#container').removeClass('hide');
 

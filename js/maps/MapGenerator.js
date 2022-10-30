@@ -22,6 +22,10 @@ const TEXTURE_GOAL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/T
 const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile4.png');
 const TEXTURE_DEATH = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile5.png');
 const TEXTURE_BALL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile6.png');
+const TEXTURE_SNACK = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile11.png');
+TEXTURE_SNACK.wrapS = THREE.RepeatWrapping;
+TEXTURE_SNACK.wrapT = THREE.RepeatWrapping;
+TEXTURE_SNACK.repeat.set(1, 1);
 
 const TEXTURE_CHOT = new THREE.TextureLoader().load('../images/amiyaroad/tiles/ChotTile.png');
 TEXTURE_CHOT.wrapS = THREE.RepeatWrapping;
@@ -76,6 +80,12 @@ const AMIYABAR_WIDTH = 50;
 const AMIYABAR_HEIGHT = 20;
 const AMIYABAR_DEPTH = 50;
 
+const SNACK_WIDTH = 30;
+const SNACK_HEIGHT = 30;
+const SNACK_DEPTH = 0.01;
+
+//const SNACK_RADIUS = 3;
+
 const DEATH_WIDTH = 100;
 const DEATH_HEIGHT = 100;
 const DEATH_DEPTH = 20;
@@ -85,6 +95,7 @@ const GOAL_DEPTH = 40;
 
 const BALL_RADIUS = 6;
 const BALL_MASS = 2;
+
 
 let tileOpacity = 1;
 let tunnelOpacity = 0.75;
@@ -359,6 +370,9 @@ class MapGenerator {
             } else if (tileType.indexOf("Corkscrew") >= 0) {
                 let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_CORKSCREW_MAIN, shininess: tileShininess, specular: 0xd4aae7, transparent: tunnelTransparent, opacity: tunnelOpacity }));
                 newTile = this.createTunnelWithPhysics("Corkscrew" + i, 0, this.pos, this.quat, this.scale, material, CORK_START_ANGLE, CORK_END_ANGLE, CORKSCREW_OFFSET);
+            } else if (tileType.indexOf("Snack") >= 0) {
+                let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex/*, side: THREE.DoubleSide*/, map: TEXTURE_SNACK, shininess: tileShininess, specular: 0xd4aae7, transparent: true, opacity: 1 }));
+                newTile = this.createTileWithoutPhysics("Snack" + i, SNACK_WIDTH, SNACK_HEIGHT, SNACK_DEPTH, 0, this.pos, this.quat, this.scale, material);
             }
             if (newTile) {
                 newTile.scale.x = this.scale.x;
@@ -419,6 +433,19 @@ class MapGenerator {
 
     }
     createTileWithPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
+        const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
+        object.scale.set(scale.x, scale.y, scale.z);
+        const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
+        shape.setMargin(margin);
+        object.name = name;
+        object.receiveShadow = useShadows;
+        object.castShadow = useShadows;
+        object.body = this.createRigidBody(object, shape, mass, pos, quat, scale);
+
+        return object;
+
+    }
+    createTileWithoutPhysics(name, sx, sy, sz, mass, pos, quat, scale, material) {
         const object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), material);
         object.scale.set(scale.x, scale.y, scale.z);
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5 * scale.x, sy * 0.5 * scale.y, sz * 0.5 * scale.z));
@@ -1213,6 +1240,16 @@ class MapGenerator {
             }
             let actualTileName = this.getOrDefault(tileName, "Corkscrew" + this.allObjects.length);
             return this.createTunnelWithPhysics(actualTileName, 0, this.pos, this.quat, this.scale, material, CORK_START_ANGLE, CORK_END_ANGLE, CORKSCREW_OFFSET);
+        } else if (tileSelection == 11) {
+            //console.log("Add snack");
+
+            let material = this.getMaterial(new THREE.MeshPhongMaterial({ color: materialHex, map: TEXTURE_SNACK, shininess: tileShininess, specular: 0xd4aae7, transparent: true, opacity: 1 }));
+            if (tileMaterial != null) {
+                material = tileMaterial;
+            }
+            let actualTileName = this.getOrDefault(tileName, "Snack" + this.allObjects.length);
+            
+            return this.createTileWithoutPhysics(actualTileName, SNACK_WIDTH, SNACK_HEIGHT, SNACK_DEPTH, 0, this.pos, this.quat, this.scale, material);
         }
 
         return null;
