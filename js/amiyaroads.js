@@ -8,12 +8,12 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.5 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.4.6 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
 const languageToggle = new LanguageToggle();
-let mapGenerator;
+let mapGenerator = undefined;
 //global
 let initialized = false;
 let keyStates;
@@ -690,7 +690,7 @@ function initFirstTime() {
 	stats.domElement.style.top = '0px';
 	container.appendChild(stats.domElement);
 
-	if (mapGenerator == null) {
+	if (mapGenerator == undefined) {
 		initPhysics();
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
@@ -1299,7 +1299,7 @@ function initPlayer() {
 function createObjects(currentWorld, currentLevel, inEditor, inPlayTest, loadedFromImage = true) {
 	console.log("createObjects");
 
-	if (mapGenerator == null) {
+	if (mapGenerator == undefined) {
 		mapGenerator = new MapGenerator(scene, physicsWorld);
 	}
 
@@ -1739,14 +1739,28 @@ function win() {
 	dead = false;
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
-	if (bgm && bgm.isPlaying) {
-		bgm.stop();
-	}
-
+	
 	stopSoundEffects();
 
 	clearScene();
 
+	// check if there's another level in this world to jump to
+	var $nextLevelButton = $('#Level' + currentWorld + "-" + (parseInt(currentLevel) + 1));
+	if ($nextLevelButton.length > 0) {
+		$nextLevelButton.click();
+		return;
+	}
+	// check if there's another world to jump to
+	$nextLevelButton = $('#Level' + (parseInt(currentWorld) + 1) + "-1");
+	if ($nextLevelButton.length > 0) {
+		$nextLevelButton.click();
+		return;
+	}
+	if (bgm && bgm.isPlaying) {
+		bgm.stop();
+	}
+
+	//otherwise go back to main menu
 	$('.hud--mobile').addClass("hide");
 	$('.menu--start-screen').removeClass('hide');
 	$('.hud--basic').addClass('hide');

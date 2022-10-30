@@ -898,8 +898,8 @@ class MapGenerator {
         for (let i = 0; i < this.allObjects.length; i++) {
             this.physicsWorld.removeRigidBody(this.allObjects[i].body);
         }
-        this.allObjects = [];
-        this.rigidBodies = [];
+        this.allObjects = undefined;
+        this.rigidBodies = undefined;
 
     }
 
