@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.4.6 \"Dehumidified-Spider-Sweat\"";
+const versionString = "PRE-ALPHA Build 0.4.7 \"Dehumidified-Spider-Sweat\"";
 
 let stats;
 
@@ -52,7 +52,7 @@ let maxSpeed = regularMaxSpeed;
 const maxStamina = 3000;
 
 // if the player goes above this height the camera will pan with them
-const yCamerPan = 60;
+const yCameraPan = 60;
 
 let maxBuckos = 50;
 let maxBuckosUpperLimit = 200;
@@ -1209,9 +1209,10 @@ function setupContactResultCallback() {
 				boostImpulse.normalize();
 				boostImpulse.op_mul(BOOST_ACCELERATION);
 				player.body.applyCentralImpulse(boostImpulse);
-
+				
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
+				
 			}
 
 		} else if (tag.indexOf("Spring") >= 0) {
@@ -1250,9 +1251,10 @@ function setupContactResultCallback() {
 
 				tileObject.userData.collided = true;
 				tileObject.userData.collidedTime = clock.elapsedTime;
-
+				
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
+				
 			}
 
 		} else if (tag.indexOf("AmiyaBar") >= 0) {
@@ -1263,15 +1265,17 @@ function setupContactResultCallback() {
 			}
 
 		} else if (tag.indexOf("Tile") >= 0) {
-			if (localPos.y() >= 9.99) {
+			if (localPos.y() >= 9.99 ) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
 		} else if (tag.indexOf("Tunnel") >= 0 || tag.indexOf("HalfPipe") >= 0 || tag.indexOf("Corkscrew") >= 0) {
-			if (localPos.y() <= 0 || velocity.y() >= 20 || velocity.y() < -15) {
+			//if (localPos.y() <= 0 || velocity.y() >= 20 || velocity.y() < -15) {
+			if (velocity.y() <= 0.1) {
 				timeLastOnGround = clock.elapsedTime;
 				onGround = true;
 			}
+			
 
 		}
 
@@ -1503,8 +1507,8 @@ function updateWorld(deltaTime) {
 		water.material.uniforms['time'].value += deltaTime;
 	}
 
-	camera.position.set(0, 100 + Math.max(player.position.y - yCamerPan, 0), player.position.z - 200);
-	camera.lookAt(0, 5 + Math.max(player.position.y - yCamerPan, 0), player.position.z);
+	camera.position.set(0, 100 + Math.max(player.position.y - yCameraPan, 0), player.position.z - 200);
+	camera.lookAt(player.position.x * 0.15, 5 + Math.max(player.position.y - yCameraPan, 0), player.position.z);
 	spotLight.position.set(player.position.x, player.position.y + 200, player.position.z);
 
 }
@@ -1739,7 +1743,7 @@ function win() {
 	dead = false;
 	$('.menu--loading-screen').removeClass('hide');
 	$('#container').addClass('hide');
-	
+
 	stopSoundEffects();
 
 	clearScene();
