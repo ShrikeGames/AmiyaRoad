@@ -9,25 +9,25 @@ const COLOUR_SECONDARY_WORLD2 = new THREE.Color(0x8dbede);
 const COLOUR_MAIN_WORLD3 = new THREE.Color(0xffffff);
 const COLOUR_SECONDARY_WORLD3 = new THREE.Color(0xe6f5ff);
 
-const TEXTURE_TILE_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile1.png');
+const TEXTURE_TILE_MAIN = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile1.png');
 TEXTURE_TILE_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_TILE_MAIN.wrapT = THREE.RepeatWrapping;
 TEXTURE_TILE_MAIN.repeat.set(2, 2);
-const TEXTURE_GHOST_TILE = new THREE.TextureLoader().load('../images/amiyaroad/tiles/GhostTile.png');
+const TEXTURE_GHOST_TILE = new THREE.TextureLoader().load('./images/amiyaroad/tiles/GhostTile.png');
 TEXTURE_GHOST_TILE.wrapS = THREE.RepeatWrapping;
 TEXTURE_GHOST_TILE.wrapT = THREE.RepeatWrapping;
 TEXTURE_GHOST_TILE.repeat.set(2, 2);
-const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile2.png');
-const TEXTURE_GOAL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile3.png');
-const TEXTURE_BOOST = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile4.png');
-const TEXTURE_DEATH = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile5.png');
-const TEXTURE_BALL = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile6.png');
-const TEXTURE_SNACK = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile11.png');
+const TEXTURE_AMIYABAR = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile2.png');
+const TEXTURE_GOAL = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile3.png');
+const TEXTURE_BOOST = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile4.png');
+const TEXTURE_DEATH = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile5.png');
+const TEXTURE_BALL = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile6.png');
+const TEXTURE_SNACK = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile11.png');
 TEXTURE_SNACK.wrapS = THREE.RepeatWrapping;
 TEXTURE_SNACK.wrapT = THREE.RepeatWrapping;
 TEXTURE_SNACK.repeat.set(1, 1);
 
-const TEXTURE_CHOT = new THREE.TextureLoader().load('../images/amiyaroad/tiles/ChotTile.png');
+const TEXTURE_CHOT = new THREE.TextureLoader().load('./images/amiyaroad/tiles/ChotTile.png');
 TEXTURE_CHOT.wrapS = THREE.RepeatWrapping;
 TEXTURE_CHOT.wrapT = THREE.RepeatWrapping;
 TEXTURE_CHOT.repeat.set(500, 500);
@@ -57,13 +57,13 @@ let useTextures = true;
 let useShadows = true;
 
 const margin = 0.05;
-var TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
+var TEXTURE_PLAYER = new THREE.TextureLoader().load('./images/amiyaroad/Amiya.png');
 
 TEXTURE_PLAYER.wrapS = THREE.RepeatWrapping;
 TEXTURE_PLAYER.wrapT = THREE.RepeatWrapping;
 TEXTURE_PLAYER.repeat.set(1, 1);
 
-const TEXTURE_SPRING = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile9.png');
+const TEXTURE_SPRING = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile9.png');
 TEXTURE_SPRING.wrapS = THREE.RepeatWrapping;
 TEXTURE_SPRING.wrapT = THREE.RepeatWrapping;
 TEXTURE_SPRING.repeat.set(1, 1);
@@ -107,17 +107,17 @@ const TUNNEL_WIDTH = 50;
 const TUNNEL_DEPTH = 100;
 const TUNNEL_RADIAL_SEGMENTS = 16;
 const TUNNEL_THICKNESS = 5;
-const TEXTURE_TUNNEL_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile7.png');
+const TEXTURE_TUNNEL_MAIN = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile7.png');
 TEXTURE_TUNNEL_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_TUNNEL_MAIN.wrapT = THREE.RepeatWrapping;
 TEXTURE_TUNNEL_MAIN.repeat.set(2, 2);
 
-const TEXTURE_HALFPIPE_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile8.png');
+const TEXTURE_HALFPIPE_MAIN = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile8.png');
 TEXTURE_HALFPIPE_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_HALFPIPE_MAIN.wrapT = THREE.RepeatWrapping;
 TEXTURE_HALFPIPE_MAIN.repeat.set(2, 2);
 
-const TEXTURE_CORKSCREW_MAIN = new THREE.TextureLoader().load('../images/amiyaroad/tiles/Tile10.png');
+const TEXTURE_CORKSCREW_MAIN = new THREE.TextureLoader().load('./images/amiyaroad/tiles/Tile10.png');
 TEXTURE_CORKSCREW_MAIN.wrapS = THREE.RepeatWrapping;
 TEXTURE_CORKSCREW_MAIN.wrapT = THREE.RepeatWrapping;
 TEXTURE_CORKSCREW_MAIN.repeat.set(2, 2);
@@ -1008,9 +1008,9 @@ class MapGenerator {
         //toggle
         cheat2 = !cheat2;
         if (cheat2) {
-            TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Plok.png');
+            TEXTURE_PLAYER = new THREE.TextureLoader().load('./images/amiyaroad/Plok.png');
         } else {
-            TEXTURE_PLAYER = new THREE.TextureLoader().load('../images/amiyaroad/Amiya.png');
+            TEXTURE_PLAYER = new THREE.TextureLoader().load('./images/amiyaroad/Amiya.png');
         }
     }
     activateCheat3() {

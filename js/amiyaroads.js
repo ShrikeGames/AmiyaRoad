@@ -8,7 +8,7 @@ import { LanguageToggle } from './utils/LanguageToggle.js';
 import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 import { FontLoader } from './jsm/loaders/FontLoader.js';
 import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-const versionString = "PRE-ALPHA Build 0.5.2 \"Elegant-Spooder\"";
+const versionString = "Itch.io Build 1.0.0 \"Ancient Spooder\"";
 
 let stats;
 
@@ -946,7 +946,7 @@ function initMusic() {
 	// load a resource
 	loader.load(
 		// resource URL
-		'../audio/Slizzy_Slick.mp3',
+		'./Slizzy_Slick.mp3',
 
 		// onLoad callback
 		function (audioBuffer) {
@@ -987,7 +987,7 @@ function initSoundEffects() {
 	// load a resource
 	loader.load(
 		// resource URL
-		'../audio/tsunderia amiya scream 6.mp3',
+		'./tsunderia amiya scream 6.mp3',
 
 		// onLoad callback
 		function (audioBuffer) {
@@ -1013,7 +1013,7 @@ function initSoundEffects() {
 	// load a resource
 	loader.load(
 		// resource URL
-		'../audio/tsunderia amiya bonko.mp3',
+		'./tsunderia amiya bonko.mp3',
 
 		// onLoad callback
 		function (audioBuffer) {
@@ -1038,7 +1038,7 @@ function initSoundEffects() {
 	);
 	loader.load(
 		// resource URL
-		'../audio/tsunderia amiya yummy.mp3',
+		'./tsunderia amiya yummy.mp3',
 
 		// onLoad callback
 		function (audioBuffer) {
